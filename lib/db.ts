@@ -6,7 +6,7 @@ export default sql;
 
 // Database initialization script
 export async function initializeDatabase() {
-  // Users table
+  // Users table with password field for admin users
   await sql`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
@@ -14,10 +14,21 @@ export async function initializeDatabase() {
       name VARCHAR(255) NOT NULL,
       email VARCHAR(255),
       phone VARCHAR(50),
+      password VARCHAR(255),
       role VARCHAR(50) DEFAULT 'customer',
       shop_id INTEGER,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
+  `;
+  
+  // Add password column if it doesn't exist (for existing databases)
+  await sql`
+    DO $$ 
+    BEGIN 
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='password') THEN
+        ALTER TABLE users ADD COLUMN password VARCHAR(255);
+      END IF;
+    END $$;
   `;
 
   // Shops table

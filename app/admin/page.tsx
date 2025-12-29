@@ -7,9 +7,15 @@ import { Shop, User } from '@/lib/types';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Store, Users, Plus, Edit2, Trash2, MapPin, Clock, X } from 'lucide-react';
+import { Store, Users, Plus, Edit2, Trash2, MapPin, Clock, X, Key, Copy, Check } from 'lucide-react';
 
 type AdminTab = 'shops' | 'users';
+
+interface PasswordInfo {
+  password: string;
+  email: string;
+  name: string;
+}
 
 export default function AdminPage() {
   const { data: session, status } = useSession();
@@ -18,6 +24,11 @@ export default function AdminPage() {
   const [shops, setShops] = useState<Shop[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Password display state
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordInfo, setPasswordInfo] = useState<PasswordInfo | null>(null);
+  const [copied, setCopied] = useState(false);
 
   // Shop form state
   const [showShopForm, setShowShopForm] = useState(false);
@@ -44,6 +55,7 @@ export default function AdminPage() {
   });
 
   const [formLoading, setFormLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState<number | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -171,15 +183,61 @@ export default function AdminPage() {
       });
 
       if (res.ok) {
-        const newUser = await res.json();
-        setUsers([...users, newUser]);
+        const data = await res.json();
+        setUsers([...users, data.user]);
         setShowUserForm(false);
         resetUserForm();
+        
+        // Show password modal if password was generated
+        if (data.password) {
+          setPasswordInfo({
+            password: data.password,
+            email: data.user.email,
+            name: data.user.name,
+          });
+          setShowPasswordModal(true);
+        }
       }
     } catch (error) {
       console.error('Error creating user:', error);
     } finally {
       setFormLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (userId: number, userName: string, userEmail: string) => {
+    if (!confirm(`${userName}-н нууц үгийг шинэчлэх үү?`)) return;
+
+    setResetLoading(userId);
+    try {
+      const res = await fetch(`/api/users/${userId}/reset-password`, {
+        method: 'POST',
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setPasswordInfo({
+          password: data.newPassword,
+          email: userEmail,
+          name: userName,
+        });
+        setShowPasswordModal(true);
+      } else {
+        alert('Нууц үг шинэчлэхэд алдаа гарлаа');
+      }
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      alert('Нууц үг шинэчлэхэд алдаа гарлаа');
+    } finally {
+      setResetLoading(null);
+    }
+  };
+
+  const copyPassword = async () => {
+    if (passwordInfo?.password) {
+      await navigator.clipboard.writeText(passwordInfo.password);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
@@ -237,6 +295,85 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-6xl mx-auto">
+        {/* Password Modal */}
+        {showPasswordModal && passwordInfo && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card variant="elevated" className="w-full max-w-md animate-fade-in">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <Key className="w-5 h-5 text-sky-500" />
+                  Шинэ нууц үг
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowPasswordModal(false);
+                    setPasswordInfo(null);
+                    setCopied(false);
+                  }}
+                  className="text-slate-400 hover:text-slate-600"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                <p className="text-amber-800 text-sm font-medium">
+                  ⚠️ Анхааруулга: Энэ нууц үгийг одоо хадгалж аваарай! Дахин харагдахгүй.
+                </p>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                <div>
+                  <label className="text-xs text-slate-500">Хэрэглэгч</label>
+                  <p className="font-medium text-slate-800">{passwordInfo.name}</p>
+                </div>
+                <div>
+                  <label className="text-xs text-slate-500">И-мэйл</label>
+                  <p className="font-medium text-slate-800">{passwordInfo.email}</p>
+                </div>
+                <div>
+                  <label className="text-xs text-slate-500">Нууц үг</label>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 px-4 py-3 bg-slate-100 rounded-xl font-mono text-lg font-bold text-slate-800">
+                      {passwordInfo.password}
+                    </code>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={copyPassword}
+                      className="gap-1"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="w-4 h-4 text-green-600" />
+                          Хуулсан
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          Хуулах
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                variant="primary"
+                className="w-full"
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  setPasswordInfo(null);
+                  setCopied(false);
+                }}
+              >
+                Ойлголоо, хаах
+              </Button>
+            </Card>
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-8 animate-fade-in">
           <h1 className="text-3xl font-bold text-slate-800">Систем удирдлага</h1>
@@ -465,6 +602,11 @@ export default function AdminPage() {
                     <X className="w-5 h-5" />
                   </button>
                 </div>
+                <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 mb-4">
+                  <p className="text-sky-800 text-sm">
+                    💡 新規ユーザーを作成すると、自動的にパスワードが生成されます。
+                  </p>
+                </div>
                 <form onSubmit={handleCreateUser}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <Input
@@ -565,6 +707,7 @@ export default function AdminPage() {
                         <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">И-мэйл</th>
                         <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Эрх</th>
                         <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Дэлгүүр</th>
+                        <th className="text-right py-3 px-4 text-sm font-medium text-slate-600">Үйлдэл</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -592,6 +735,20 @@ export default function AdminPage() {
                           <td className="py-3 px-4 text-slate-600">
                             {(user as { shop_name?: string }).shop_name || '-'}
                           </td>
+                          <td className="py-3 px-4 text-right">
+                            {(user.role === 'shop_admin' || user.role === 'super_admin') && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleResetPassword(user.id, user.name, user.email || '')}
+                                isLoading={resetLoading === user.id}
+                                className="gap-1 text-sky-600 hover:text-sky-700 hover:bg-sky-50"
+                              >
+                                <Key className="w-4 h-4" />
+                                <span className="hidden sm:inline">Нууц үг шинэчлэх</span>
+                              </Button>
+                            )}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -605,4 +762,3 @@ export default function AdminPage() {
     </div>
   );
 }
-

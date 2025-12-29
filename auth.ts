@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Facebook from "next-auth/providers/facebook";
 import Credentials from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 import sql from "./lib/db";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -39,9 +40,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
 
           const user = users[0];
-          // In production, use bcrypt to compare passwords
-          // For demo, we'll use a simple check
-          if (credentials.password === process.env.ADMIN_PASSWORD) {
+          
+          // Check if user has a password set
+          if (!user.password) {
+            return null;
+          }
+          
+          // Compare password using bcrypt
+          const isValidPassword = await bcrypt.compare(
+            credentials.password as string,
+            user.password
+          );
+
+          if (isValidPassword) {
             return {
               id: String(user.id),
               name: user.name,
@@ -115,4 +126,3 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/auth/signin",
   },
 });
-
