@@ -25,6 +25,7 @@ export default function TimeSlotPicker({
     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
       {timeSlots.map((slot) => (
         <button
+          type="button"
           key={slot.time}
           onClick={() => slot.available && onSelectTime(slot.time)}
           disabled={!slot.available}

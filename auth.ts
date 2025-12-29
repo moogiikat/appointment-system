@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Facebook from "next-auth/providers/facebook";
+import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import sql from "./lib/db";
@@ -14,6 +15,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           scope: "public_profile,email",
         },
       },
+    }),
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
     // Credentials for shop admin and super admin login
     Credentials({
@@ -72,24 +77,56 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async signIn({ user, account }) {
+      // Handle Facebook sign-in
       if (account?.provider === "facebook") {
         try {
-          // Check if user exists
           const existingUsers = await sql`
             SELECT * FROM users WHERE facebook_id = ${account.providerAccountId}
           `;
 
           if (existingUsers.length === 0) {
-            // Create new user
             await sql`
               INSERT INTO users (facebook_id, name, email, role)
               VALUES (${account.providerAccountId}, ${user.name || ''}, ${user.email || ''}, 'customer')
             `;
           }
         } catch (error) {
-          console.error("Error saving user:", error);
+          console.error("Error saving Facebook user:", error);
         }
       }
+      
+      // Handle Google sign-in
+      if (account?.provider === "google") {
+        try {
+          const existingUsers = await sql`
+            SELECT * FROM users WHERE google_id = ${account.providerAccountId}
+          `;
+
+          if (existingUsers.length === 0) {
+            // Check if user with same email exists (link accounts)
+            const emailUsers = await sql`
+              SELECT * FROM users WHERE email = ${user.email || ''}
+            `;
+            
+            if (emailUsers.length > 0) {
+              // Link Google account to existing user
+              await sql`
+                UPDATE users SET google_id = ${account.providerAccountId}
+                WHERE email = ${user.email || ''}
+              `;
+            } else {
+              // Create new user
+              await sql`
+                INSERT INTO users (google_id, name, email, role)
+                VALUES (${account.providerAccountId}, ${user.name || ''}, ${user.email || ''}, 'customer')
+              `;
+            }
+          }
+        } catch (error) {
+          console.error("Error saving Google user:", error);
+        }
+      }
+      
       return true;
     },
     async jwt({ token, user, account }) {
@@ -98,6 +135,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const users = await sql`
             SELECT * FROM users WHERE facebook_id = ${account.providerAccountId}
           `;
+          if (users.length > 0) {
+            token.userId = users[0].id;
+            token.role = users[0].role;
+            token.shopId = users[0].shop_id;
+          }
+        } catch (error) {
+          console.error("JWT callback error:", error);
+        }
+      } else if (account?.provider === "google") {
+        try {
+          // First try to find by google_id
+          let users = await sql`
+            SELECT * FROM users WHERE google_id = ${account.providerAccountId}
+          `;
+          // If not found, try by email (for linked accounts)
+          if (users.length === 0) {
+            users = await sql`
+              SELECT * FROM users WHERE email = ${token.email || ''}
+            `;
+          }
           if (users.length > 0) {
             token.userId = users[0].id;
             token.role = users[0].role;

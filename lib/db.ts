@@ -11,6 +11,7 @@ export async function initializeDatabase() {
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       facebook_id VARCHAR(255) UNIQUE,
+      google_id VARCHAR(255) UNIQUE,
       name VARCHAR(255) NOT NULL,
       email VARCHAR(255),
       phone VARCHAR(50),
@@ -27,6 +28,16 @@ export async function initializeDatabase() {
     BEGIN 
       IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='password') THEN
         ALTER TABLE users ADD COLUMN password VARCHAR(255);
+      END IF;
+    END $$;
+  `;
+  
+  // Add google_id column if it doesn't exist (for existing databases)
+  await sql`
+    DO $$ 
+    BEGIN 
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='google_id') THEN
+        ALTER TABLE users ADD COLUMN google_id VARCHAR(255) UNIQUE;
       END IF;
     END $$;
   `;
@@ -69,6 +80,7 @@ export async function initializeDatabase() {
   await sql`CREATE INDEX IF NOT EXISTS idx_reservations_date ON reservations(reservation_date)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_reservations_shop ON reservations(shop_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_users_facebook ON users(facebook_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_users_google ON users(google_id)`;
 
   console.log('Database initialized successfully');
 }

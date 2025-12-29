@@ -39,6 +39,7 @@ export default function DatePicker({
   return (
     <div className="flex items-center gap-2">
       <button
+        type="button"
         onClick={() => setStartIndex(Math.max(0, startIndex - daysToShow))}
         disabled={!canGoPrev}
         className={`p-2 rounded-xl transition-all duration-200 flex-shrink-0 ${
@@ -57,6 +58,7 @@ export default function DatePicker({
 
           return (
             <button
+              type="button"
               key={date.toISOString()}
               onClick={() => !isPast && onSelectDate(date)}
               disabled={isPast}
@@ -86,6 +88,7 @@ export default function DatePicker({
       </div>
 
       <button
+        type="button"
         onClick={() => setStartIndex(Math.min(dates.length - daysToShow, startIndex + daysToShow))}
         disabled={!canGoNext}
         className={`p-2 rounded-xl transition-all duration-200 flex-shrink-0 ${

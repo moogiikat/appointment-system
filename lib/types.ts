@@ -1,6 +1,7 @@
 export interface User {
   id: number;
   facebook_id?: string;
+  google_id?: string;
   name: string;
   email?: string;
   phone?: string;
