@@ -15,8 +15,16 @@ import Link from 'next/link';
 
 export default function BookingPage({ params }: { params: Promise<{ shopId: string }> }) {
   const { shopId } = use(params);
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
+  const userRole = (session?.user as { role?: string })?.role;
+
+  // Shop admin cannot make reservations - redirect to shop-admin
+  useEffect(() => {
+    if (status === 'authenticated' && userRole === 'shop_admin') {
+      router.push('/shop-admin');
+    }
+  }, [status, userRole, router]);
 
   const [shop, setShop] = useState<Shop | null>(null);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);

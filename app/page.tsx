@@ -1,13 +1,25 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Shop } from '@/lib/types';
 import ShopCard from '@/components/ShopCard';
 import { Calendar, Clock, Users, Shield } from 'lucide-react';
 
 export default function Home() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
+  const userRole = (session?.user as { role?: string })?.role;
+
+  // Shop admin cannot view home page - redirect to shop-admin
+  useEffect(() => {
+    if (status === 'authenticated' && userRole === 'shop_admin') {
+      router.push('/shop-admin');
+    }
+  }, [status, userRole, router]);
 
   useEffect(() => {
     async function fetchShops() {

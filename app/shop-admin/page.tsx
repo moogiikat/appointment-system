@@ -9,7 +9,7 @@ import { getStatusText, getStatusColor } from '@/lib/utils';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Calendar, Clock, User, Phone, Mail, Check, X, FileText, Settings } from 'lucide-react';
+import { Calendar, Clock, User, Phone, Mail, Check, X, FileText, Settings, Lock, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 
 export default function ShopAdminPage() {
   const { data: session, status } = useSession();
@@ -305,101 +305,152 @@ export default function ShopAdminPage() {
           </Card>
         ) : (
           <div className="space-y-4">
-            {reservations.map((reservation, index) => (
-              <Card
-                key={reservation.id}
-                variant="elevated"
-                className={`animate-fade-in stagger-${(index % 5) + 1} opacity-0`}
-              >
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div>
-                      <div className="text-xs text-slate-500 mb-1">Цаг</div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-sky-500" />
-                        <span className="font-bold text-lg text-slate-800">
-                          {reservation.reservation_time.slice(0, 5)}
+            {reservations.map((reservation, index) => {
+              // Only completed and cancelled reservations are locked
+              const isLocked = reservation.status === 'completed' || reservation.status === 'cancelled';
+              
+              // Get status icon
+              const getStatusIcon = (status: string) => {
+                switch (status) {
+                  case 'confirmed':
+                    return <CheckCircle2 className="w-4 h-4" />;
+                  case 'completed':
+                    return <Lock className="w-4 h-4" />;
+                  case 'cancelled':
+                    return <XCircle className="w-4 h-4" />;
+                  default:
+                    return <AlertCircle className="w-4 h-4" />;
+                }
+              };
+              
+              return (
+                <Card
+                  key={reservation.id}
+                  variant="elevated"
+                  className={`animate-fade-in stagger-${(index % 5) + 1} opacity-0 ${
+                    isLocked ? 'bg-slate-50 border border-slate-200' : ''
+                  }`}
+                >
+                  {/* Locked indicator */}
+                  {isLocked && (
+                    <div className="flex items-center gap-2 text-xs text-slate-500 mb-3 pb-3 border-b border-slate-200">
+                      <Lock className="w-3 h-3" />
+                      <span>Энэ захиалгыг өөрчлөх боломжгүй</span>
+                    </div>
+                  )}
+                  
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div>
+                        <div className="text-xs text-slate-500 mb-1">Цаг</div>
+                        <div className="flex items-center gap-2">
+                          <Clock className={`w-4 h-4 ${isLocked ? 'text-slate-400' : 'text-sky-500'}`} />
+                          <span className={`font-bold text-lg ${isLocked ? 'text-slate-500' : 'text-slate-800'}`}>
+                            {reservation.reservation_time.slice(0, 5)}
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-slate-500 mb-1">Нэр</div>
+                        <div className="flex items-center gap-2">
+                          <User className={`w-4 h-4 ${isLocked ? 'text-slate-400' : 'text-sky-500'}`} />
+                          <span className={`font-medium ${isLocked ? 'text-slate-500' : 'text-slate-700'}`}>
+                            {reservation.customer_name}
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-slate-500 mb-1">Холбоо барих</div>
+                        <div className="space-y-1">
+                          {reservation.customer_phone && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <Phone className={`w-3 h-3 ${isLocked ? 'text-slate-400' : 'text-sky-500'}`} />
+                              <span className={isLocked ? 'text-slate-500' : 'text-slate-600'}>{reservation.customer_phone}</span>
+                            </div>
+                          )}
+                          {reservation.customer_email && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <Mail className={`w-3 h-3 ${isLocked ? 'text-slate-400' : 'text-sky-500'}`} />
+                              <span className={`truncate ${isLocked ? 'text-slate-500' : 'text-slate-600'}`}>{reservation.customer_email}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-slate-500 mb-1">Төлөв</div>
+                        <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(reservation.status)}`}>
+                          {getStatusIcon(reservation.status)}
+                          {getStatusText(reservation.status)}
                         </span>
                       </div>
                     </div>
-                    <div>
-                      <div className="text-xs text-slate-500 mb-1">Нэр</div>
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-sky-500" />
-                        <span className="font-medium text-slate-700">
-                          {reservation.customer_name}
-                        </span>
+
+                    {reservation.notes && (
+                      <div className="flex items-start gap-2 px-3 py-2 bg-slate-50 rounded-lg lg:max-w-xs">
+                        <FileText className="w-4 h-4 text-slate-400 mt-0.5" />
+                        <p className="text-sm text-slate-600">{reservation.notes}</p>
                       </div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-500 mb-1">Холбоо барих</div>
-                      <div className="space-y-1">
-                        {reservation.customer_phone && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <Phone className="w-3 h-3 text-sky-500" />
-                            <span className="text-slate-600">{reservation.customer_phone}</span>
-                          </div>
-                        )}
-                        {reservation.customer_email && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <Mail className="w-3 h-3 text-sky-500" />
-                            <span className="text-slate-600 truncate">{reservation.customer_email}</span>
-                          </div>
-                        )}
+                    )}
+
+                    {/* Actions for pending */}
+                    {reservation.status === 'pending' && (
+                      <div className="flex gap-2">
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => handleStatusChange(reservation.id, 'confirmed')}
+                          className="gap-1"
+                        >
+                          <Check className="w-4 h-4" />
+                          Баталгаажуулах
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleStatusChange(reservation.id, 'cancelled')}
+                          className="gap-1"
+                        >
+                          <X className="w-4 h-4" />
+                          Цуцлах
+                        </Button>
                       </div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-500 mb-1">Төлөв</div>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(reservation.status)}`}>
-                        {getStatusText(reservation.status)}
-                      </span>
-                    </div>
+                    )}
+
+                    {/* Actions for confirmed */}
+                    {reservation.status === 'confirmed' && (
+                      <div className="flex gap-2">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => handleStatusChange(reservation.id, 'completed')}
+                          className="gap-1"
+                        >
+                          <Check className="w-4 h-4" />
+                          Дууссан
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleStatusChange(reservation.id, 'cancelled')}
+                          className="gap-1"
+                        >
+                          <X className="w-4 h-4" />
+                          Цуцлах
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {/* Locked indicator for completed/cancelled */}
+                    {isLocked && (
+                      <div className="flex items-center gap-2 text-slate-400 text-sm">
+                        <Lock className="w-4 h-4" />
+                        <span className="hidden sm:inline">Түгжигдсэн</span>
+                      </div>
+                    )}
                   </div>
-
-                  {reservation.notes && (
-                    <div className="flex items-start gap-2 px-3 py-2 bg-slate-50 rounded-lg lg:max-w-xs">
-                      <FileText className="w-4 h-4 text-slate-400 mt-0.5" />
-                      <p className="text-sm text-slate-600">{reservation.notes}</p>
-                    </div>
-                  )}
-
-                  {reservation.status === 'pending' && (
-                    <div className="flex gap-2">
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={() => handleStatusChange(reservation.id, 'confirmed')}
-                        className="gap-1"
-                      >
-                        <Check className="w-4 h-4" />
-                        Баталгаажуулах
-                      </Button>
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleStatusChange(reservation.id, 'cancelled')}
-                        className="gap-1"
-                      >
-                        <X className="w-4 h-4" />
-                        Цуцлах
-                      </Button>
-                    </div>
-                  )}
-
-                  {reservation.status === 'confirmed' && (
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => handleStatusChange(reservation.id, 'completed')}
-                      className="gap-1"
-                    >
-                      <Check className="w-4 h-4" />
-                      Дууссан
-                    </Button>
-                  )}
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
