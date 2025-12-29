@@ -62,6 +62,7 @@ export async function GET(request: NextRequest) {
 // Create new reservation
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth();
     const body = await request.json();
     const {
       shop_id,
@@ -72,6 +73,7 @@ export async function POST(request: NextRequest) {
       reservation_date,
       reservation_time,
       notes,
+      status: requestedStatus,
     } = body;
 
     // Validate required fields
@@ -120,10 +122,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Determine status - only admins can set custom status
+    const userRole = (session?.user as { role?: string })?.role;
+    const isAdmin = userRole === 'shop_admin' || userRole === 'super_admin';
+    const finalStatus = isAdmin && requestedStatus ? requestedStatus : 'pending';
+
     // Create reservation
     const result = await sql`
-      INSERT INTO reservations (shop_id, user_id, customer_name, customer_phone, customer_email, reservation_date, reservation_time, notes)
-      VALUES (${shop_id}, ${user_id || null}, ${customer_name}, ${customer_phone || null}, ${customer_email || null}, ${reservation_date}, ${reservation_time}, ${notes || null})
+      INSERT INTO reservations (shop_id, user_id, customer_name, customer_phone, customer_email, reservation_date, reservation_time, notes, status)
+      VALUES (${shop_id}, ${user_id || null}, ${customer_name}, ${customer_phone || null}, ${customer_email || null}, ${reservation_date}, ${reservation_time}, ${notes || null}, ${finalStatus})
       RETURNING *
     `;
 
