@@ -26,7 +26,6 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -93,7 +92,6 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
   useEffect(() => {
     if (session?.user) {
       if (session.user.name) setCustomerName(session.user.name);
-      if (session.user.email) setCustomerEmail(session.user.email);
     }
   }, [session]);
 
@@ -111,8 +109,8 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
       return;
     }
 
-    if (!customerPhone.trim() && !customerEmail.trim()) {
-      setError('Утас эсвэл и-мэйл оруулна уу');
+    if (!customerPhone.trim()) {
+      setError('Утасны дугаар оруулна уу');
       return;
     }
 
@@ -127,7 +125,6 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
           user_id: (session?.user as { id?: number })?.id,
           customer_name: customerName,
           customer_phone: customerPhone,
-          customer_email: customerEmail,
           reservation_date: format(selectedDate, 'yyyy-MM-dd'),
           reservation_time: selectedTime,
           notes,
@@ -317,19 +314,12 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
                   />
                   <Input
                     id="phone"
-                    label="Утасны дугаар"
+                    label="Утасны дугаар *"
                     placeholder="99001122"
                     type="tel"
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
-                  />
-                  <Input
-                    id="email"
-                    label="И-мэйл"
-                    placeholder="example@mail.com"
-                    type="email"
-                    value={customerEmail}
-                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    required
                   />
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1.5">

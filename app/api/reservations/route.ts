@@ -69,7 +69,6 @@ export async function POST(request: NextRequest) {
       user_id,
       customer_name,
       customer_phone,
-      customer_email,
       reservation_date,
       reservation_time,
       notes,
@@ -77,9 +76,9 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Validate required fields
-    if (!shop_id || !customer_name || !reservation_date || !reservation_time) {
+    if (!shop_id || !customer_name || !customer_phone || !reservation_date || !reservation_time) {
       return NextResponse.json(
-        { error: 'Шаардлагатай талбаруудыг бөглөнө үү' },
+        { error: 'Шаардлагатай талбаруудыг бөглөнө үү (нэр, утас, огноо, цаг)' },
         { status: 400 }
       );
     }
@@ -129,8 +128,8 @@ export async function POST(request: NextRequest) {
 
     // Create reservation
     const result = await sql`
-      INSERT INTO reservations (shop_id, user_id, customer_name, customer_phone, customer_email, reservation_date, reservation_time, notes, status)
-      VALUES (${shop_id}, ${user_id || null}, ${customer_name}, ${customer_phone || null}, ${customer_email || null}, ${reservation_date}, ${reservation_time}, ${notes || null}, ${finalStatus})
+      INSERT INTO reservations (shop_id, user_id, customer_name, customer_phone, reservation_date, reservation_time, notes, status)
+      VALUES (${shop_id}, ${user_id || null}, ${customer_name}, ${customer_phone}, ${reservation_date}, ${reservation_time}, ${notes || null}, ${finalStatus})
       RETURNING *
     `;
 
