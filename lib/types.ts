@@ -5,6 +5,7 @@ export interface User {
   name: string;
   email?: string;
   phone?: string;
+  avatar?: string;
   role: 'customer' | 'shop_admin' | 'super_admin';
   shop_id?: number;
   created_at: Date;
