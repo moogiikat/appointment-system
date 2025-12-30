@@ -38,6 +38,7 @@ export default function AdminPage() {
     description: '',
     address: '',
     phone: '',
+    icon: '',
     opening_time: '09:00',
     closing_time: '18:00',
     slot_duration: 30,
@@ -247,6 +248,7 @@ export default function AdminPage() {
       description: '',
       address: '',
       phone: '',
+      icon: '',
       opening_time: '09:00',
       closing_time: '18:00',
       slot_duration: 30,
@@ -271,6 +273,7 @@ export default function AdminPage() {
       description: shop.description || '',
       address: shop.address || '',
       phone: shop.phone || '',
+      icon: shop.icon || '',
       opening_time: shop.opening_time?.slice(0, 5) || '09:00',
       closing_time: shop.closing_time?.slice(0, 5) || '18:00',
       slot_duration: shop.slot_duration || 30,
@@ -431,6 +434,13 @@ export default function AdminPage() {
                       required
                     />
                     <Input
+                      id="icon"
+                      label="Зургийн URL"
+                      placeholder="https://example.com/icon.jpg"
+                      value={shopForm.icon}
+                      onChange={(e) => setShopForm({ ...shopForm, icon: e.target.value })}
+                    />
+                    <Input
                       id="phone"
                       label="Утас"
                       value={shopForm.phone}
@@ -541,8 +551,14 @@ export default function AdminPage() {
                     className={`animate-fade-in stagger-${(index % 5) + 1} opacity-0`}
                   >
                     <div className="flex items-start justify-between mb-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-md">
-                        <span className="text-lg font-bold text-white">{shop.name.charAt(0)}</span>
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-md overflow-hidden">
+                        {shop.icon ? (
+                          <img src={shop.icon} alt={shop.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
+                            <span className="text-lg font-bold text-white">{shop.name.charAt(0)}</span>
+                          </div>
+                        )}
                       </div>
                       <div className="flex gap-2">
                         <button

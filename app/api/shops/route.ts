@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
       description,
       address,
       phone,
+      icon,
       opening_time,
       closing_time,
       slot_duration,
@@ -45,12 +46,8 @@ export async function POST(request: NextRequest) {
     } = body;
 
     const result = await sql`
-      INSERT INTO shops (name, description, address, phone, opening_time, closing_time, slot_duration, max_capacity)
-      VALUES (${name}, ${description || ""}, ${address || ""}, ${
-      phone || ""
-    }, ${opening_time || "09:00"}, ${closing_time || "18:00"}, ${
-      slot_duration || 30
-    }, ${max_capacity || 1})
+      INSERT INTO shops (name, description, address, phone, icon, opening_time, closing_time, slot_duration, max_capacity)
+      VALUES (${name}, ${description || ""}, ${address || ""}, ${phone || ""}, ${icon || null}, ${opening_time || "09:00"}, ${closing_time || "18:00"}, ${slot_duration || 30}, ${max_capacity || 1})
       RETURNING *
     `;
 

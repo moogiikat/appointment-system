@@ -16,8 +16,14 @@ export default function ShopCard({ shop }: ShopCardProps) {
       <Card variant="elevated" className="hover:shadow-2xl transition-all duration-300 group border border-slate-100 hover:border-sky-200 cursor-pointer h-full">
         <div className="flex flex-col h-full">
           <div className="flex-1">
-            <div className="w-14 h-14 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-sky-500/25 group-hover:scale-110 transition-transform duration-300">
-              <span className="text-2xl font-bold text-white">{shop.name.charAt(0)}</span>
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-sky-500/25 group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+              {shop.icon ? (
+                <img src={shop.icon} alt={shop.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">{shop.name.charAt(0)}</span>
+                </div>
+              )}
             </div>
             <h3 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-sky-600 transition-colors">{shop.name}</h3>
             {shop.description && (

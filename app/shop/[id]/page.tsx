@@ -92,8 +92,14 @@ export default function ShopDetailPage({ params }: { params: Promise<{ id: strin
         <Card variant="elevated" className="mb-6 animate-fade-in">
           <div className="flex flex-col sm:flex-row items-start gap-6">
             {/* Shop Icon */}
-            <div className="w-24 h-24 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-xl shadow-sky-500/30 flex-shrink-0">
-              <span className="text-4xl font-bold text-white">{shop.name.charAt(0)}</span>
+            <div className="w-24 h-24 rounded-2xl flex items-center justify-center shadow-xl shadow-sky-500/30 flex-shrink-0 overflow-hidden">
+              {shop.icon ? (
+                <img src={shop.icon} alt={shop.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
+                  <span className="text-4xl font-bold text-white">{shop.name.charAt(0)}</span>
+                </div>
+              )}
             </div>
             
             {/* Shop Info */}

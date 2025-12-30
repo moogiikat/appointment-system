@@ -60,6 +60,7 @@ export async function initializeDatabase() {
       description TEXT,
       address VARCHAR(500),
       phone VARCHAR(50),
+      icon VARCHAR(500),
       opening_time TIME DEFAULT '09:00',
       closing_time TIME DEFAULT '18:00',
       slot_duration INTEGER DEFAULT 30,
@@ -67,6 +68,16 @@ export async function initializeDatabase() {
       is_active BOOLEAN DEFAULT true,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
+  `;
+  
+  // Add icon column if it doesn't exist (for existing databases)
+  await sql`
+    DO $$ 
+    BEGIN 
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='shops' AND column_name='icon') THEN
+        ALTER TABLE shops ADD COLUMN icon VARCHAR(500);
+      END IF;
+    END $$;
   `;
 
   // Reservations table

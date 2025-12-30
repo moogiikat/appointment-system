@@ -238,8 +238,14 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
         {shop && (
           <div className="mb-8 animate-fade-in">
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg shadow-sky-500/25">
-                <span className="text-2xl font-bold text-white">{shop.name.charAt(0)}</span>
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg shadow-sky-500/25 overflow-hidden">
+                {shop.icon ? (
+                  <img src={shop.icon} alt={shop.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-white">{shop.name.charAt(0)}</span>
+                  </div>
+                )}
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-slate-800 mb-1">{shop.name}</h1>

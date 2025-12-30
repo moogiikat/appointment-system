@@ -17,6 +17,7 @@ export interface Shop {
   description?: string;
   address?: string;
   phone?: string;
+  icon?: string;
   opening_time: string;
   closing_time: string;
   slot_duration: number;
