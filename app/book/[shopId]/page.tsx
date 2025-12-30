@@ -19,26 +19,34 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
   const router = useRouter();
   const userRole = (session?.user as { role?: string })?.role;
 
-  // Shop admin cannot make reservations - redirect to shop-admin
-  useEffect(() => {
-    if (status === 'authenticated' && userRole === 'shop_admin') {
-      router.push('/shop-admin');
-    }
-  }, [status, userRole, router]);
-
+  // All useState hooks must be at the top, before any conditional returns
   const [shop, setShop] = useState<Shop | null>(null);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [customerName, setCustomerName] = useState(session?.user?.name || '');
+  const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
-  const [customerEmail, setCustomerEmail] = useState(session?.user?.email || '');
+  const [customerEmail, setCustomerEmail] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [reservationId, setReservationId] = useState<number | null>(null);
+
+  // Require authentication - redirect to login if not authenticated
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push(`/auth/signin?callbackUrl=${encodeURIComponent(`/book/${shopId}`)}`);
+    }
+  }, [status, shopId, router]);
+
+  // Shop admin cannot make reservations - redirect to shop-admin
+  useEffect(() => {
+    if (status === 'authenticated' && userRole === 'shop_admin') {
+      router.push('/shop-admin');
+    }
+  }, [status, userRole, router]);
 
   // Fetch shop info
   useEffect(() => {
@@ -53,8 +61,10 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
         console.error('Error fetching shop:', error);
       }
     }
-    fetchShop();
-  }, [shopId]);
+    if (status === 'authenticated') {
+      fetchShop();
+    }
+  }, [shopId, status]);
 
   // Fetch time slots when date changes
   useEffect(() => {
@@ -73,11 +83,11 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
         setLoading(false);
       }
     }
-    if (shopId) {
+    if (shopId && status === 'authenticated') {
       fetchTimeSlots();
       setSelectedTime(null);
     }
-  }, [shopId, selectedDate]);
+  }, [shopId, selectedDate, status]);
 
   // Update customer info from session
   useEffect(() => {
@@ -140,6 +150,27 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
     }
   };
 
+  // Show loading while checking authentication
+  if (status === 'loading' || status === 'unauthenticated') {
+    return (
+      <div className="min-h-screen py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="animate-pulse space-y-6">
+            <div className="h-8 bg-slate-200 rounded w-1/4" />
+            <div className="h-20 bg-slate-200 rounded-2xl" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="h-32 bg-slate-200 rounded-2xl" />
+                <div className="h-48 bg-slate-200 rounded-2xl" />
+              </div>
+              <div className="h-64 bg-slate-200 rounded-2xl" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (success) {
     return (
       <div className="min-h-screen py-12 px-4">
@@ -184,13 +215,11 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
                   Нүүр хуудас руу буцах
                 </Button>
               </Link>
-              {session && (
-                <Link href="/my-reservations">
-                  <Button variant="outline" className="w-full">
-                    Миний захиалгууд
-                  </Button>
-                </Link>
-              )}
+              <Link href="/my-reservations">
+                <Button variant="outline" className="w-full">
+                  Миний захиалгууд
+                </Button>
+              </Link>
             </div>
           </Card>
         </div>
@@ -327,15 +356,6 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
               >
                 Захиалга баталгаажуулах
               </Button>
-
-              {!session && (
-                <p className="text-xs text-slate-500 text-center">
-                  <Link href="/auth/signin" className="text-sky-600 hover:underline">
-                    Facebook-ээр нэвтэрч
-                  </Link>
-                  {' '}захиалгаа хялбар удирдаарай
-                </p>
-              )}
             </div>
           </div>
         </form>
@@ -343,4 +363,3 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
     </div>
   );
 }
-

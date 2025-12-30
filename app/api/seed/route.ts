@@ -166,12 +166,12 @@ export async function GET() {
         shopAdmin1: {
           email: 'salon@example.com',
           password: shopAdmin1Password,
-          role: 'Дэлгүүрийн админ - "Алтан одод" салон',
+          role: 'Үйлчилгээний газрын админ - "Алтан одод" салон',
         },
         shopAdmin2: {
           email: 'auto@example.com',
           password: shopAdmin2Password,
-          role: 'Дэлгүүрийн админ - "Хурд" авто засвар',
+          role: 'Үйлчилгээний газрын админ - "Хурд" авто засвар',
         },
       },
     });

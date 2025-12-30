@@ -4,8 +4,8 @@ import SessionProvider from "@/components/providers/SessionProvider";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "Цаг Захиалга | Дэлгүүрийн цаг захиалах систем",
-  description: "Дэлгүүр, салон, үйлчилгээний газрын цаг захиалах систем. Хялбар, хурдан захиалга.",
+  title: "Үйлчилгээний газрын цаг захиалах систем",
+  description: "Үйлчилгээний газрын цаг захиалах систем. Хялбар, хурдан захиалга.",
 };
 
 export default function RootLayout({

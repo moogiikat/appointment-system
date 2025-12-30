@@ -310,7 +310,7 @@ export default function ShopAdminPage() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-slate-800">
-                  {shop?.name || 'Дэлгүүрийн удирдлага'}
+                  {shop?.name || 'Үйлчилгээний газрын удирдлага'}
                 </h1>
                 <p className="text-slate-500 text-sm">Захиалгын менежмент</p>
               </div>
@@ -470,7 +470,7 @@ export default function ShopAdminPage() {
                 <Settings className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-800">Дэлгүүрийн тохиргоо</h2>
+                <h2 className="text-lg font-bold text-slate-800">Үйлчилгээний газрын тохиргоо</h2>
                 <p className="text-sm text-slate-500">Үндсэн мэдээлэл засах</p>
               </div>
             </div>
@@ -478,7 +478,7 @@ export default function ShopAdminPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   id="shopName"
-                  label="Дэлгүүрийн нэр"
+                  label="Үйлчилгээний газрын нэр"
                   value={shopName}
                   onChange={(e) => setShopName(e.target.value)}
                   required
@@ -533,11 +533,11 @@ export default function ShopAdminPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                  Дэлгүүрийн тодорхойлолт
+                  Үйлчилгээний газрын тодорхойлолт
                 </label>
                 <textarea
                   className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none bg-white resize-none"
-                  placeholder="Дэлгүүрийн тухай мэдээлэл..."
+                  placeholder="Үйлчилгээний газрын тухай мэдээлэл..."
                   rows={4}
                   value={shopDescription}
                   onChange={(e) => setShopDescription(e.target.value)}

@@ -388,7 +388,7 @@ export default function AdminPage() {
             className="gap-2"
           >
             <Store className="w-4 h-4" />
-            Дэлгүүрүүд
+            Үйлчилгээний газрын жагсаалт
           </Button>
           <Button
             variant={activeTab === 'users' ? 'primary' : 'ghost'}
@@ -425,7 +425,7 @@ export default function AdminPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <Input
                       id="name"
-                      label="Дэлгүүрийн нэр *"
+                      label="Үйлчилгээний газрын нэр *"
                       value={shopForm.name}
                       onChange={(e) => setShopForm({ ...shopForm, name: e.target.value })}
                       required
@@ -638,7 +638,7 @@ export default function AdminPage() {
                         onChange={(e) => setUserForm({ ...userForm, role: e.target.value })}
                         required
                       >
-                        <option value="shop_admin">Дэлгүүрийн админ</option>
+                        <option value="shop_admin">Үйлчилгээний газрын админ</option>
                         <option value="super_admin">Систем админ</option>
                       </select>
                     </div>
@@ -728,7 +728,7 @@ export default function AdminPage() {
                               {user.role === 'super_admin'
                                 ? 'Систем админ'
                                 : user.role === 'shop_admin'
-                                ? 'Дэлгүүрийн админ'
+                                ? 'Үйлчилгээний газрын админ'
                                 : 'Хэрэглэгч'}
                             </span>
                           </td>

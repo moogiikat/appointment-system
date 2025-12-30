@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Shop } from '@/lib/types';
@@ -15,11 +16,13 @@ import {
   Calendar,
   AlertCircle,
   CheckCircle,
-  Info
+  Info,
+  LogIn
 } from 'lucide-react';
 
 export default function ShopDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [shop, setShop] = useState<Shop | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,6 +46,16 @@ export default function ShopDetailPage({ params }: { params: Promise<{ id: strin
     }
     fetchShop();
   }, [id, router]);
+
+  const handleBookingClick = () => {
+    if (status === 'authenticated') {
+      // If logged in, go directly to booking page
+      router.push(`/book/${id}`);
+    } else {
+      // If not logged in, redirect to login with callback to booking page
+      router.push(`/auth/signin?callbackUrl=${encodeURIComponent(`/book/${id}`)}`);
+    }
+  };
 
   if (loading) {
     return (
@@ -97,7 +110,7 @@ export default function ShopDetailPage({ params }: { params: Promise<{ id: strin
         <Card variant="elevated" className="mb-6 animate-fade-in stagger-1 opacity-0">
           <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
             <Info className="w-5 h-5 text-sky-500" />
-            Дэлгүүрийн мэдээлэл
+            Үйлчилгээний газрын мэдээлэл
           </h2>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -181,19 +194,38 @@ export default function ShopDetailPage({ params }: { params: Promise<{ id: strin
 
         {/* Booking Button */}
         <div className="animate-fade-in stagger-3 opacity-0">
-          <Link href={`/book/${shop.id}`}>
-            <Button variant="primary" size="lg" className="w-full gap-2 text-lg py-4">
-              <Calendar className="w-5 h-5" />
-              Цаг захиалах
-            </Button>
-          </Link>
+          <Button 
+            variant="primary" 
+            size="lg" 
+            className="w-full gap-2 text-lg py-4"
+            onClick={handleBookingClick}
+          >
+            {status === 'authenticated' ? (
+              <>
+                <Calendar className="w-5 h-5" />
+                Цаг захиалах
+              </>
+            ) : (
+              <>
+                <LogIn className="w-5 h-5" />
+                Нэвтэрч захиалга хийх
+              </>
+            )}
+          </Button>
           
-          <p className="text-center text-sm text-slate-500 mt-4">
-            Захиалга хийхэд <span className="text-sky-600 font-medium">үнэгүй</span>
-          </p>
+          {status !== 'authenticated' && (
+            <p className="text-center text-sm text-slate-500 mt-4">
+              Захиалга хийхийн тулд эхлээд <span className="text-sky-600 font-medium">нэвтрэх</span> шаардлагатай
+            </p>
+          )}
+          
+          {status === 'authenticated' && (
+            <p className="text-center text-sm text-slate-500 mt-4">
+              Захиалга хийхэд <span className="text-sky-600 font-medium">үнэгүй</span>
+            </p>
+          )}
         </div>
       </div>
     </div>
   );
 }
-
