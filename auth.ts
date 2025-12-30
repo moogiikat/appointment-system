@@ -85,9 +85,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           `;
 
           if (existingUsers.length === 0) {
+            // Create new user with avatar from Facebook
             await sql`
-              INSERT INTO users (facebook_id, name, email, role)
-              VALUES (${account.providerAccountId}, ${user.name || ''}, ${user.email || ''}, 'customer')
+              INSERT INTO users (facebook_id, name, email, avatar, role)
+              VALUES (${account.providerAccountId}, ${user.name || ''}, ${user.email || ''}, ${user.image || null}, 'customer')
+            `;
+          } else {
+            // Update avatar if changed
+            await sql`
+              UPDATE users SET avatar = ${user.image || null}, name = ${user.name || ''}
+              WHERE facebook_id = ${account.providerAccountId}
             `;
           }
         } catch (error) {
@@ -109,18 +116,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             `;
             
             if (emailUsers.length > 0) {
-              // Link Google account to existing user
+              // Link Google account to existing user and update avatar
               await sql`
-                UPDATE users SET google_id = ${account.providerAccountId}
+                UPDATE users SET google_id = ${account.providerAccountId}, avatar = ${user.image || null}
                 WHERE email = ${user.email || ''}
               `;
             } else {
-              // Create new user
+              // Create new user with avatar from Google
               await sql`
-                INSERT INTO users (google_id, name, email, role)
-                VALUES (${account.providerAccountId}, ${user.name || ''}, ${user.email || ''}, 'customer')
+                INSERT INTO users (google_id, name, email, avatar, role)
+                VALUES (${account.providerAccountId}, ${user.name || ''}, ${user.email || ''}, ${user.image || null}, 'customer')
               `;
             }
+          } else {
+            // Update avatar if changed
+            await sql`
+              UPDATE users SET avatar = ${user.image || null}, name = ${user.name || ''}
+              WHERE google_id = ${account.providerAccountId}
+            `;
           }
         } catch (error) {
           console.error("Error saving Google user:", error);

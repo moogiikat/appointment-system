@@ -51,7 +51,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, phone, avatar } = body;
+    const { name, phone } = body;
 
     // Validate name
     if (!name || name.trim().length === 0) {
@@ -61,13 +61,12 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Update user profile
+    // Update user profile (avatar is managed by OAuth only)
     const result = await sql`
       UPDATE users 
       SET 
         name = ${name.trim()},
-        phone = ${phone || null},
-        avatar = ${avatar || null}
+        phone = ${phone || null}
       WHERE id = ${userId}
       RETURNING id, name, email, phone, avatar, role, created_at
     `;

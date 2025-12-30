@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { User, Camera, Mail, Phone, Calendar, ArrowLeft, Check, Loader2 } from 'lucide-react';
+import { User, Mail, Phone, Calendar, ArrowLeft, Check, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface UserProfile {
@@ -22,7 +22,6 @@ interface UserProfile {
 export default function ProfilePage() {
   const { data: session, status, update } = useSession();
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,8 +32,6 @@ export default function ProfilePage() {
   // Form state
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [avatar, setAvatar] = useState<string | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -51,8 +48,6 @@ export default function ProfilePage() {
           setProfile(data);
           setName(data.name || '');
           setPhone(data.phone || '');
-          setAvatar(data.avatar || null);
-          setAvatarPreview(data.avatar || null);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -65,33 +60,6 @@ export default function ProfilePage() {
       fetchProfile();
     }
   }, [status]);
-
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setError('Зөвхөн зураг оруулна уу');
-      return;
-    }
-
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      setError('Зургийн хэмжээ 2MB-аас бага байх ёстой');
-      return;
-    }
-
-    // Convert to base64
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result as string;
-      setAvatar(base64);
-      setAvatarPreview(base64);
-      setError('');
-    };
-    reader.readAsDataURL(file);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,7 +74,6 @@ export default function ProfilePage() {
         body: JSON.stringify({
           name,
           phone,
-          avatar,
         }),
       });
 
@@ -196,9 +163,9 @@ export default function ProfilePage() {
             <div className="flex flex-col items-center">
               <div className="relative mb-4">
                 <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-sky-400 to-cyan-400 flex items-center justify-center shadow-xl">
-                  {avatarPreview ? (
+                  {profile?.avatar ? (
                     <img
-                      src={avatarPreview}
+                      src={profile.avatar}
                       alt="Avatar"
                       className="w-full h-full object-cover"
                     />
@@ -208,26 +175,9 @@ export default function ProfilePage() {
                     </span>
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 w-10 h-10 bg-sky-500 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-sky-600 transition-colors"
-                >
-                  <Camera className="w-5 h-5" />
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarChange}
-                  className="hidden"
-                />
               </div>
               <p className="text-sm text-slate-500">
-                Зураг солихын тулд камерын товчийг дарна уу
-              </p>
-              <p className="text-xs text-slate-400 mt-1">
-                PNG, JPG (2MB хүртэл)
+                Профайл зураг нь Facebook/Google-ээс автоматаар авагдана
               </p>
             </div>
           </Card>
@@ -335,4 +285,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
