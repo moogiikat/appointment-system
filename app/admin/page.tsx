@@ -157,7 +157,7 @@ export default function AdminPage() {
   };
 
   const handleDeleteShop = async (id: number) => {
-    if (!confirm('Энэ дэлгүүрийг устгах уу? Бүх захиалга устана!')) return;
+    if (!confirm('Энэ үйлчилгээний газрыг устгах уу? Бүх захиалга устана!')) return;
 
     try {
       const res = await fetch(`/api/shops/${id}`, { method: 'DELETE' });
@@ -380,7 +380,7 @@ export default function AdminPage() {
         {/* Header */}
         <div className="mb-8 animate-fade-in">
           <h1 className="text-3xl font-bold text-slate-800">Систем удирдлага</h1>
-          <p className="text-slate-600">Бүх дэлгүүр, хэрэглэгчдийн удирдлага</p>
+          <p className="text-slate-600">Бүх үйлчилгээний газрын, хэрэглэгчдийн удирдлага</p>
         </div>
 
         {/* Tabs */}
@@ -411,8 +411,8 @@ export default function AdminPage() {
               <Card variant="elevated" className="mb-6 animate-fade-in">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-bold text-slate-800">
-                    {editingShop ? 'Дэлгүүр засах' : 'Шинэ дэлгүүр нэмэх'}
-                  </h2>
+                    {editingShop ? 'Үйлчилгээний газар засах' : 'Шинэ үйлчилгээний газар нэмэх'}
+                  </h2> 
                   <button
                     onClick={() => {
                       setShowShopForm(false);
@@ -525,7 +525,7 @@ export default function AdminPage() {
                 className="mb-6 gap-2"
               >
                 <Plus className="w-4 h-4" />
-                Шинэ дэлгүүр нэмэх
+                Шинэ үйлчилгээний газар нэмэх
               </Button>
             )}
 
@@ -539,8 +539,8 @@ export default function AdminPage() {
             ) : shops.length === 0 ? (
               <Card variant="elevated" className="text-center py-12">
                 <Store className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                <h3 className="font-semibold text-slate-700">Дэлгүүр бүртгэгдээгүй</h3>
-                <p className="text-slate-500 text-sm">Шинэ дэлгүүр нэмэх товч дарна уу</p>
+                <h3 className="font-semibold text-slate-700">Үйлчилгээний газар бүртгэгдээгүй</h3>
+                <p className="text-slate-500 text-sm">Шинэ үйлчилгээний газар нэмэх товч дарна уу</p>
               </Card>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -660,7 +660,7 @@ export default function AdminPage() {
                     </div>
                     {userForm.role === 'shop_admin' && (
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1.5">Дэлгүүр</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1.5">Үйлчилгээний газар</label>
                         <select
                           className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none"
                           value={userForm.shop_id}
@@ -722,7 +722,7 @@ export default function AdminPage() {
                         <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Нэр</th>
                         <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">И-мэйл</th>
                         <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Эрх</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Дэлгүүр</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Үйлчилгээний газар</th>
                         <th className="text-right py-3 px-4 text-sm font-medium text-slate-600">Үйлдэл</th>
                       </tr>
                     </thead>

@@ -15,7 +15,7 @@ export async function GET(
 
     if (shops.length === 0) {
       return NextResponse.json(
-        { error: 'Дэлгүүр олдсонгүй' },
+        { error: 'Үйлчилгээний газар олдсонгүй' },
         { status: 404 }
       );
     }
@@ -24,7 +24,7 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching shop:', error);
     return NextResponse.json(
-      { error: 'Дэлгүүрийг татахад алдаа гарлаа' },
+      { error: 'Үйлчилгээний газарийг татахад алдаа гарлаа' },
       { status: 500 }
     );
   }
@@ -80,14 +80,14 @@ export async function PUT(
     `;
 
     if (result.length === 0) {
-      return NextResponse.json({ error: 'Дэлгүүр олдсонгүй' }, { status: 404 });
+      return NextResponse.json({ error: 'Үйлчилгээний газар олдсонгүй' }, { status: 404 });
     }
 
     return NextResponse.json(result[0]);
   } catch (error) {
     console.error('Error updating shop:', error);
     return NextResponse.json(
-      { error: 'Дэлгүүр шинэчлэхэд алдаа гарлаа' },
+      { error: 'Үйлчилгээний газар шинэчлэхэд алдаа гарлаа' },
       { status: 500 }
     );
   }
@@ -107,11 +107,11 @@ export async function DELETE(
     const { id } = await params;
     await sql`DELETE FROM shops WHERE id = ${id}`;
 
-    return NextResponse.json({ message: 'Дэлгүүр устгагдлаа' });
+    return NextResponse.json({ message: 'Үйлчилгээний газар устгагдлаа' });
   } catch (error) {
     console.error('Error deleting shop:', error);
     return NextResponse.json(
-      { error: 'Дэлгүүр устгахад алдаа гарлаа' },
+      { error: 'Үйлчилгээний газар устгахад алдаа гарлаа' },
       { status: 500 }
     );
   }

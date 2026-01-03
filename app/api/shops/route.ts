@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error creating shop:", error);
     return NextResponse.json(
-      { error: "Дэлгүүр үүсгэхэд алдаа гарлаа" },
+      { error: "Үйлчилгээний газар үүсгэхэд алдаа гарлаа" },
       { status: 500 }
     );
   }

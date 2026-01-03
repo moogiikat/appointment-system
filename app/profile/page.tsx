@@ -109,7 +109,7 @@ export default function ProfilePage() {
       case 'super_admin':
         return 'Систем админ';
       case 'shop_admin':
-        return 'Дэлгүүр админ';
+        return 'Үйлчилгээний газар админ';
       default:
         return 'Хэрэглэгч';
     }

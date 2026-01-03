@@ -82,7 +82,7 @@ export default function Navbar() {
                   <Link href="/shop-admin">
                     <Button variant="ghost" size="sm" className="gap-2">
                       <Store className="w-4 h-4" />
-                      <span className="hidden sm:inline">Дэлгүүр</span>
+                      <span className="hidden sm:inline">Үйлчилгээний газар</span>
                     </Button>
                   </Link>
                 )}

@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     // Get shop info
     const shops = await sql`SELECT * FROM shops WHERE id = ${shop_id}`;
     if (shops.length === 0) {
-      return NextResponse.json({ error: 'Дэлгүүр олдсонгүй' }, { status: 404 });
+      return NextResponse.json({ error: 'Үйлчилгээний газар олдсонгүй' }, { status: 404 });
     }
 
     const shop = shops[0];

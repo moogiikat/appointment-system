@@ -186,7 +186,7 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
             <div className="bg-slate-50 rounded-xl p-4 mb-6 text-left">
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Дэлгүүр:</span>
+                  <span className="text-slate-500">Үйлчилгээний газар:</span>
                   <span className="font-medium text-slate-700">{shop?.name}</span>
                 </div>
                 <div className="flex justify-between">
