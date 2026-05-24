@@ -9,9 +9,10 @@ interface DayTimelineProps {
   shop: Shop;
   reservations: Reservation[];
   selectedDate: string;
+  onReservationClick?: (id: number) => void;
 }
 
-export default function DayTimeline({ shop, reservations, selectedDate }: DayTimelineProps) {
+export default function DayTimeline({ shop, reservations, selectedDate, onReservationClick }: DayTimelineProps) {
   const slots = generateTimeSlots(
     shop.opening_time.slice(0, 5),
     shop.closing_time.slice(0, 5),
@@ -54,13 +55,15 @@ export default function DayTimeline({ shop, reservations, selectedDate }: DayTim
               <div className="flex-1 flex items-center gap-2 min-h-[32px]">
                 {slotReservations.length > 0 ? (
                   slotReservations.map((r) => (
-                    <div
+                    <button
                       key={r.id}
-                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-white text-xs font-semibold ${statusColors[r.status] || 'bg-sky-500'}`}
+                      type="button"
+                      onClick={() => onReservationClick?.(r.id)}
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-white text-xs font-semibold transition-transform hover:scale-105 ${statusColors[r.status] || 'bg-sky-500'}`}
                       title={`${r.customer_name} - ${r.customer_phone || ''}`}
                     >
                       <span className="truncate max-w-[120px]">{r.customer_name}</span>
-                    </div>
+                    </button>
                   ))
                 ) : (
                   <span className="text-xs text-slate-400 italic">Сул</span>

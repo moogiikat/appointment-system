@@ -48,3 +48,19 @@ export interface TimeSlot {
   max_capacity: number;
 }
 
+export interface ShopDashboardStats {
+  today_count: number;
+  week_count: number;
+  month_count: number;
+  cancellation_rate: number;
+  completion_rate: number;
+  status_breakdown: {
+    pending: number;
+    confirmed: number;
+    cancelled: number;
+    completed: number;
+  };
+  popular_times: { time: string; count: number }[];
+  daily_counts: { date: string; count: number }[];
+}
+
