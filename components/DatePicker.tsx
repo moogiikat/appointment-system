@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { format, addDays, isSameDay, isToday, isBefore, startOfDay } from 'date-fns';
+import { format, addDays, isSameDay, isBefore, startOfDay } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { getMongoliaStartOfDay } from '@/lib/utils';
 
 interface DatePickerProps {
   selectedDate: Date;
@@ -14,11 +15,12 @@ interface DatePickerProps {
 export default function DatePicker({
   selectedDate,
   onSelectDate,
-  minDate = new Date(),
+  minDate = getMongoliaStartOfDay(),
   maxDays = 30,
 }: DatePickerProps) {
   const [startIndex, setStartIndex] = useState(0);
   const daysToShow = 7;
+  const today = getMongoliaStartOfDay();
 
   const dates = Array.from({ length: maxDays }, (_, i) => addDays(startOfDay(minDate), i));
   const visibleDates = dates.slice(startIndex, startIndex + daysToShow);
@@ -54,7 +56,8 @@ export default function DatePicker({
       <div className="flex-1 grid grid-cols-7 gap-1">
         {visibleDates.map((date) => {
           const isSelected = isSameDay(date, selectedDate);
-          const isPast = isBefore(date, startOfDay(new Date()));
+          const isPast = isBefore(date, today);
+          const isTodayDate = isSameDay(date, today);
 
           return (
             <button
@@ -76,12 +79,17 @@ export default function DatePicker({
               <span className="text-[10px] sm:text-xs font-semibold whitespace-nowrap">
                 {dayNames[date.getDay()]}
               </span>
-              <span className={`text-base sm:text-lg font-bold ${isToday(date) && !isSelected ? 'text-sky-500' : ''}`}>
+              <span className={`text-base sm:text-lg font-bold ${isTodayDate && !isSelected ? 'text-sky-500' : ''}`}>
                 {format(date, 'd')}
               </span>
               <span className="text-[10px] sm:text-xs opacity-70 whitespace-nowrap">
                 {format(date, 'M')}/{format(date, 'd')}
               </span>
+              {isTodayDate && (
+                <span className={`text-[9px] font-bold mt-0.5 ${isSelected ? 'text-white/90' : 'text-emerald-500'}`}>
+                  Өнөөдөр
+                </span>
+              )}
             </button>
           );
         })}

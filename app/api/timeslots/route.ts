@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sql from '@/lib/db';
-import { generateTimeSlots } from '@/lib/utils';
+import { generateTimeSlots, getMongoliaDate, getMongoliaDateTime } from '@/lib/utils';
+import { format } from 'date-fns';
 import { TimeSlot } from '@/lib/types';
 
 export async function GET(request: NextRequest) {
@@ -46,8 +47,15 @@ export async function GET(request: NextRequest) {
       reservationCounts[time] = Number(r.count);
     }
 
+    // Filter past slots when booking for today (Mongolia time)
+    const isToday = date === getMongoliaDate();
+    const currentTime = format(getMongoliaDateTime(), 'HH:mm');
+    const bookableSlots = isToday
+      ? allSlots.filter((time) => time > currentTime)
+      : allSlots;
+
     // Build time slots with availability
-    const timeSlots: TimeSlot[] = allSlots.map((time) => {
+    const timeSlots: TimeSlot[] = bookableSlots.map((time) => {
       const currentCount = reservationCounts[time] || 0;
       return {
         time,

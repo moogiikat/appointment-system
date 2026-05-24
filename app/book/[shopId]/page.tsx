@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { Shop, TimeSlot } from '@/lib/types';
+import { getMongoliaStartOfDay, isValidMongoliaPhone } from '@/lib/utils';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -22,7 +23,7 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
   // All useState hooks must be at the top, before any conditional returns
   const [shop, setShop] = useState<Shop | null>(null);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(getMongoliaStartOfDay());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
@@ -88,10 +89,44 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
     }
   }, [shopId, selectedDate, status]);
 
-  // Update customer info from session
+  // Auto-refresh time slots every 30 seconds
   useEffect(() => {
+    if (!shopId || status !== 'authenticated') return;
+
+    const interval = setInterval(async () => {
+      try {
+        const dateStr = format(selectedDate, 'yyyy-MM-dd');
+        const res = await fetch(`/api/timeslots?shop_id=${shopId}&date=${dateStr}`);
+        if (res.ok) {
+          const data = await res.json();
+          setTimeSlots(data);
+        }
+      } catch (error) {
+        console.error('Error refreshing time slots:', error);
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [shopId, selectedDate, status]);
+
+  // Update customer info from session and profile
+  useEffect(() => {
+    async function loadCustomerInfo() {
+      if (session?.user?.name) setCustomerName(session.user.name);
+
+      try {
+        const res = await fetch('/api/profile');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.phone) setCustomerPhone(data.phone);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    }
+
     if (session?.user) {
-      if (session.user.name) setCustomerName(session.user.name);
+      loadCustomerInfo();
     }
   }, [session]);
 
@@ -111,6 +146,11 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
 
     if (!customerPhone.trim()) {
       setError('Утасны дугаар оруулна уу');
+      return;
+    }
+
+    if (!isValidMongoliaPhone(customerPhone)) {
+      setError('Зөв утасны дугаар оруулна уу (8 оронтой, 8 эсвэл 9-өөр эхэлнэ)');
       return;
     }
 
@@ -339,6 +379,26 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm animate-fade-in">
                   {error}
+                </div>
+              )}
+
+              {selectedTime && (
+                <div className="bg-gradient-to-br from-sky-50 to-cyan-50 rounded-xl p-4 border border-sky-100">
+                  <h3 className="text-sm font-bold text-slate-700 mb-3">Захиалгын хураангуй</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Огноо:</span>
+                      <span className="font-semibold text-slate-800">{format(selectedDate, 'yyyy-MM-dd')}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Цаг:</span>
+                      <span className="font-semibold text-sky-600">{selectedTime}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Үйлчилгээний газар:</span>
+                      <span className="font-semibold text-slate-800 truncate ml-2">{shop?.name}</span>
+                    </div>
+                  </div>
                 </div>
               )}
 

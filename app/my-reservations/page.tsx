@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Reservation } from '@/lib/types';
-import { getStatusText, getStatusColor, formatDate } from '@/lib/utils';
+import { getStatusText, getStatusColor, formatDate, parseMongoliaDate, getMongoliaStartOfDay } from '@/lib/utils';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { Calendar, Clock, Store, Phone, Mail, XCircle, Lock, CheckCircle2, AlertCircle } from 'lucide-react';
@@ -15,6 +15,7 @@ export default function MyReservationsPage() {
   const router = useRouter();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<'upcoming' | 'past' | 'all'>('upcoming');
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -84,6 +85,23 @@ export default function MyReservationsPage() {
     }
   };
 
+  const today = getMongoliaStartOfDay();
+
+  const filteredReservations = reservations.filter((r) => {
+    const reservationDate = parseMongoliaDate(r.reservation_date);
+    if (filter === 'upcoming') {
+      return reservationDate >= today && r.status !== 'cancelled';
+    }
+    if (filter === 'past') {
+      return reservationDate < today || r.status === 'completed' || r.status === 'cancelled';
+    }
+    return true;
+  });
+
+  const upcomingCount = reservations.filter(
+    (r) => parseMongoliaDate(r.reservation_date) >= today && r.status !== 'cancelled'
+  ).length;
+
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen py-12 px-4">
@@ -107,8 +125,32 @@ export default function MyReservationsPage() {
           </h1>
           <p className="text-slate-600 text-lg">
             Таны бүх захиалгын мэдээлэл
+            {!loading && upcomingCount > 0 && (
+              <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-700">
+                {upcomingCount} ирэх захиалга
+              </span>
+            )}
           </p>
         </div>
+
+        {!loading && reservations.length > 0 && (
+          <div className="flex gap-2 mb-6">
+            {(['upcoming', 'past', 'all'] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setFilter(tab)}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                  filter === tab
+                    ? 'bg-sky-500 text-white shadow-md'
+                    : 'bg-white text-slate-600 border border-slate-200 hover:border-sky-300'
+                }`}
+              >
+                {tab === 'upcoming' ? 'Ирэх' : tab === 'past' ? 'Өнгөрсөн' : 'Бүгд'}
+              </button>
+            ))}
+          </div>
+        )}
 
         {reservations.length === 0 ? (
           <Card variant="elevated" className="text-center py-16 animate-fade-in">
@@ -127,9 +169,24 @@ export default function MyReservationsPage() {
               </Button>
             </Link>
           </Card>
+        ) : filteredReservations.length === 0 ? (
+          <Card variant="elevated" className="text-center py-12">
+            <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+            <h2 className="text-lg font-semibold text-slate-700 mb-2">
+              {filter === 'upcoming' ? 'Ирэх захиалга байхгүй' : 'Захиалга олдсонгүй'}
+            </h2>
+            <p className="text-slate-500 mb-6">
+              {filter === 'upcoming' ? 'Шинэ захиалга хийж үзнэ үү' : 'Өөр шүүлтүүр сонгоно уу'}
+            </p>
+            {filter !== 'all' && (
+              <Button variant="outline" onClick={() => setFilter('all')}>
+                Бүгдийг харах
+              </Button>
+            )}
+          </Card>
         ) : (
           <div className="space-y-6">
-            {reservations.map((reservation, index) => {
+            {filteredReservations.map((reservation, index) => {
               const isLocked = !canModify(reservation.status);
               
               return (

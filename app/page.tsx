@@ -1,20 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Shop } from "@/lib/types";
 import ShopCard from "@/components/ShopCard";
-import { Calendar, Clock, Users, Shield } from "lucide-react";
+import Button from "@/components/ui/Button";
+import {
+  Calendar,
+  Clock,
+  Users,
+  Shield,
+  Search,
+  Store,
+  ArrowRight,
+  Sparkles,
+} from "lucide-react";
 
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const userRole = (session?.user as { role?: string })?.role;
 
-  // Shop admin cannot view home page - redirect to shop-admin
   useEffect(() => {
     if (status === "authenticated" && userRole === "shop_admin") {
       router.push("/shop-admin");
@@ -38,6 +49,17 @@ export default function Home() {
     fetchShops();
   }, []);
 
+  const filteredShops = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return shops;
+    return shops.filter(
+      (shop) =>
+        shop.name.toLowerCase().includes(query) ||
+        shop.description?.toLowerCase().includes(query) ||
+        shop.address?.toLowerCase().includes(query)
+    );
+  }, [shops, searchQuery]);
+
   const features = [
     {
       icon: Calendar,
@@ -51,9 +73,8 @@ export default function Home() {
     },
     {
       icon: Users,
-      title: "Facebook, Google-ээр нэвтрэх",
-      description:
-        "Facebook эсвэл Google хаягаараа хурдан нэвтэрч захиалга хийх",
+      title: "Google-ээр нэвтрэх",
+      description: "Google хаягаараа хурдан нэвтэрч захиалга хийх",
     },
     {
       icon: Shield,
@@ -72,6 +93,11 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto relative">
           <div className="text-center animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/80 backdrop-blur rounded-full shadow-sm border border-sky-100 text-sm text-sky-700 font-medium mb-6">
+              <Sparkles className="w-4 h-4" />
+              Монголын #1 цаг захиалгын систем
+            </div>
+
             <h1 className="text-5xl md:text-7xl font-extrabold text-slate-800 mb-6">
               <span className="gradient-text">Цаг захиалах</span>
               <br />
@@ -82,11 +108,44 @@ export default function Home() {
               найдвартай.
             </p>
 
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
+              {status === "authenticated" && userRole !== "shop_admin" ? (
+                <>
+                  <Link href="/my-reservations">
+                    <Button variant="primary" size="lg" className="gap-2">
+                      <Calendar className="w-5 h-5" />
+                      Миний захиалгууд
+                    </Button>
+                  </Link>
+                  <a href="#shops">
+                    <Button variant="outline" size="lg" className="gap-2">
+                      <Store className="w-5 h-5" />
+                      Үйлчилгээний газар сонгох
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </a>
+                </>
+              ) : status !== "loading" ? (
+                <Link href="/auth/signin">
+                  <Button variant="primary" size="lg" className="gap-2">
+                    <Users className="w-5 h-5" />
+                    Нэвтэрч захиалга хийх
+                  </Button>
+                </Link>
+              ) : null}
+            </div>
+
             <div className="flex flex-wrap justify-center gap-4 text-sm font-medium">
               <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md border border-slate-100">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                 <span className="text-slate-700">Монгол цаг (UTC+8)</span>
               </div>
+              {!loading && shops.length > 0 && (
+                <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md border border-slate-100">
+                  <Store className="w-4 h-4 text-sky-500" />
+                  <span className="text-slate-700">{shops.length} үйлчилгээний газар</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -119,12 +178,34 @@ export default function Home() {
       {/* Shops Section */}
       <section className="py-16 px-4" id="shops">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-slate-800 mb-4">
               Үйлчилгээний газрын жагсаалт
             </h2>
-            <p className="text-slate-600">Захиалга хийх үйлчилгээний газрыг сонгоно уу</p>
+            <p className="text-slate-600">
+              Захиалга хийх үйлчилгээний газрыг сонгоно уу
+            </p>
           </div>
+
+          {!loading && shops.length > 0 && (
+            <div className="max-w-xl mx-auto mb-8">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Нэр, хаяг, тайлбараар хайх..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-slate-200 rounded-2xl focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:outline-none transition-all placeholder:text-slate-400 shadow-sm"
+                />
+              </div>
+              {searchQuery && (
+                <p className="text-sm text-slate-500 mt-2 text-center">
+                  {filteredShops.length} үр дүн олдлоо
+                </p>
+              )}
+            </div>
+          )}
 
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -146,15 +227,26 @@ export default function Home() {
                 <Calendar className="w-12 h-12 text-slate-400" />
               </div>
               <h3 className="text-xl font-semibold text-slate-700 mb-2">
-                 Үйлчилгээний газар бүртгэгдээгүй байна
+                Үйлчилгээний газар бүртгэгдээгүй байна
               </h3>
               <p className="text-slate-500">
                 Удахгүй үйлчилгээний газрын жагсаалт нэмэгдэх болно
               </p>
             </div>
+          ) : filteredShops.length === 0 ? (
+            <div className="text-center py-12">
+              <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-slate-700 mb-2">
+                Хайлтаар үр дүн олдсонгүй
+              </h3>
+              <p className="text-slate-500 mb-4">Өөр түлхүүр үгээр оролдоно уу</p>
+              <Button variant="outline" onClick={() => setSearchQuery("")}>
+                Хайлт цэвэрлэх
+              </Button>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {shops.map((shop, index) => (
+              {filteredShops.map((shop, index) => (
                 <div
                   key={shop.id}
                   className={`animate-fade-in stagger-${
@@ -172,8 +264,14 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-slate-200 bg-white">
         <div className="max-w-7xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-lg flex items-center justify-center">
+              <Calendar className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-bold text-slate-700">Цаг Захиалга</span>
+          </div>
           <p className="text-slate-500 text-sm">
-            © 2024 Цаг Захиалга. Бүх эрх хуулиар хамгаалагдсан.
+            © 2026 Цаг Захиалга. Бүх эрх хуулиар хамгаалагдсан.
           </p>
         </div>
       </footer>

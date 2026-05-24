@@ -1,4 +1,4 @@
-import { format, parseISO, addMinutes } from 'date-fns';
+import { format, parseISO, addMinutes, startOfDay } from 'date-fns';
 
 // Mongolia timezone offset is UTC+8
 const MONGOLIA_OFFSET = 8 * 60; // in minutes
@@ -6,6 +6,39 @@ const MONGOLIA_OFFSET = 8 * 60; // in minutes
 export function toMongoliaTime(date: Date): Date {
   const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
   return new Date(utc + (MONGOLIA_OFFSET * 60000));
+}
+
+export function getMongoliaStartOfDay(): Date {
+  return startOfDay(getMongoliaDateTime());
+}
+
+export function parseMongoliaDate(dateString: string): Date {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+export function isPastDate(dateString: string): boolean {
+  const date = parseMongoliaDate(dateString);
+  return date < getMongoliaStartOfDay();
+}
+
+export function isPastTimeSlot(dateString: string, timeString: string): boolean {
+  if (dateString !== getMongoliaDate()) return isPastDate(dateString);
+  const currentTime = format(getMongoliaDateTime(), 'HH:mm');
+  return timeString.slice(0, 5) <= currentTime;
+}
+
+export function isValidMongoliaPhone(phone: string): boolean {
+  const cleaned = phone.replace(/[\s\-()]/g, '');
+  return /^(?:\+976|976)?[89]\d{7}$/.test(cleaned) || /^[89]\d{7}$/.test(cleaned);
+}
+
+export function formatMongoliaPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, '').replace(/^976/, '');
+  if (digits.length === 8) {
+    return `${digits.slice(0, 4)} ${digits.slice(4)}`;
+  }
+  return phone;
 }
 
 export function formatDate(dateString: string): string {

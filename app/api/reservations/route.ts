@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sql from '@/lib/db';
 import { auth } from '@/auth';
+import { isPastDate, isPastTimeSlot, isValidMongoliaPhone } from '@/lib/utils';
 
 // Get reservations
 export async function GET(request: NextRequest) {
@@ -79,6 +80,27 @@ export async function POST(request: NextRequest) {
     if (!shop_id || !customer_name || !customer_phone || !reservation_date || !reservation_time) {
       return NextResponse.json(
         { error: 'Шаардлагатай талбаруудыг бөглөнө үү (нэр, утас, огноо, цаг)' },
+        { status: 400 }
+      );
+    }
+
+    if (!isValidMongoliaPhone(customer_phone)) {
+      return NextResponse.json(
+        { error: 'Зөв утасны дугаар оруулна уу (8 оронтой, 8 эсвэл 9-өөр эхэлнэ)' },
+        { status: 400 }
+      );
+    }
+
+    if (isPastDate(reservation_date)) {
+      return NextResponse.json(
+        { error: 'Өнгөрсөн огноонд захиалга хийх боломжгүй' },
+        { status: 400 }
+      );
+    }
+
+    if (isPastTimeSlot(reservation_date, reservation_time)) {
+      return NextResponse.json(
+        { error: 'Өнгөрсөн цагт захиалга хийх боломжгүй' },
         { status: 400 }
       );
     }

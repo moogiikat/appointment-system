@@ -9,12 +9,14 @@ import { getStatusText, getStatusColor } from '@/lib/utils';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { 
-  Calendar, 
-  Clock, 
-  User, 
-  Phone, 
-  Mail, 
+import DayTimeline from '@/components/DayTimeline';
+import { ToastContainer, useToast } from '@/components/Toast';
+import {
+  Calendar,
+  Clock,
+  User,
+  Phone,
+  Mail,
   Check, 
   X, 
   FileText, 
@@ -34,6 +36,7 @@ import {
 export default function ShopAdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { toasts, showToast, dismissToast } = useToast();
   const [shop, setShop] = useState<Shop | null>(null);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -241,14 +244,14 @@ export default function ShopAdminPage() {
           }
         }
         
-        alert('Захиалга амжилттай бүртгэгдлээ!');
+        showToast('Захиалга амжилттай бүртгэгдлээ!', 'success');
       } else {
         const errorData = await res.json();
-        alert(errorData.error || 'Захиалга бүртгэхэд алдаа гарлаа');
+        showToast(errorData.error || 'Захиалга бүртгэхэд алдаа гарлаа', 'error');
       }
     } catch (error) {
       console.error('Error creating manual reservation:', error);
-      alert('Захиалга бүртгэхэд алдаа гарлаа');
+      showToast('Захиалга бүртгэхэд алдаа гарлаа', 'error');
     } finally {
       setManualLoading(false);
     }
@@ -615,6 +618,11 @@ export default function ShopAdminPage() {
           </div>
         </div>
 
+        {/* Day Timeline */}
+        {shop && (
+          <DayTimeline shop={shop} reservations={reservations} selectedDate={selectedDate} />
+        )}
+
         {/* Reservations List */}
         {loading ? (
           <div className="space-y-4">
@@ -808,6 +816,7 @@ export default function ShopAdminPage() {
           </div>
         )}
       </div>
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }
