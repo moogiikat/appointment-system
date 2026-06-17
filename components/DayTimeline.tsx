@@ -1,8 +1,7 @@
 'use client';
 
-import { Reservation } from '@/lib/types';
+import { Reservation, Shop } from '@/lib/types';
 import { generateTimeSlots } from '@/lib/utils';
-import { Shop } from '@/lib/types';
 import { Clock } from 'lucide-react';
 
 interface DayTimelineProps {
@@ -51,7 +50,7 @@ export default function DayTimeline({ shop, reservations, selectedDate, onReserv
                 isEmpty ? 'hover:bg-slate-50' : 'bg-slate-50/80'
               }`}
             >
-              <span className="w-14 text-sm font-bold text-slate-600 flex-shrink-0">{time}</span>
+              <span className="w-14 text-sm font-bold text-slate-600 shrink-0">{time}</span>
               <div className="flex-1 flex items-center gap-2 min-h-[32px]">
                 {slotReservations.length > 0 ? (
                   slotReservations.map((r) => (
@@ -70,7 +69,7 @@ export default function DayTimeline({ shop, reservations, selectedDate, onReserv
                 )}
               </div>
               <span
-                className={`text-xs font-medium flex-shrink-0 px-2 py-0.5 rounded-full ${
+                className={`text-xs font-medium shrink-0 px-2 py-0.5 rounded-full ${
                   isFull
                     ? 'bg-red-100 text-red-600'
                     : isEmpty

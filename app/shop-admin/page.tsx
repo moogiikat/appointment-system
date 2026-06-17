@@ -173,7 +173,7 @@ export default function ShopAdminPage() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg shadow-sky-500/20 flex-shrink-0">
+              <div className="w-12 h-12 bg-linear-to-br from-sky-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg shadow-sky-500/20 shrink-0">
                 {shop?.icon ? (
                   <img src={shop.icon} alt="" className="w-full h-full object-cover rounded-2xl" />
                 ) : (
@@ -206,7 +206,7 @@ export default function ShopAdminPage() {
                     key={key}
                     type="button"
                     onClick={() => setActiveTab(key)}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap flex-shrink-0 ${
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
                       activeTab === key
                         ? 'bg-white text-sky-600 shadow-sm'
                         : 'text-slate-500 hover:text-slate-700'
@@ -254,7 +254,7 @@ export default function ShopAdminPage() {
             {pendingCount > 0 && (
               <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-2xl">
                 <div className="flex items-center gap-2 text-amber-800">
-                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                  <AlertCircle className="w-5 h-5 shrink-0" />
                   <span className="font-semibold text-sm">
                     {pendingCount} захиалга баталгаажуулахыг хүлээж байна
                   </span>
@@ -296,23 +296,18 @@ export default function ShopAdminPage() {
                   )}
                 </div>
                 <div className="flex gap-2 flex-wrap">
-                  {[
-                    { icon: AlertCircle, count: pendingCount, label: 'хүлээгдэж', color: 'amber' },
-                    { icon: CheckCircle2, count: confirmedCount, label: 'баталгаажсан', color: 'green' },
-                    { icon: Users, count: reservations.length, label: 'нийт', color: 'slate' },
-                  ].map(({ icon: Icon, count, label, color }) => (
-                    <span
-                      key={label}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-${color}-50 text-${color}-700`}
-                      style={{
-                        background: color === 'amber' ? '#fffbeb' : color === 'green' ? '#f0fdf4' : '#f8fafc',
-                        color: color === 'amber' ? '#b45309' : color === 'green' ? '#15803d' : '#475569',
-                      }}
-                    >
-                      <Icon className="w-3.5 h-3.5" />
-                      {count} {label}
-                    </span>
-                  ))}
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-50 text-amber-700">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    {pendingCount} хүлээгдэж
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-50 text-green-700">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    {confirmedCount} баталгаажсан
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700">
+                    <Users className="w-3.5 h-3.5" />
+                    {reservations.length} нийт
+                  </span>
                 </div>
               </div>
               <WeekDateStrip selectedDate={selectedDate} onSelectDate={setSelectedDate} />
@@ -352,7 +347,7 @@ export default function ShopAdminPage() {
                         key={key}
                         type="button"
                         onClick={() => setStatusFilter(key)}
-                        className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                        className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                           statusFilter === key
                             ? 'bg-sky-500 text-white shadow-sm'
                             : 'bg-slate-100 text-slate-600 hover:bg-slate-200'

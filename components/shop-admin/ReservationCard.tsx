@@ -29,7 +29,7 @@ export default function ReservationCard({
   onStatusChange,
 }: ReservationCardProps) {
   const isLocked = reservation.status === 'completed' || reservation.status === 'cancelled';
-  const isPhoneReservation = reservation.notes?.includes('[電話予約]');
+  const isPhoneReservation = reservation.notes?.includes('[Утсаар]');
 
   const statusIcon = {
     confirmed: CheckCircle2,
@@ -56,7 +56,7 @@ export default function ReservationCard({
     >
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         {/* Time block */}
-        <div className="flex items-center gap-3 sm:w-28 flex-shrink-0">
+        <div className="flex items-center gap-3 sm:w-28 shrink-0">
           <div
             className={`w-11 h-11 rounded-xl flex items-center justify-center ${
               isLocked ? 'bg-slate-100' : 'bg-sky-100'
@@ -79,7 +79,7 @@ export default function ReservationCard({
         {/* Customer */}
         <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <User className="w-4 h-4 text-slate-400 flex-shrink-0" />
+            <User className="w-4 h-4 text-slate-400 shrink-0" />
             <div className="min-w-0">
               <p className="text-xs text-slate-400">Үйлчлүүлэгч</p>
               <p className="font-semibold text-slate-800 truncate">{reservation.customer_name}</p>
@@ -90,7 +90,7 @@ export default function ReservationCard({
               href={`tel:${reservation.customer_phone.replace(/\s/g, '')}`}
               className="flex items-center gap-2 min-w-0 group"
             >
-              <Phone className="w-4 h-4 text-slate-400 flex-shrink-0 group-hover:text-sky-500" />
+              <Phone className="w-4 h-4 text-slate-400 shrink-0 group-hover:text-sky-500" />
               <div className="min-w-0">
                 <p className="text-xs text-slate-400">Утас — дарж залгах</p>
                 <p className="font-semibold text-sky-600 truncate group-hover:underline">
@@ -103,14 +103,14 @@ export default function ReservationCard({
 
         {/* Status */}
         <span
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold flex-shrink-0 ${getStatusColor(reservation.status)}`}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shrink-0 ${getStatusColor(reservation.status)}`}
         >
           <StatusIcon className="w-3.5 h-3.5" />
           {getStatusText(reservation.status)}
         </span>
 
         {/* Actions */}
-        <div className="flex gap-2 sm:ml-auto flex-shrink-0">
+        <div className="flex gap-2 sm:ml-auto shrink-0">
           {reservation.status === 'pending' && (
             <>
               <Button
@@ -161,7 +161,7 @@ export default function ReservationCard({
 
       {reservation.notes && !isPhoneReservation && (
         <div className="mt-3 flex items-start gap-2 px-3 py-2 bg-slate-50 rounded-xl text-sm text-slate-600">
-          <FileText className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
+          <FileText className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
           <p>{reservation.notes}</p>
         </div>
       )}

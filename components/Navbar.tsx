@@ -13,7 +13,6 @@ export default function Navbar() {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Shop admin はトップページではなく shop-admin に遷移
   const logoHref = userRole === 'shop_admin' ? '/shop-admin' : '/';
 
   // Fetch user avatar
@@ -54,7 +53,7 @@ export default function Navbar() {
           <div className="flex items-center">
            {userRole !== 'shop_admin' && (
             <Link href={logoHref} className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/30">
+              <div className="w-10 h-10 bg-linear-to-br from-sky-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/30">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
               <span className="font-bold text-xl text-slate-800">Цаг Захиалга</span>
@@ -67,7 +66,6 @@ export default function Navbar() {
               <div className="w-8 h-8 rounded-full bg-slate-200 animate-pulse" />
             ) : session?.user ? (
               <>
-                {/* Super Admin: システム管理 */}
                 {userRole === 'super_admin' && (
                   <Link href="/admin">
                     <Button variant="ghost" size="sm" className="gap-2">
@@ -77,7 +75,6 @@ export default function Navbar() {
                   </Link>
                 )}
                 
-                {/* Shop Admin: 店舗管理のみ */}
                 {userRole === 'shop_admin' && (
                   <Link href="/shop-admin">
                     <Button variant="ghost" size="sm" className="gap-2">
@@ -87,7 +84,6 @@ export default function Navbar() {
                   </Link>
                 )}
                 
-                {/* マイ予約: shop_admin 以外のみ表示 */}
                 {userRole !== 'shop_admin' && (
                   <Link href="/my-reservations">
                     <Button variant="ghost" size="sm" className="gap-2">
@@ -105,7 +101,7 @@ export default function Navbar() {
                     className="flex items-center gap-2 px-2 py-1.5 hover:bg-slate-100 rounded-full transition-colors"
                   >
                     {/* Avatar */}
-                    <div className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-sky-400 to-cyan-400 flex items-center justify-center ring-2 ring-sky-200">
+                    <div className="w-9 h-9 rounded-full overflow-hidden bg-linear-to-br from-sky-400 to-cyan-400 flex items-center justify-center ring-2 ring-sky-200">
                       {avatar ? (
                         <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
                       ) : (

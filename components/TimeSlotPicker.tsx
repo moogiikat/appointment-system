@@ -53,7 +53,7 @@ export default function TimeSlotPicker({
               relative py-3 px-2 rounded-xl text-sm font-semibold transition-all duration-200
               ${
                 selectedTime === slot.time
-                  ? 'bg-gradient-to-r from-sky-500 to-cyan-500 text-white shadow-lg shadow-sky-500/30 scale-105'
+                  ? 'bg-linear-to-r from-sky-500 to-cyan-500 text-white shadow-lg shadow-sky-500/30 scale-105'
                   : slot.available
                   ? 'bg-white border-2 border-slate-200 text-slate-700 hover:border-sky-400 hover:text-sky-600 hover:bg-sky-50'
                   : 'bg-slate-100 text-slate-400 cursor-not-allowed line-through'

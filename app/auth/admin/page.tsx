@@ -44,7 +44,7 @@ function AdminSignInContent() {
   return (
     <Card variant="elevated" className="w-full max-w-md relative animate-fade-in border border-slate-200">
       <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-gradient-to-br from-slate-700 to-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-slate-500/30">
+        <div className="w-16 h-16 bg-linear-to-br from-slate-700 to-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-slate-500/30">
           <Shield className="w-8 h-8 text-white" />
         </div>
         <h1 className="text-2xl font-bold text-slate-800">Админ нэвтрэлт</h1>
@@ -111,7 +111,7 @@ function LoadingFallback() {
 export default function AdminSignInPage() {
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4">
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-100/50 via-transparent to-slate-200/50" />
+      <div className="absolute inset-0 bg-linear-to-br from-slate-100/50 via-transparent to-slate-200/50" />
       <div className="absolute top-20 left-10 w-72 h-72 bg-slate-300/30 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-slate-300/30 rounded-full blur-3xl" />
 

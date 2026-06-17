@@ -75,7 +75,7 @@ export default function ShopSettingsPanel({
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-5 pb-6">
-      <Card variant="elevated" className="!p-5">
+      <Card variant="elevated" className="p-5!">
         <h2 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
           <Store className="w-4 h-4 text-sky-500" />
           Үндсэн мэдээлэл
@@ -85,7 +85,7 @@ export default function ShopSettingsPanel({
           <Input id="shopPhone" label="Утасны дугаар" value={shopPhone} onChange={(e) => setShopPhone(e.target.value)} placeholder="99112233" />
           <Input id="shopAddress" label="Хаяг" value={shopAddress} onChange={(e) => setShopAddress(e.target.value)} placeholder="УБ, ..." />
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5 flex items-center gap-1.5">
+            <label className="flex text-sm font-medium text-slate-700 mb-1.5 items-center gap-1.5">
               <FileText className="w-4 h-4 text-slate-400" />
               Тодорхойлолт
             </label>
@@ -100,7 +100,7 @@ export default function ShopSettingsPanel({
         </div>
       </Card>
 
-      <Card variant="elevated" className="!p-5">
+      <Card variant="elevated" className="p-5!">
         <h2 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
           <Clock className="w-4 h-4 text-sky-500" />
           Ажиллах цаг
@@ -111,7 +111,7 @@ export default function ShopSettingsPanel({
         </div>
       </Card>
 
-      <Card variant="elevated" className="!p-5">
+      <Card variant="elevated" className="p-5!">
         <h2 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
           <Users className="w-4 h-4 text-sky-500" />
           Захиалгын тохиргоо
@@ -125,23 +125,23 @@ export default function ShopSettingsPanel({
         </p>
       </Card>
 
-      <Card variant="bordered" className="!p-4 bg-slate-50">
+      <Card variant="bordered" className="p-4! bg-slate-50">
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Урьдчилан харах</p>
         <div className="space-y-2 text-sm text-slate-600">
           {shopAddress && (
             <p className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-sky-500 flex-shrink-0" />
+              <MapPin className="w-4 h-4 text-sky-500 shrink-0" />
               {shopAddress}
             </p>
           )}
           {shopPhone && (
             <p className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-sky-500 flex-shrink-0" />
+              <Phone className="w-4 h-4 text-sky-500 shrink-0" />
               {shopPhone}
             </p>
           )}
           <p className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-sky-500 flex-shrink-0" />
+            <Clock className="w-4 h-4 text-sky-500 shrink-0" />
             {openingTime} – {closingTime} · {slotDuration} мин · {maxCapacity} хүн/цаг
           </p>
         </div>

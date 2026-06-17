@@ -279,7 +279,7 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
                 {shop.icon ? (
                   <img src={shop.icon} alt={shop.name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
+                  <div className="w-full h-full bg-linear-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
                     <span className="text-2xl font-bold text-white">{shop.name.charAt(0)}</span>
                   </div>
                 )}
@@ -383,7 +383,7 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
               )}
 
               {selectedTime && (
-                <div className="bg-gradient-to-br from-sky-50 to-cyan-50 rounded-xl p-4 border border-sky-100">
+                <div className="bg-linear-to-br from-sky-50 to-cyan-50 rounded-xl p-4 border border-sky-100">
                   <h3 className="text-sm font-bold text-slate-700 mb-3">Захиалгын хураангуй</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">

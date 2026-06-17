@@ -44,7 +44,7 @@ export default function DatePicker({
         type="button"
         onClick={() => setStartIndex(Math.max(0, startIndex - daysToShow))}
         disabled={!canGoPrev}
-        className={`p-2 rounded-xl transition-all duration-200 flex-shrink-0 ${
+        className={`p-2 rounded-xl transition-all duration-200 shrink-0 ${
           canGoPrev
             ? 'bg-white border-2 border-slate-200 text-slate-700 hover:border-sky-400 hover:text-sky-600 hover:bg-sky-50'
             : 'bg-slate-100 text-slate-300 cursor-not-allowed'
@@ -69,7 +69,7 @@ export default function DatePicker({
                 flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all duration-200 min-w-0
                 ${
                   isSelected
-                    ? 'bg-gradient-to-r from-sky-500 to-cyan-500 text-white shadow-lg shadow-sky-500/30 scale-105'
+                    ? 'bg-linear-to-r from-sky-500 to-cyan-500 text-white shadow-lg shadow-sky-500/30 scale-105'
                     : isPast
                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                     : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-sky-400 hover:text-sky-600 hover:bg-sky-50'
@@ -99,7 +99,7 @@ export default function DatePicker({
         type="button"
         onClick={() => setStartIndex(Math.min(dates.length - daysToShow, startIndex + daysToShow))}
         disabled={!canGoNext}
-        className={`p-2 rounded-xl transition-all duration-200 flex-shrink-0 ${
+        className={`p-2 rounded-xl transition-all duration-200 shrink-0 ${
           canGoNext
             ? 'bg-white border-2 border-slate-200 text-slate-700 hover:border-sky-400 hover:text-sky-600 hover:bg-sky-50'
             : 'bg-slate-100 text-slate-300 cursor-not-allowed'

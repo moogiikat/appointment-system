@@ -12,10 +12,6 @@ function SignInContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
 
-  const handleFacebookLogin = () => {
-    signIn('facebook', { callbackUrl });
-  };
-
   const handleGoogleLogin = () => {
     signIn('google', { callbackUrl });
   };
@@ -24,7 +20,7 @@ function SignInContent() {
     <Card variant="elevated" className="w-full max-w-md relative animate-fade-in border border-slate-100">
       <div className="text-center mb-8">
         <Link href="/" className="inline-block">
-          <div className="w-16 h-16 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-sky-500/30">
+          <div className="w-16 h-16 bg-linear-to-br from-sky-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-sky-500/30">
             <Calendar className="w-8 h-8 text-white" />
           </div>
         </Link>
@@ -58,19 +54,6 @@ function SignInContent() {
         Google-ээр нэвтрэх
       </button>
 
-      {/* Facebook Login Button */}
-      {/* <Button
-        variant="primary"
-        size="lg"
-        className="w-full mb-6 bg-[#1877F2] hover:bg-[#166FE5]"
-        onClick={handleFacebookLogin}
-      >
-        <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-        </svg>
-        Facebook-ээр нэвтрэх
-      </Button> */}
-
       <p className="text-center text-xs text-slate-500 mt-6">
         Нэвтрэхээр бол{' '}
         <span className="text-sky-600 font-medium">үйлчилгээний нөхцөл</span>-ийг зөвшөөрч байна
@@ -96,7 +79,7 @@ function LoadingFallback() {
 export default function SignInPage() {
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4">
-      <div className="absolute inset-0 bg-gradient-to-br from-sky-100/50 via-transparent to-cyan-100/50" />
+      <div className="absolute inset-0 bg-linear-to-br from-sky-100/50 via-transparent to-cyan-100/50" />
       <div className="absolute top-20 left-10 w-72 h-72 bg-sky-200/40 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-200/40 rounded-full blur-3xl" />
       

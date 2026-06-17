@@ -30,7 +30,7 @@ export function isPastTimeSlot(dateString: string, timeString: string): boolean 
 
 export function isValidMongoliaPhone(phone: string): boolean {
   const cleaned = phone.replace(/[\s\-()]/g, '');
-  return /^(?:\+976|976)?[89]\d{7}$/.test(cleaned) || /^[89]\d{7}$/.test(cleaned);
+  return /^(?:\+976|976)?[89]\d{7}$/.test(cleaned);
 }
 
 export function formatMongoliaPhone(phone: string): string {

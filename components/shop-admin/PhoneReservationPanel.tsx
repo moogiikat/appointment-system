@@ -62,7 +62,7 @@ export default function PhoneReservationPanel({
           customer_phone: manualPhone,
           reservation_date: manualDate,
           reservation_time: manualTime,
-          notes: manualNotes ? `[電話予約] ${manualNotes}` : '[電話予約]',
+          notes: manualNotes ? `[Утсаар] ${manualNotes}` : '[Утсаар]',
           status: 'confirmed',
         }),
       });
@@ -96,7 +96,7 @@ export default function PhoneReservationPanel({
         </div>
       </div>
 
-      <Card variant="elevated" className="!p-5">
+      <Card variant="elevated" className="p-5!">
         <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
           <Calendar className="w-4 h-4 text-sky-500" />
           Огноо ба цаг
@@ -120,7 +120,7 @@ export default function PhoneReservationPanel({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5 flex items-center justify-between">
+            <label className="flex text-sm font-medium text-slate-700 mb-1.5 items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-slate-400" />
                 Цаг
@@ -162,7 +162,7 @@ export default function PhoneReservationPanel({
         </div>
       </Card>
 
-      <Card variant="elevated" className="!p-5">
+      <Card variant="elevated" className="p-5!">
         <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
           <User className="w-4 h-4 text-sky-500" />
           Үйлчлүүлэгчийн мэдээлэл
@@ -185,7 +185,7 @@ export default function PhoneReservationPanel({
             type="tel"
           />
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5 flex items-center gap-1.5">
+            <label className="flex text-sm font-medium text-slate-700 mb-1.5 items-center gap-1.5">
               <FileText className="w-4 h-4 text-slate-400" />
               Тэмдэглэл
             </label>
@@ -201,7 +201,7 @@ export default function PhoneReservationPanel({
       </Card>
 
       {manualTime && manualName.trim() && (
-        <Card variant="bordered" className="!p-4 bg-sky-50 border-sky-200">
+        <Card variant="bordered" className="p-4! bg-sky-50 border-sky-200">
           <p className="text-xs font-semibold text-sky-600 uppercase tracking-wider mb-2">Баталгаажуулах</p>
           <p className="text-sm text-slate-700">
             <span className="font-bold">{manualName}</span> — {manualDate} {manualTime}

@@ -34,7 +34,7 @@ export default function WeekDateStrip({ selectedDate, onSelectDate }: WeekDateSt
       <button
         type="button"
         onClick={() => shiftWeek(-1)}
-        className="p-2.5 rounded-xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50 transition-all flex-shrink-0"
+        className="p-2.5 rounded-xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50 transition-all shrink-0"
         aria-label="Өмнөх 7 хоног"
       >
         <ChevronLeft className="w-5 h-5 text-slate-600" />
@@ -53,7 +53,7 @@ export default function WeekDateStrip({ selectedDate, onSelectDate }: WeekDateSt
               onClick={() => onSelectDate(dateStr)}
               className={`flex flex-col items-center py-2.5 px-1 rounded-xl transition-all duration-200 ${
                 isSelected
-                  ? 'bg-gradient-to-br from-sky-500 to-cyan-500 text-white shadow-lg shadow-sky-500/30 scale-105'
+                  ? 'bg-linear-to-br from-sky-500 to-cyan-500 text-white shadow-lg shadow-sky-500/30 scale-105'
                   : isToday
                   ? 'bg-sky-50 border-2 border-sky-300 text-sky-700 hover:bg-sky-100'
                   : 'bg-white border border-slate-200 text-slate-700 hover:border-sky-300 hover:bg-sky-50'
@@ -70,7 +70,7 @@ export default function WeekDateStrip({ selectedDate, onSelectDate }: WeekDateSt
       <button
         type="button"
         onClick={() => shiftWeek(1)}
-        className="p-2.5 rounded-xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50 transition-all flex-shrink-0"
+        className="p-2.5 rounded-xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50 transition-all shrink-0"
         aria-label="Дараагийн 7 хоног"
       >
         <ChevronRight className="w-5 h-5 text-slate-600" />

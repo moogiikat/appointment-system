@@ -20,7 +20,7 @@ export default function ShopCard({ shop }: ShopCardProps) {
               {shop.icon ? (
                 <img src={shop.icon} alt={shop.name} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
+                <div className="w-full h-full bg-linear-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
                   <span className="text-2xl font-bold text-white">{shop.name.charAt(0)}</span>
                 </div>
               )}

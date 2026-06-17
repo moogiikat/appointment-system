@@ -92,11 +92,11 @@ export default function ShopDetailPage({ params }: { params: Promise<{ id: strin
         <Card variant="elevated" className="mb-6 animate-fade-in">
           <div className="flex flex-col sm:flex-row items-start gap-6">
             {/* Shop Icon */}
-            <div className="w-24 h-24 rounded-2xl flex items-center justify-center shadow-xl shadow-sky-500/30 flex-shrink-0 overflow-hidden">
+            <div className="w-24 h-24 rounded-2xl flex items-center justify-center shadow-xl shadow-sky-500/30 shrink-0 overflow-hidden">
               {shop.icon ? (
                 <img src={shop.icon} alt={shop.name} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
+                <div className="w-full h-full bg-linear-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
                   <span className="text-4xl font-bold text-white">{shop.name.charAt(0)}</span>
                 </div>
               )}
@@ -169,28 +169,28 @@ export default function ShopDetailPage({ params }: { params: Promise<{ id: strin
           
           <div className="space-y-3">
             <div className="flex items-start gap-3 p-3 bg-amber-50 rounded-xl border border-amber-100">
-              <CheckCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <CheckCircle className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
               <p className="text-amber-800 text-sm">
                 Захиалга хийснээс хойш <strong>цуцлах боломжтой</strong>. Гэхдээ цаг хугацаанд нь ирж чадахгүй бол заавал урьдчилан мэдэгдэнэ үү.
               </p>
             </div>
             
             <div className="flex items-start gap-3 p-3 bg-sky-50 rounded-xl border border-sky-100">
-              <CheckCircle className="w-5 h-5 text-sky-600 mt-0.5 flex-shrink-0" />
+              <CheckCircle className="w-5 h-5 text-sky-600 mt-0.5 shrink-0" />
               <p className="text-sky-800 text-sm">
                 Захиалсан цагаасаа <strong>5-10 минутын өмнө</strong> ирнэ үү.
               </p>
             </div>
             
             <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-              <CheckCircle className="w-5 h-5 text-slate-600 mt-0.5 flex-shrink-0" />
+              <CheckCircle className="w-5 h-5 text-slate-600 mt-0.5 shrink-0" />
               <p className="text-slate-700 text-sm">
                 Нэг цагийн үйлчилгээний хугацаа <strong>{shop.slot_duration} минут</strong> байна.
               </p>
             </div>
             
             <div className="flex items-start gap-3 p-3 bg-red-50 rounded-xl border border-red-100">
-              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
               <p className="text-red-800 text-sm">
                 Захиалга хийхдээ <strong>зөв утасны дугаар</strong> оруулна уу. Бид танд холбогдож баталгаажуулах болно.
               </p>

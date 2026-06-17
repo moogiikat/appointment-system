@@ -117,7 +117,7 @@ export default function MyReservationsPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 bg-gradient-to-b from-slate-50 to-white">
+    <div className="min-h-screen py-12 px-4 bg-linear-to-b from-slate-50 to-white">
       <div className="max-w-5xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-slate-900 mb-2 animate-fade-in">
@@ -154,7 +154,7 @@ export default function MyReservationsPage() {
 
         {reservations.length === 0 ? (
           <Card variant="elevated" className="text-center py-16 animate-fade-in">
-            <div className="w-24 h-24 bg-gradient-to-br from-sky-100 to-cyan-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+            <div className="w-24 h-24 bg-linear-to-br from-sky-100 to-cyan-100 rounded-full mx-auto mb-6 flex items-center justify-center">
               <Calendar className="w-12 h-12 text-sky-500" />
             </div>
             <h2 className="text-2xl font-semibold text-slate-800 mb-3">
@@ -200,10 +200,10 @@ export default function MyReservationsPage() {
                   {/* Header Section */}
                   <div className="flex items-start justify-between gap-4 mb-6 pb-6 border-b-2 border-slate-100">
                     <div className="flex items-start gap-4 flex-1">
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ${
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shrink-0 ${
                         isLocked 
                           ? 'bg-slate-300' 
-                          : 'bg-gradient-to-br from-sky-500 to-cyan-500'
+                          : 'bg-linear-to-br from-sky-500 to-cyan-500'
                       }`}>
                         <Store className="w-7 h-7 text-white" />
                       </div>
@@ -219,7 +219,7 @@ export default function MyReservationsPage() {
                     </div>
                     
                     {/* Action Button */}
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       {(reservation.status === 'pending' || reservation.status === 'confirmed') ? (
                         <Button
                           variant="danger"
@@ -250,7 +250,7 @@ export default function MyReservationsPage() {
                   {/* Main Information Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     {/* Date & Time Section */}
-                    <div className="bg-gradient-to-br from-sky-50 to-cyan-50 rounded-xl p-5 border border-sky-100">
+                    <div className="bg-linear-to-br from-sky-50 to-cyan-50 rounded-xl p-5 border border-sky-100">
                       <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">
                         Огноо ба Цаг
                       </h4>
@@ -282,7 +282,7 @@ export default function MyReservationsPage() {
 
                     {/* Contact Information Section */}
                     {(reservation.customer_phone || reservation.customer_email) && (
-                      <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-5 border border-slate-200">
+                      <div className="bg-linear-to-br from-slate-50 to-slate-100 rounded-xl p-5 border border-slate-200">
                         <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">
                           Холбоо Барих Мэдээлэл
                         </h4>

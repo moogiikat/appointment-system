@@ -122,32 +122,32 @@ export default function DashboardStats({
               label="Өнөөдрийн захиалга"
               value={stats.today_count}
               icon={Calendar}
-              color="bg-gradient-to-br from-sky-500 to-cyan-500"
+              color="bg-linear-to-br from-sky-500 to-cyan-500"
             />
             <StatCard
               label="7 хоногийн захиалга"
               value={stats.week_count}
               icon={TrendingUp}
-              color="bg-gradient-to-br from-violet-500 to-purple-500"
+              color="bg-linear-to-br from-violet-500 to-purple-500"
             />
             <StatCard
               label="Цуцлалтын хувь (30 хоног)"
               value={stats.cancellation_rate}
               suffix="%"
               icon={XCircle}
-              color="bg-gradient-to-br from-red-400 to-rose-500"
+              color="bg-linear-to-br from-red-400 to-rose-500"
             />
             <StatCard
               label="Дууссан хувь (30 хоног)"
               value={stats.completion_rate}
               suffix="%"
               icon={CheckCircle2}
-              color="bg-gradient-to-br from-emerald-500 to-green-500"
+              color="bg-linear-to-br from-emerald-500 to-green-500"
             />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card variant="elevated" className="!p-5">
+            <Card variant="elevated" className="p-5!">
               <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-sky-500" />
                 Сүүлийн 7 хоног
@@ -163,8 +163,8 @@ export default function DashboardStats({
                       <div
                         className={`w-full rounded-t-lg transition-all duration-500 ${
                           isToday
-                            ? 'bg-gradient-to-t from-sky-500 to-cyan-400'
-                            : 'bg-gradient-to-t from-slate-300 to-slate-200'
+                            ? 'bg-linear-to-t from-sky-500 to-cyan-400'
+                            : 'bg-linear-to-t from-slate-300 to-slate-200'
                         }`}
                         style={{ height: `${height}%`, minHeight: day.count > 0 ? '8px' : '4px' }}
                       />
@@ -177,7 +177,7 @@ export default function DashboardStats({
               </div>
             </Card>
 
-            <Card variant="elevated" className="!p-5">
+            <Card variant="elevated" className="p-5!">
               <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
                 <Clock className="w-4 h-4 text-sky-500" />
                 Түгээмэл цаг (30 хоног)
@@ -192,7 +192,7 @@ export default function DashboardStats({
                       <span className="w-12 text-sm font-bold text-slate-700">{slot.time}</span>
                       <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-sky-400 to-cyan-400 rounded-full flex items-center justify-end pr-2"
+                          className="h-full bg-linear-to-r from-sky-400 to-cyan-400 rounded-full flex items-center justify-end pr-2"
                           style={{ width: `${(slot.count / maxPopular) * 100}%`, minWidth: '2rem' }}
                         >
                           <span className="text-xs font-bold text-white">{slot.count}</span>
@@ -205,7 +205,7 @@ export default function DashboardStats({
             </Card>
           </div>
 
-          <Card variant="elevated" className="!p-5">
+          <Card variant="elevated" className="p-5!">
             <h3 className="text-sm font-bold text-slate-700 mb-3">
               Статусын хуваарь (30 хоног) — Нийт {monthTotal} захиалга
             </h3>

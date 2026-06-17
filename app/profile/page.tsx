@@ -128,7 +128,7 @@ export default function ProfilePage() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50 py-12 px-4">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-sky-50 py-12 px-4">
         <div className="max-w-2xl mx-auto">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-slate-200 rounded w-1/3" />
@@ -140,7 +140,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50 py-8 px-4">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-sky-50 py-8 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Back button */}
         <Link
@@ -162,7 +162,7 @@ export default function ProfilePage() {
           <Card variant="elevated" className="mb-6">
             <div className="flex flex-col items-center">
               <div className="relative mb-4">
-                <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-sky-400 to-cyan-400 flex items-center justify-center shadow-xl">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-linear-to-br from-sky-400 to-cyan-400 flex items-center justify-center shadow-xl">
                   {profile?.avatar ? (
                     <img
                       src={profile.avatar}

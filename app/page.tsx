@@ -87,7 +87,7 @@ export default function Home() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative py-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-sky-100/50 via-transparent to-cyan-100/50" />
+        <div className="absolute inset-0 bg-linear-to-br from-sky-100/50 via-transparent to-cyan-100/50" />
         <div className="absolute top-20 left-10 w-72 h-72 bg-sky-200/40 rounded-full blur-3xl" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-200/40 rounded-full blur-3xl" />
 
@@ -162,7 +162,7 @@ export default function Home() {
                   index + 1
                 } opacity-0 bg-white rounded-2xl p-6 shadow-lg border border-slate-100 hover:shadow-xl hover:border-sky-200 transition-all duration-300 hover:-translate-y-1`}
               >
-                <div className="w-12 h-12 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-sky-500/25">
+                <div className="w-12 h-12 bg-linear-to-br from-sky-500 to-cyan-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-sky-500/25">
                   <feature.icon className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-bold text-slate-800 mb-2">
@@ -265,7 +265,7 @@ export default function Home() {
       <footer className="py-8 px-4 border-t border-slate-200 bg-white">
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-linear-to-br from-sky-500 to-cyan-500 rounded-lg flex items-center justify-center">
               <Calendar className="w-4 h-4 text-white" />
             </div>
             <span className="font-bold text-slate-700">Цаг Захиалга</span>
