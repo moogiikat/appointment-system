@@ -7,7 +7,8 @@ import { Reservation } from '@/lib/types';
 import { getStatusText, getStatusColor, formatDate, parseMongoliaDate, getMongoliaStartOfDay } from '@/lib/utils';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { Calendar, Clock, Store, Phone, Mail, XCircle, Lock, CheckCircle2, AlertCircle } from 'lucide-react';
+import ReviewModal from '@/components/ReviewModal';
+import { Calendar, Clock, Store, Phone, Mail, XCircle, Lock, CheckCircle2, AlertCircle, Star } from 'lucide-react';
 import Link from 'next/link';
 
 export default function MyReservationsPage() {
@@ -16,6 +17,7 @@ export default function MyReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'upcoming' | 'past' | 'all'>('upcoming');
+  const [reviewTarget, setReviewTarget] = useState<Reservation | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -230,6 +232,16 @@ export default function MyReservationsPage() {
                           <XCircle className="w-4 h-4" />
                           Цуцлах
                         </Button>
+                      ) : reservation.status === 'completed' && !reservation.has_review ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setReviewTarget(reservation)}
+                          className="gap-2 whitespace-nowrap"
+                        >
+                          <Star className="w-4 h-4" />
+                          Сэтгэгдэл үлдээх
+                        </Button>
                       ) : reservation.status === 'completed' ? (
                         <div className="flex items-center gap-2 text-slate-400 text-sm px-3 py-2 bg-slate-100 rounded-xl">
                           <Lock className="w-4 h-4" />
@@ -335,6 +347,20 @@ export default function MyReservationsPage() {
           </div>
         )}
       </div>
+
+      {reviewTarget && (
+        <ReviewModal
+          shopId={reviewTarget.shop_id}
+          reservationId={reviewTarget.id}
+          shopName={reviewTarget.shop_name || ''}
+          onClose={() => setReviewTarget(null)}
+          onSubmitted={() =>
+            setReservations((prev) =>
+              prev.map((r) => (r.id === reviewTarget.id ? { ...r, has_review: true } : r))
+            )
+          }
+        />
+      )}
     </div>
   );
 }

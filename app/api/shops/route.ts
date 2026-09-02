@@ -2,11 +2,34 @@ import { NextRequest, NextResponse } from "next/server";
 import sql from "@/lib/db";
 import { auth } from "@/auth";
 
-// Get all shops
-export async function GET() {
+// Get all shops (optionally filtered by category, district, keyword)
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get('category');
+    const district = searchParams.get('district');
+    const q = searchParams.get('q');
+
     const shops = await sql`
-      SELECT * FROM shops WHERE is_active = true ORDER BY name
+      SELECT s.*,
+        COALESCE(rv.rating_avg, 0) AS rating_avg,
+        COALESCE(rv.rating_count, 0) AS rating_count
+      FROM shops s
+      LEFT JOIN (
+        SELECT shop_id, ROUND(AVG(rating)::numeric, 1) AS rating_avg, COUNT(*) AS rating_count
+        FROM reviews
+        GROUP BY shop_id
+      ) rv ON rv.shop_id = s.id
+      WHERE s.is_active = true
+        AND (${category}::text IS NULL OR s.category = ${category})
+        AND (${district}::text IS NULL OR s.district = ${district})
+        AND (
+          ${q}::text IS NULL
+          OR s.name ILIKE ${q ? `%${q}%` : null}
+          OR s.description ILIKE ${q ? `%${q}%` : null}
+          OR s.address ILIKE ${q ? `%${q}%` : null}
+        )
+      ORDER BY s.name
     `;
     return NextResponse.json(shops);
   } catch (error) {
@@ -39,6 +62,9 @@ export async function POST(request: NextRequest) {
       address,
       phone,
       icon,
+      category,
+      district,
+      photos,
       opening_time,
       closing_time,
       slot_duration,
@@ -46,8 +72,8 @@ export async function POST(request: NextRequest) {
     } = body;
 
     const result = await sql`
-      INSERT INTO shops (name, description, address, phone, icon, opening_time, closing_time, slot_duration, max_capacity)
-      VALUES (${name}, ${description || ""}, ${address || ""}, ${phone || ""}, ${icon || null}, ${opening_time || "09:00"}, ${closing_time || "18:00"}, ${slot_duration || 30}, ${max_capacity || 1})
+      INSERT INTO shops (name, description, address, phone, icon, category, district, photos, opening_time, closing_time, slot_duration, max_capacity)
+      VALUES (${name}, ${description || ""}, ${address || ""}, ${phone || ""}, ${icon || null}, ${category || null}, ${district || null}, ${Array.isArray(photos) ? photos : []}, ${opening_time || "09:00"}, ${closing_time || "18:00"}, ${slot_duration || 30}, ${max_capacity || 1})
       RETURNING *
     `;
 

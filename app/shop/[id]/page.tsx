@@ -4,20 +4,27 @@ import { useState, useEffect, use } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Shop } from '@/lib/types';
+import { Shop, ShopService } from '@/lib/types';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { 
-  ArrowLeft, 
-  MapPin, 
-  Clock, 
-  Phone, 
-  Users, 
+import StarRating from '@/components/StarRating';
+import FavoriteButton from '@/components/FavoriteButton';
+import PhotoGallery from '@/components/PhotoGallery';
+import MapEmbed from '@/components/MapEmbed';
+import ReviewList from '@/components/ReviewList';
+import {
+  ArrowLeft,
+  MapPin,
+  Clock,
+  Phone,
+  Users,
   Calendar,
   AlertCircle,
   CheckCircle,
   Info,
-  LogIn
+  LogIn,
+  MessageCircle,
+  Tag,
 } from 'lucide-react';
 
 export default function ShopDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -25,6 +32,7 @@ export default function ShopDetailPage({ params }: { params: Promise<{ id: strin
   const { data: session, status } = useSession();
   const router = useRouter();
   const [shop, setShop] = useState<Shop | null>(null);
+  const [services, setServices] = useState<ShopService[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,6 +54,13 @@ export default function ShopDetailPage({ params }: { params: Promise<{ id: strin
     }
     fetchShop();
   }, [id, router]);
+
+  useEffect(() => {
+    fetch(`/api/shops/${id}/services`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setServices)
+      .catch(() => setServices([]));
+  }, [id]);
 
   const handleBookingClick = () => {
     if (status === 'authenticated') {
@@ -88,6 +103,13 @@ export default function ShopDetailPage({ params }: { params: Promise<{ id: strin
           Буцах
         </Link>
 
+        {/* Photo Gallery */}
+        {shop.photos && shop.photos.length > 0 && (
+          <div className="mb-6 animate-fade-in">
+            <PhotoGallery photos={shop.photos} alt={shop.name} />
+          </div>
+        )}
+
         {/* Shop Header */}
         <Card variant="elevated" className="mb-6 animate-fade-in">
           <div className="flex flex-col sm:flex-row items-start gap-6">
@@ -101,16 +123,82 @@ export default function ShopDetailPage({ params }: { params: Promise<{ id: strin
                 </div>
               )}
             </div>
-            
+
             {/* Shop Info */}
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-slate-800 mb-2">{shop.name}</h1>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  {(shop.category || shop.district) && (
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      {shop.category && (
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700">
+                          {shop.category}
+                        </span>
+                      )}
+                      {shop.district && (
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                          {shop.district}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  <h1 className="text-2xl font-bold text-slate-800 mb-1">{shop.name}</h1>
+                  {(shop.rating_count ?? 0) > 0 && (
+                    <StarRating value={shop.rating_avg || 0} showValue count={shop.rating_count} />
+                  )}
+                </div>
+                <FavoriteButton shopId={shop.id} className="w-10 h-10 bg-slate-50 hover:bg-red-50 shrink-0" />
+              </div>
               {shop.description && (
-                <p className="text-slate-600 leading-relaxed whitespace-pre-line">{shop.description}</p>
+                <p className="text-slate-600 leading-relaxed whitespace-pre-line mt-3">{shop.description}</p>
               )}
             </div>
           </div>
         </Card>
+
+        {/* Services / Menu */}
+        {services.length > 0 && (
+          <Card variant="elevated" className="mb-6 animate-fade-in">
+            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <Tag className="w-5 h-5 text-sky-500" />
+              Үйлчилгээ, үнийн жагсаалт
+            </h2>
+            <div className="space-y-2">
+              {services.map((service) => (
+                <div
+                  key={service.id}
+                  className="flex items-center justify-between p-3 bg-slate-50 rounded-xl"
+                >
+                  <div>
+                    <p className="font-medium text-slate-800">{service.name}</p>
+                    {service.description && (
+                      <p className="text-xs text-slate-500">{service.description}</p>
+                    )}
+                    {service.duration_minutes && (
+                      <p className="text-xs text-slate-500">{service.duration_minutes} минут</p>
+                    )}
+                  </div>
+                  {typeof service.price === 'number' && (
+                    <span className="font-bold text-sky-600 whitespace-nowrap">
+                      {service.price.toLocaleString()}₮
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* Map */}
+        {shop.address && (
+          <Card variant="elevated" className="mb-6 animate-fade-in">
+            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-sky-500" />
+              Байршил
+            </h2>
+            <MapEmbed address={shop.address} />
+          </Card>
+        )}
 
         {/* Shop Details */}
         <Card variant="elevated" className="mb-6 animate-fade-in stagger-1 opacity-0">
@@ -196,6 +284,15 @@ export default function ShopDetailPage({ params }: { params: Promise<{ id: strin
               </p>
             </div>
           </div>
+        </Card>
+
+        {/* Reviews */}
+        <Card variant="elevated" className="mb-6 animate-fade-in">
+          <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <MessageCircle className="w-5 h-5 text-sky-500" />
+            Сэтгэгдэл
+          </h2>
+          <ReviewList shopId={shop.id} />
         </Card>
 
         {/* Booking Button */}

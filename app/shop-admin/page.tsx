@@ -14,6 +14,8 @@ import WeekDateStrip from '@/components/shop-admin/WeekDateStrip';
 import ReservationCard from '@/components/shop-admin/ReservationCard';
 import ShopSettingsPanel from '@/components/shop-admin/ShopSettingsPanel';
 import PhoneReservationPanel from '@/components/shop-admin/PhoneReservationPanel';
+import ServicesPanel from '@/components/shop-admin/ServicesPanel';
+import ReviewsPanel from '@/components/shop-admin/ReviewsPanel';
 import {
   Calendar,
   Settings,
@@ -28,9 +30,11 @@ import {
   Search,
   CheckCheck,
   Clock,
+  Tag,
+  MessageCircle,
 } from 'lucide-react';
 
-type Tab = 'schedule' | 'phone' | 'stats' | 'settings';
+type Tab = 'schedule' | 'phone' | 'stats' | 'services' | 'reviews' | 'settings';
 type StatusFilter = 'all' | Reservation['status'];
 
 export default function ShopAdminPage() {
@@ -200,6 +204,8 @@ export default function ShopAdminPage() {
                   { key: 'schedule' as Tab, label: 'Хуваарь', icon: LayoutList },
                   { key: 'phone' as Tab, label: 'Утсаар', icon: PhoneCall },
                   { key: 'stats' as Tab, label: 'Статистик', icon: BarChart3 },
+                  { key: 'services' as Tab, label: 'Үйлчилгээ', icon: Tag },
+                  { key: 'reviews' as Tab, label: 'Сэтгэгдэл', icon: MessageCircle },
                   { key: 'settings' as Tab, label: 'Тохиргоо', icon: Settings },
                 ]).map(({ key, label, icon: Icon }) => (
                   <button
@@ -237,6 +243,22 @@ export default function ShopAdminPage() {
 
         {activeTab === 'stats' && shop && (
           <DashboardStats shopId={shop.id} refreshKey={statsRefreshKey} defaultExpanded hideToggle />
+        )}
+
+        {activeTab === 'services' && shop && (
+          <ServicesPanel
+            shopId={shop.id}
+            onSuccess={(msg) => showToast(msg, 'success')}
+            onError={(msg) => showToast(msg, 'error')}
+          />
+        )}
+
+        {activeTab === 'reviews' && shop && (
+          <ReviewsPanel
+            shopId={shop.id}
+            onSuccess={(msg) => showToast(msg, 'success')}
+            onError={(msg) => showToast(msg, 'error')}
+          />
         )}
 
         {activeTab === 'settings' && shop && (

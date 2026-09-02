@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Shop, User } from '@/lib/types';
+import { UB_DISTRICTS, SUGGESTED_CATEGORIES } from '@/lib/constants';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Store, Users, Plus, Edit2, Trash2, MapPin, Clock, X, Key, Copy, Check } from 'lucide-react';
+import { Store, Users, Plus, Edit2, Trash2, MapPin, Clock, X, Key, Copy, Check, Tag } from 'lucide-react';
 
 type AdminTab = 'shops' | 'users';
 
@@ -39,6 +40,8 @@ export default function AdminPage() {
     address: '',
     phone: '',
     icon: '',
+    category: '',
+    district: '',
     opening_time: '09:00',
     closing_time: '18:00',
     slot_duration: 30,
@@ -249,6 +252,8 @@ export default function AdminPage() {
       address: '',
       phone: '',
       icon: '',
+      category: '',
+      district: '',
       opening_time: '09:00',
       closing_time: '18:00',
       slot_duration: 30,
@@ -274,6 +279,8 @@ export default function AdminPage() {
       address: shop.address || '',
       phone: shop.phone || '',
       icon: shop.icon || '',
+      category: shop.category || '',
+      district: shop.district || '',
       opening_time: shop.opening_time?.slice(0, 5) || '09:00',
       closing_time: shop.closing_time?.slice(0, 5) || '18:00',
       slot_duration: shop.slot_duration || 30,
@@ -452,6 +459,32 @@ export default function AdminPage() {
                       value={shopForm.address}
                       onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
                     />
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">Ангилал</label>
+                      <select
+                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none"
+                        value={shopForm.category}
+                        onChange={(e) => setShopForm({ ...shopForm, category: e.target.value })}
+                      >
+                        <option value="">Сонгоно уу</option>
+                        {SUGGESTED_CATEGORIES.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">Дүүрэг</label>
+                      <select
+                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none"
+                        value={shopForm.district}
+                        onChange={(e) => setShopForm({ ...shopForm, district: e.target.value })}
+                      >
+                        <option value="">Сонгоно уу</option>
+                        {UB_DISTRICTS.map((d) => (
+                          <option key={d} value={d}>{d}</option>
+                        ))}
+                      </select>
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
                       <Input
                         id="opening"
@@ -576,6 +609,21 @@ export default function AdminPage() {
                       </div>
                     </div>
                     <h3 className="font-bold text-slate-800 mb-2">{shop.name}</h3>
+                    {(shop.category || shop.district) && (
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {shop.category && (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700">
+                            <Tag className="w-3 h-3" />
+                            {shop.category}
+                          </span>
+                        )}
+                        {shop.district && (
+                          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                            {shop.district}
+                          </span>
+                        )}
+                      </div>
+                    )}
                     <div className="space-y-1 text-sm text-slate-600">
                       {shop.address && (
                         <div className="flex items-center gap-2">

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { Calendar, User, LogOut, Settings, Store, ChevronDown } from 'lucide-react';
+import { Calendar, User, LogOut, Settings, Store, ChevronDown, Heart } from 'lucide-react';
 import Button from './ui/Button';
 
 export default function Navbar() {
@@ -89,6 +89,15 @@ export default function Navbar() {
                     <Button variant="ghost" size="sm" className="gap-2">
                       <Calendar className="w-4 h-4" />
                       <span className="hidden sm:inline">Миний захиалга</span>
+                    </Button>
+                  </Link>
+                )}
+
+                {userRole !== 'shop_admin' && userRole !== 'super_admin' && (
+                  <Link href="/favorites">
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      <Heart className="w-4 h-4" />
+                      <span className="hidden sm:inline">Хадгалсан</span>
                     </Button>
                   </Link>
                 )}

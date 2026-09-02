@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Shop } from "@/lib/types";
+import { UB_DISTRICTS, SUGGESTED_CATEGORIES } from "@/lib/constants";
 import ShopCard from "@/components/ShopCard";
 import Button from "@/components/ui/Button";
 import {
@@ -24,7 +25,14 @@ export default function Home() {
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [districtFilter, setDistrictFilter] = useState("");
   const userRole = (session?.user as { role?: string })?.role;
+
+  const categories = useMemo(() => {
+    const fromShops = shops.map((s) => s.category).filter(Boolean) as string[];
+    return Array.from(new Set([...SUGGESTED_CATEGORIES, ...fromShops])).sort();
+  }, [shops]);
 
   useEffect(() => {
     if (status === "authenticated" && userRole === "shop_admin") {
@@ -51,14 +59,19 @@ export default function Home() {
 
   const filteredShops = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    if (!query) return shops;
-    return shops.filter(
-      (shop) =>
+    return shops.filter((shop) => {
+      const matchesQuery =
+        !query ||
         shop.name.toLowerCase().includes(query) ||
         shop.description?.toLowerCase().includes(query) ||
-        shop.address?.toLowerCase().includes(query)
-    );
-  }, [shops, searchQuery]);
+        shop.address?.toLowerCase().includes(query);
+      const matchesCategory = !categoryFilter || shop.category === categoryFilter;
+      const matchesDistrict = !districtFilter || shop.district === districtFilter;
+      return matchesQuery && matchesCategory && matchesDistrict;
+    });
+  }, [shops, searchQuery, categoryFilter, districtFilter]);
+
+  const hasActiveFilters = !!(searchQuery || categoryFilter || districtFilter);
 
   const features = [
     {
@@ -188,8 +201,8 @@ export default function Home() {
           </div>
 
           {!loading && shops.length > 0 && (
-            <div className="max-w-xl mx-auto mb-8">
-              <div className="relative">
+            <div className="max-w-3xl mx-auto mb-8">
+              <div className="relative mb-3">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   type="text"
@@ -199,8 +212,43 @@ export default function Home() {
                   className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-slate-200 rounded-2xl focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:outline-none transition-all placeholder:text-slate-400 shadow-sm"
                 />
               </div>
-              {searchQuery && (
-                <p className="text-sm text-slate-500 mt-2 text-center">
+              <div className="flex flex-wrap gap-3 justify-center">
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="px-4 py-2.5 bg-white border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none text-sm text-slate-700 shadow-sm"
+                >
+                  <option value="">Бүх ангилал</option>
+                  {categories.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                <select
+                  value={districtFilter}
+                  onChange={(e) => setDistrictFilter(e.target.value)}
+                  className="px-4 py-2.5 bg-white border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none text-sm text-slate-700 shadow-sm"
+                >
+                  <option value="">Бүх дүүрэг</option>
+                  {UB_DISTRICTS.map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+                {hasActiveFilters && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setCategoryFilter("");
+                      setDistrictFilter("");
+                    }}
+                    className="px-4 py-2.5 text-sm font-semibold text-sky-600 hover:bg-sky-50 rounded-xl transition-colors"
+                  >
+                    Шүүлтүүр цэвэрлэх
+                  </button>
+                )}
+              </div>
+              {hasActiveFilters && (
+                <p className="text-sm text-slate-500 mt-3 text-center">
                   {filteredShops.length} үр дүн олдлоо
                 </p>
               )}
@@ -240,7 +288,14 @@ export default function Home() {
                 Хайлтаар үр дүн олдсонгүй
               </h3>
               <p className="text-slate-500 mb-4">Өөр түлхүүр үгээр оролдоно уу</p>
-              <Button variant="outline" onClick={() => setSearchQuery("")}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchQuery("");
+                  setCategoryFilter("");
+                  setDistrictFilter("");
+                }}
+              >
                 Хайлт цэвэрлэх
               </Button>
             </div>
