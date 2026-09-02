@@ -110,6 +110,16 @@ export async function initializeDatabase() {
     END $$;
   `;
 
+  // Add points_per_visit column if it doesn't exist (for existing databases)
+  await sql`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='shops' AND column_name='points_per_visit') THEN
+        ALTER TABLE shops ADD COLUMN points_per_visit INTEGER DEFAULT 0;
+      END IF;
+    END $$;
+  `;
+
   // Reservations table
   await sql`
     CREATE TABLE IF NOT EXISTS reservations (
@@ -168,6 +178,50 @@ export async function initializeDatabase() {
     )
   `;
 
+  // Point transactions table (loyalty points ledger, no real payment involved)
+  await sql`
+    CREATE TABLE IF NOT EXISTS point_transactions (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      shop_id INTEGER REFERENCES shops(id) ON DELETE CASCADE,
+      reservation_id INTEGER REFERENCES reservations(id) ON DELETE SET NULL,
+      amount INTEGER NOT NULL,
+      reason VARCHAR(50) NOT NULL,
+      description TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(reservation_id, reason)
+    )
+  `;
+
+  // Shop coupons table (redeemable with points, no monetary settlement)
+  await sql`
+    CREATE TABLE IF NOT EXISTS shop_coupons (
+      id SERIAL PRIMARY KEY,
+      shop_id INTEGER REFERENCES shops(id) ON DELETE CASCADE,
+      title VARCHAR(255) NOT NULL,
+      description TEXT,
+      points_cost INTEGER NOT NULL DEFAULT 0,
+      max_claims INTEGER,
+      claimed_count INTEGER NOT NULL DEFAULT 0,
+      is_active BOOLEAN DEFAULT true,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `;
+
+  // User coupons table (a user's claimed coupon wallet)
+  await sql`
+    CREATE TABLE IF NOT EXISTS user_coupons (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      coupon_id INTEGER REFERENCES shop_coupons(id) ON DELETE CASCADE,
+      shop_id INTEGER REFERENCES shops(id) ON DELETE CASCADE,
+      code VARCHAR(20) UNIQUE NOT NULL,
+      points_spent INTEGER NOT NULL DEFAULT 0,
+      claimed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      used_at TIMESTAMP
+    )
+  `;
+
   // Create indexes for better performance
   await sql`CREATE INDEX IF NOT EXISTS idx_reservations_date ON reservations(reservation_date)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_reservations_shop ON reservations(shop_id)`;
@@ -176,6 +230,10 @@ export async function initializeDatabase() {
   await sql`CREATE INDEX IF NOT EXISTS idx_reviews_shop ON reviews(shop_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_favorites_user ON favorites(user_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_shop_services_shop ON shop_services(shop_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_point_transactions_user ON point_transactions(user_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_shop_coupons_shop ON shop_coupons(shop_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_user_coupons_user ON user_coupons(user_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_user_coupons_code ON user_coupons(code)`;
 
   console.log('Database initialized successfully');
 }

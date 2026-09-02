@@ -16,6 +16,7 @@ import ShopSettingsPanel from '@/components/shop-admin/ShopSettingsPanel';
 import PhoneReservationPanel from '@/components/shop-admin/PhoneReservationPanel';
 import ServicesPanel from '@/components/shop-admin/ServicesPanel';
 import ReviewsPanel from '@/components/shop-admin/ReviewsPanel';
+import CouponsPanel from '@/components/shop-admin/CouponsPanel';
 import {
   Calendar,
   Settings,
@@ -32,9 +33,10 @@ import {
   Clock,
   Tag,
   MessageCircle,
+  Ticket,
 } from 'lucide-react';
 
-type Tab = 'schedule' | 'phone' | 'stats' | 'services' | 'reviews' | 'settings';
+type Tab = 'schedule' | 'phone' | 'stats' | 'services' | 'reviews' | 'coupons' | 'settings';
 type StatusFilter = 'all' | Reservation['status'];
 
 export default function ShopAdminPage() {
@@ -206,6 +208,7 @@ export default function ShopAdminPage() {
                   { key: 'stats' as Tab, label: 'Статистик', icon: BarChart3 },
                   { key: 'services' as Tab, label: 'Үйлчилгээ', icon: Tag },
                   { key: 'reviews' as Tab, label: 'Сэтгэгдэл', icon: MessageCircle },
+                  { key: 'coupons' as Tab, label: 'Купон', icon: Ticket },
                   { key: 'settings' as Tab, label: 'Тохиргоо', icon: Settings },
                 ]).map(({ key, label, icon: Icon }) => (
                   <button
@@ -255,6 +258,14 @@ export default function ShopAdminPage() {
 
         {activeTab === 'reviews' && shop && (
           <ReviewsPanel
+            shopId={shop.id}
+            onSuccess={(msg) => showToast(msg, 'success')}
+            onError={(msg) => showToast(msg, 'error')}
+          />
+        )}
+
+        {activeTab === 'coupons' && shop && (
+          <CouponsPanel
             shopId={shop.id}
             onSuccess={(msg) => showToast(msg, 'success')}
             onError={(msg) => showToast(msg, 'error')}

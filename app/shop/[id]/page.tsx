@@ -12,6 +12,7 @@ import FavoriteButton from '@/components/FavoriteButton';
 import PhotoGallery from '@/components/PhotoGallery';
 import MapEmbed from '@/components/MapEmbed';
 import ReviewList from '@/components/ReviewList';
+import CouponList from '@/components/CouponList';
 import {
   ArrowLeft,
   MapPin,
@@ -25,6 +26,7 @@ import {
   LogIn,
   MessageCircle,
   Tag,
+  Ticket,
 } from 'lucide-react';
 
 export default function ShopDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -188,6 +190,15 @@ export default function ShopDetailPage({ params }: { params: Promise<{ id: strin
             </div>
           </Card>
         )}
+
+        {/* Coupons */}
+        <Card variant="elevated" className="mb-6 animate-fade-in">
+          <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <Ticket className="w-5 h-5 text-amber-500" />
+            Купон
+          </h2>
+          <CouponList shopId={shop.id} />
+        </Card>
 
         {/* Map */}
         {shop.address && (

@@ -6,7 +6,7 @@ import { UB_DISTRICTS, SUGGESTED_CATEGORIES } from '@/lib/constants';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Store, Clock, Users, MapPin, Phone, FileText, Check, Image as ImageIcon, Plus, X, Tag } from 'lucide-react';
+import { Store, Clock, Users, MapPin, Phone, FileText, Check, Image as ImageIcon, Plus, X, Tag, Coins } from 'lucide-react';
 
 interface ShopSettingsPanelProps {
   shop: Shop;
@@ -33,6 +33,7 @@ export default function ShopSettingsPanel({
   const [closingTime, setClosingTime] = useState('18:00');
   const [slotDuration, setSlotDuration] = useState(30);
   const [maxCapacity, setMaxCapacity] = useState(1);
+  const [pointsPerVisit, setPointsPerVisit] = useState(0);
 
   useEffect(() => {
     setShopName(shop.name);
@@ -46,6 +47,7 @@ export default function ShopSettingsPanel({
     setClosingTime(shop.closing_time?.slice(0, 5) || '18:00');
     setSlotDuration(shop.slot_duration || 30);
     setMaxCapacity(shop.max_capacity || 1);
+    setPointsPerVisit(shop.points_per_visit || 0);
   }, [shop]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,6 +69,7 @@ export default function ShopSettingsPanel({
           closing_time: closingTime,
           slot_duration: slotDuration,
           max_capacity: maxCapacity,
+          points_per_visit: pointsPerVisit,
         }),
       });
       if (res.ok) {
@@ -202,6 +205,24 @@ export default function ShopSettingsPanel({
         </div>
         <p className="text-xs text-slate-500 mt-3 bg-sky-50 px-3 py-2 rounded-lg">
           Жишээ: {openingTime}–{closingTime}, {slotDuration} мин тутамд {maxCapacity} хүн захиалах боломжтой
+        </p>
+      </Card>
+
+      <Card variant="elevated" className="p-5!">
+        <h2 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+          <Coins className="w-4 h-4 text-amber-500" />
+          Урамшууллын оноо
+        </h2>
+        <Input
+          id="pointsPerVisit"
+          label="Нэг захиалга дуусахад олгох оноо"
+          type="number"
+          min="0"
+          value={pointsPerVisit}
+          onChange={(e) => setPointsPerVisit(Number(e.target.value))}
+        />
+        <p className="text-xs text-slate-500 mt-3 bg-amber-50 px-3 py-2 rounded-lg">
+          0 бол оноо олгохгүй. Хэрэглэгч захиалгаа дуусгах бүрт энэ оноог автоматаар авна.
         </p>
       </Card>
 
