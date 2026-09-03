@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Shop, User } from '@/lib/types';
@@ -8,7 +8,8 @@ import { UB_DISTRICTS, SUGGESTED_CATEGORIES } from '@/lib/constants';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Store, Users, Plus, Edit2, Trash2, MapPin, Clock, X, Key, Copy, Check, Tag } from 'lucide-react';
+import { ToastContainer, useToast } from '@/components/Toast';
+import { Store, Users, Plus, Edit2, Trash2, MapPin, Clock, X, Key, Copy, Check, Tag, Search, EyeOff, AlertTriangle } from 'lucide-react';
 
 type AdminTab = 'shops' | 'users';
 
@@ -25,6 +26,15 @@ export default function AdminPage() {
   const [shops, setShops] = useState<Shop[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toasts, showToast, dismissToast } = useToast();
+
+  // 一覧の絞り込み
+  const [shopQuery, setShopQuery] = useState('');
+  const [shopCategory, setShopCategory] = useState('');
+  const [shopDistrict, setShopDistrict] = useState('');
+  const [onlyHidden, setOnlyHidden] = useState(false);
+  const [userQuery, setUserQuery] = useState('');
+  const [userRole, setUserRole] = useState('');
 
   // Password display state
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -109,6 +119,52 @@ export default function AdminPage() {
     }
   }, [activeTab, session]);
 
+  /*
+   * category か district が空の店舗は、トップのジャンル検索・地区絞り込みから漏れる。
+   * 一覧には並ぶので気づきにくく、実際に客から見つけてもらえない状態になる。
+   */
+  const hiddenShops = useMemo(
+    () => shops.filter((s) => !s.category || !s.district),
+    [shops]
+  );
+
+  const filteredShops = useMemo(() => {
+    const q = shopQuery.trim().toLowerCase();
+    return shops.filter((s) => {
+      if (onlyHidden && s.category && s.district) return false;
+      if (shopCategory && s.category !== shopCategory) return false;
+      if (shopDistrict && s.district !== shopDistrict) return false;
+      if (!q) return true;
+      return (
+        s.name.toLowerCase().includes(q) ||
+        s.address?.toLowerCase().includes(q) ||
+        s.phone?.toLowerCase().includes(q)
+      );
+    });
+  }, [shops, shopQuery, shopCategory, shopDistrict, onlyHidden]);
+
+  const filteredUsers = useMemo(() => {
+    const q = userQuery.trim().toLowerCase();
+    return users.filter((u) => {
+      if (userRole && u.role !== userRole) return false;
+      if (!q) return true;
+      return (
+        u.name.toLowerCase().includes(q) ||
+        u.email?.toLowerCase().includes(q) ||
+        u.phone?.toLowerCase().includes(q)
+      );
+    });
+  }, [users, userQuery, userRole]);
+
+  // 一意制約がないので同名を作れてしまう。作る前に気づけるようにする
+  const duplicateName = useMemo(() => {
+    const name = shopForm.name.trim().toLowerCase();
+    if (!name) return false;
+    return shops.some(
+      (s) => s.name.trim().toLowerCase() === name && s.id !== editingShop?.id
+    );
+  }, [shopForm.name, shops, editingShop]);
+
   const handleCreateShop = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormLoading(true);
@@ -125,9 +181,13 @@ export default function AdminPage() {
         setShops([...shops, newShop]);
         setShowShopForm(false);
         resetShopForm();
+        showToast(`"${newShop.name}" нэмэгдлээ`, 'success');
+      } else {
+        showToast('Үйлчилгээний газар нэмэхэд алдаа гарлаа', 'error');
       }
     } catch (error) {
       console.error('Error creating shop:', error);
+      showToast('Үйлчилгээний газар нэмэхэд алдаа гарлаа', 'error');
     } finally {
       setFormLoading(false);
     }
@@ -151,24 +211,34 @@ export default function AdminPage() {
         setEditingShop(null);
         setShowShopForm(false);
         resetShopForm();
+        showToast('Хадгаллаа', 'success');
+      } else {
+        showToast('Хадгалахад алдаа гарлаа', 'error');
       }
     } catch (error) {
       console.error('Error updating shop:', error);
+      showToast('Хадгалахад алдаа гарлаа', 'error');
     } finally {
       setFormLoading(false);
     }
   };
 
   const handleDeleteShop = async (id: number) => {
-    if (!confirm('Энэ үйлчилгээний газрыг устгах уу? Бүх захиалга устана!')) return;
+    const target = shops.find((s) => s.id === id);
+    // どの店を消すのか分からないまま確認させないよう、名前を出す
+    if (!confirm(`"${target?.name ?? ''}"-г устгах уу? Энэ газрын бүх захиалга хамт устана!`)) return;
 
     try {
       const res = await fetch(`/api/shops/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setShops(shops.filter((s) => s.id !== id));
+        showToast(`"${target?.name ?? ''}" устлаа`, 'success');
+      } else {
+        showToast('Устгахад алдаа гарлаа', 'error');
       }
     } catch (error) {
       console.error('Error deleting shop:', error);
+      showToast('Устгахад алдаа гарлаа', 'error');
     }
   };
 
@@ -201,9 +271,13 @@ export default function AdminPage() {
           });
           setShowPasswordModal(true);
         }
+        showToast(`${data.user.name} нэмэгдлээ`, 'success');
+      } else {
+        showToast('Хэрэглэгч нэмэхэд алдаа гарлаа', 'error');
       }
     } catch (error) {
       console.error('Error creating user:', error);
+      showToast('Хэрэглэгч нэмэхэд алдаа гарлаа', 'error');
     } finally {
       setFormLoading(false);
     }
@@ -227,11 +301,11 @@ export default function AdminPage() {
         });
         setShowPasswordModal(true);
       } else {
-        alert('Нууц үг шинэчлэхэд алдаа гарлаа');
+        showToast('Нууц үг шинэчлэхэд алдаа гарлаа', 'error');
       }
     } catch (error) {
       console.error('Error resetting password:', error);
-      alert('Нууц үг шинэчлэхэд алдаа гарлаа');
+      showToast('Нууц үг шинэчлэхэд алдаа гарлаа', 'error');
     } finally {
       setResetLoading(null);
     }
@@ -530,6 +604,12 @@ export default function AdminPage() {
                       />
                     </div>
                   </div>
+                  {duplicateName && (
+                    <div className="flex items-start gap-2 px-3 py-2 mb-4 bg-amber-50 border border-amber-200 rounded-control text-sm text-amber-800">
+                      <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                      <span>Ижил нэртэй газар аль хэдийн бүртгэлтэй байна. Давхардуулах уу?</span>
+                    </div>
+                  )}
                   <div className="flex justify-end gap-3">
                     <Button
                       type="button"
@@ -562,6 +642,85 @@ export default function AdminPage() {
               </Button>
             )}
 
+            {/* 客から見つからない店舗の警告 */}
+            {!loading && hiddenShops.length > 0 && (
+              <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-card">
+                <div className="flex items-start gap-2 text-amber-800">
+                  <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
+                  <span className="text-sm">
+                    <strong>{hiddenShops.length} газар</strong> ангилал эсвэл дүүрэггүй байна.
+                    Эдгээр нь нүүр хуудасны хайлтад <strong>харагдахгүй</strong>.
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setOnlyHidden((v) => !v)}
+                  className="gap-1.5 shrink-0"
+                >
+                  <EyeOff className="w-4 h-4" />
+                  {onlyHidden ? 'Бүгдийг харах' : 'Зөвхөн эдгээрийг харах'}
+                </Button>
+              </div>
+            )}
+
+            {/* 検索と絞り込み */}
+            {!loading && shops.length > 0 && (
+              <div className="bg-white rounded-card border border-line p-3 mb-4 space-y-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-placeholder" />
+                  <input
+                    type="text"
+                    placeholder="Нэр, хаяг, утсаар хайх..."
+                    value={shopQuery}
+                    onChange={(e) => setShopQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2.5 border border-line rounded-control text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand-band"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2 items-center">
+                  <select
+                    value={shopCategory}
+                    onChange={(e) => setShopCategory(e.target.value)}
+                    aria-label="Ангилал"
+                    className="h-9 px-3 border border-line rounded-control text-sm text-ink bg-white focus:border-brand focus:outline-none"
+                  >
+                    <option value="">Бүх ангилал</option>
+                    {SUGGESTED_CATEGORIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={shopDistrict}
+                    onChange={(e) => setShopDistrict(e.target.value)}
+                    aria-label="Дүүрэг"
+                    className="h-9 px-3 border border-line rounded-control text-sm text-ink bg-white focus:border-brand focus:outline-none"
+                  >
+                    <option value="">Бүх дүүрэг</option>
+                    {UB_DISTRICTS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                  <span className="text-sm text-subtle tabular-nums ml-auto">
+                    {filteredShops.length} / {shops.length} газар
+                  </span>
+                  {(shopQuery || shopCategory || shopDistrict || onlyHidden) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShopQuery('');
+                        setShopCategory('');
+                        setShopDistrict('');
+                        setOnlyHidden(false);
+                      }}
+                      className="text-sm font-bold text-brand-dark hover:opacity-70"
+                    >
+                      Цэвэрлэх
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Shops List */}
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -575,9 +734,15 @@ export default function AdminPage() {
                 <h3 className="font-semibold text-ink">Үйлчилгээний газар бүртгэгдээгүй</h3>
                 <p className="text-subtle text-sm">Шинэ үйлчилгээний газар нэмэх товч дарна уу</p>
               </Card>
+            ) : filteredShops.length === 0 ? (
+              <Card variant="elevated" className="text-center py-12">
+                <Search className="w-12 h-12 text-placeholder mx-auto mb-4" />
+                <h3 className="font-semibold text-ink">Үр дүн олдсонгүй</h3>
+                <p className="text-subtle text-sm">Хайлт эсвэл шүүлтүүрээ өөрчилнө үү</p>
+              </Card>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {shops.map((shop, index) => (
+                {filteredShops.map((shop, index) => (
                   <Card
                     key={shop.id}
                     variant="elevated"
@@ -609,6 +774,16 @@ export default function AdminPage() {
                       </div>
                     </div>
                     <h3 className="font-bold text-ink-strong mb-2">{shop.name}</h3>
+                    {(!shop.category || !shop.district) && (
+                      <div className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-control px-2 py-1">
+                        <EyeOff className="w-3.5 h-3.5 shrink-0" />
+                        {!shop.category && !shop.district
+                          ? 'Ангилал, дүүрэг алга'
+                          : !shop.category
+                            ? 'Ангилал алга'
+                            : 'Дүүрэг алга'}
+                      </div>
+                    )}
                     {(shop.category || shop.district) && (
                       <div className="flex flex-wrap gap-1.5 mb-2">
                         {shop.category && (
@@ -755,6 +930,36 @@ export default function AdminPage() {
               </Button>
             )}
 
+            {/* 検索と権限の絞り込み */}
+            {users.length > 0 && (
+              <div className="bg-white rounded-card border border-line p-3 mb-4 flex flex-col sm:flex-row gap-2 sm:items-center">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-placeholder" />
+                  <input
+                    type="text"
+                    placeholder="Нэр, и-мэйл, утсаар хайх..."
+                    value={userQuery}
+                    onChange={(e) => setUserQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2.5 border border-line rounded-control text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand-band"
+                  />
+                </div>
+                <select
+                  value={userRole}
+                  onChange={(e) => setUserRole(e.target.value)}
+                  aria-label="Эрх"
+                  className="h-10 px-3 border border-line rounded-control text-sm text-ink bg-white focus:border-brand focus:outline-none"
+                >
+                  <option value="">Бүх эрх</option>
+                  <option value="super_admin">Систем админ</option>
+                  <option value="shop_admin">Үйлчилгээний газрын админ</option>
+                  <option value="customer">Хэрэглэгч</option>
+                </select>
+                <span className="text-sm text-subtle tabular-nums whitespace-nowrap">
+                  {filteredUsers.length} / {users.length}
+                </span>
+              </div>
+            )}
+
             {/* Users List */}
             {users.length === 0 ? (
               <Card variant="elevated" className="text-center py-12">
@@ -775,7 +980,7 @@ export default function AdminPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {users.map((user) => (
+                      {filteredUsers.map((user) => (
                         <tr key={user.id} className="border-b border-line last:border-0">
                           <td className="py-3 px-4 font-medium text-ink-strong">{user.name}</td>
                           <td className="py-3 px-4 text-subtle">{user.email}</td>
@@ -823,6 +1028,8 @@ export default function AdminPage() {
           </>
         )}
       </div>
+
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }

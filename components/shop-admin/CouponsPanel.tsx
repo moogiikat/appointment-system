@@ -112,12 +112,13 @@ export default function CouponsPanel({ shopId, onError, onSuccess }: CouponsPane
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Энэ купоныг устгах уу?')) return;
+    const target = coupons.find((c) => c.id === id);
+    if (!confirm(`"${target?.title ?? ''}" купоныг устгах уу?`)) return;
     try {
       const res = await fetch(`/api/shops/${shopId}/coupons/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setCoupons((prev) => prev.filter((c) => c.id !== id));
-        onSuccess('Купон устгагдлаа');
+        onSuccess(`"${target?.title ?? ''}" устгагдлаа`);
       } else {
         onError('Устгахад алдаа гарлаа');
       }

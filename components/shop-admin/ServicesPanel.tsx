@@ -91,12 +91,13 @@ export default function ServicesPanel({ shopId, onError, onSuccess }: ServicesPa
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Энэ үйлчилгээг устгах уу?')) return;
+    const target = services.find((s) => s.id === id);
+    if (!confirm(`"${target?.name ?? ''}"-г устгах уу?`)) return;
     try {
       const res = await fetch(`/api/shops/${shopId}/services/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setServices((prev) => prev.filter((s) => s.id !== id));
-        onSuccess('Үйлчилгээ устгагдлаа');
+        onSuccess(`"${target?.name ?? ''}" устгагдлаа`);
       } else {
         onError('Устгахад алдаа гарлаа');
       }
