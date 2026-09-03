@@ -131,7 +131,7 @@ export default function PhoneReservationPanel({
             </label>
             {slotsLoading ? (
               <div className="px-4 py-3 border-2 border-line rounded-card bg-surface text-placeholder text-sm animate-pulse">
-                Уншиж байна...
+                Ачаалж байна...
               </div>
             ) : availableSlots.length === 0 ? (
               <div className="px-4 py-3 border-2 border-amber-200 rounded-card bg-amber-50 text-amber-700 text-sm">

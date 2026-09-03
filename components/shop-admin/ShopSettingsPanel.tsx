@@ -233,8 +233,8 @@ export default function ShopSettingsPanel({
           Захиалгын тохиргоо
         </h2>
         <div className="space-y-4">
-          <Input id="slotDuration" label="Нэг цагийн хугацаа (минут)" type="number" min="15" max="120" step="15" value={slotDuration} onChange={(e) => setSlotDuration(Number(e.target.value))} />
-          <Input id="maxCapacity" label="Нэг цагт авах хүний тоо" type="number" min="1" max="100" value={maxCapacity} onChange={(e) => setMaxCapacity(Number(e.target.value))} />
+          <Input id="slotDuration" label="Нэг захиалгын үргэлжлэх хугацаа (минут)" type="number" min="15" max="120" step="15" value={slotDuration} onChange={(e) => setSlotDuration(Number(e.target.value))} />
+          <Input id="maxCapacity" label="Нэг цагт зэрэг үйлчлэх хүний тоо" type="number" min="1" max="100" value={maxCapacity} onChange={(e) => setMaxCapacity(Number(e.target.value))} />
         </div>
         <p className="text-xs text-subtle mt-3 bg-brand-band px-3 py-2 rounded-control">
           Жишээ: {openingTime}–{closingTime}, {slotDuration} мин тутамд {maxCapacity} хүн захиалах боломжтой
@@ -248,7 +248,7 @@ export default function ShopSettingsPanel({
         </h2>
         <Input
           id="pointsPerVisit"
-          label="Нэг захиалга дуусахад олгох оноо"
+          label="Нэг ирэлтэд олгох оноо"
           type="number"
           min="0"
           value={pointsPerVisit}

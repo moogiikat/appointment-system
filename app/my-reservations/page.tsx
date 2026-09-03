@@ -178,7 +178,7 @@ export default function MyReservationsPage() {
               {filter === 'upcoming' ? 'Ирэх захиалга байхгүй' : 'Захиалга олдсонгүй'}
             </h2>
             <p className="text-subtle mb-6">
-              {filter === 'upcoming' ? 'Шинэ захиалга хийж үзнэ үү' : 'Өөр шүүлтүүр сонгоно уу'}
+              {filter === 'upcoming' ? 'Шинэ захиалга нэмнэ үү' : 'Өөр шүүлтүүр сонгоно уу'}
             </p>
             {filter !== 'all' && (
               <Button variant="outline" onClick={() => setFilter('all')}>

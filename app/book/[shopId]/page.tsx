@@ -329,7 +329,7 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
 
               {selectedTime && (
                 <div className="bg-brand-band rounded-card p-4 border border-line">
-                  <h3 className="text-[13px] font-bold text-ink-strong mb-3">Захиалгын хураангуй</h3>
+                  <h3 className="text-[13px] font-bold text-ink-strong mb-3">Захиалгын мэдээлэл</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-subtle">Огноо:</span>

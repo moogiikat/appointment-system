@@ -53,11 +53,10 @@ export default function Navbar() {
         <div className="flex justify-between h-12 md:h-16">
           <div className="flex items-center">
            {userRole !== 'shop_admin' && (
-            <Link href={logoHref} className="flex items-center gap-2">
+            <Link href={logoHref} aria-label="Цаг Захиалга" className="flex items-center">
               <div className="w-8 h-8 md:w-9 md:h-9 bg-brand rounded-control flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold text-[15px] md:text-[18px] text-ink-strong">Цаг Захиалга</span>
             </Link>
             )}
           </div>

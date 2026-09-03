@@ -107,9 +107,9 @@ export default function ProfilePage() {
   const getRoleText = (role: string) => {
     switch (role) {
       case 'super_admin':
-        return 'Систем админ';
+        return 'Системийн админ';
       case 'shop_admin':
-        return 'Үйлчилгээний газар админ';
+        return 'Үйлчилгээний газрын админ';
       default:
         return 'Хэрэглэгч';
     }

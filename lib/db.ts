@@ -120,6 +120,38 @@ export async function initializeDatabase() {
     END $$;
   `;
 
+  // Add status column: 'pending' | 'approved' | 'rejected'
+  // 既存店舗は approved にして、これまでの見え方を変えない
+  await sql`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='shops' AND column_name='status') THEN
+        ALTER TABLE shops ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'approved';
+      END IF;
+    END $$;
+  `;
+
+  await sql`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='shops' AND column_name='rejection_reason') THEN
+        ALTER TABLE shops ADD COLUMN rejection_reason TEXT;
+      END IF;
+    END $$;
+  `;
+
+  /*
+   * 管理者ロールに限ってメールアドレスを一意にする。
+   * 認証（auth.ts の admin-login）は role IN ('shop_admin','super_admin') で引いて
+   * 先頭行を採るので、ここが重複すると誰のアカウントで入るかが不定になる。
+   * customer には貼らない。同一人物が Google と Facebook で別行を作る既存データがあるため。
+   */
+  await sql`
+    CREATE UNIQUE INDEX IF NOT EXISTS users_admin_email_unique
+    ON users (lower(email))
+    WHERE role IN ('shop_admin', 'super_admin') AND email IS NOT NULL AND email <> ''
+  `;
+
   // Reservations table
   await sql`
     CREATE TABLE IF NOT EXISTS reservations (

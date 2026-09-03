@@ -9,7 +9,7 @@ import { UB_DISTRICTS, SUGGESTED_CATEGORIES, categoryStyle } from "@/lib/constan
 import ShopCard from "@/components/ShopCard";
 import GenreGrid from "@/components/GenreGrid";
 import Button from "@/components/ui/Button";
-import { Search, MapPin, X, Store, Clock } from "lucide-react";
+import { Search, MapPin, X, Store, Clock, ArrowRight } from "lucide-react";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -124,7 +124,7 @@ export default function Home() {
 
       {/* ---- ジャンルから探す（search-genre-list）---- */}
       <section className="max-w-[1120px] mx-auto px-4 py-6 md:py-10">
-        <h2 className="epark-section-title mb-4 md:mb-6">Ангилалаар хайх</h2>
+        <h2 className="epark-section-title mb-4 md:mb-6">Ангиллаар хайх</h2>
         <GenreGrid
           categories={categories}
           selected={categoryFilter}
@@ -223,6 +223,29 @@ export default function Home() {
         )}
       </section>
 
+      {/* ---- 加盟店募集：顧客の予約導線と競合しないよう、一覧の後に控えめに置く ---- */}
+      <section className="border-t border-line bg-brand-band">
+        <div className="max-w-[1120px] mx-auto px-4 py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <Store className="w-5 h-5 text-brand shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[15px] font-bold text-ink-strong leading-snug">
+                Үйлчилгээний газар эрхэлдэг үү?
+              </p>
+              <p className="text-[13px] text-subtle mt-0.5">
+                Үнэгүй бүртгүүлээд онлайн захиалга авч эхлээрэй
+              </p>
+            </div>
+          </div>
+          <Link href="/auth/shop-register" className="shrink-0">
+            <Button variant="primary" size="md" className="w-full sm:w-auto gap-1.5">
+              Газраа бүртгүүлэх
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
       {/* ---- フッター ---- */}
       <footer className="border-t border-line bg-white">
         <div className="max-w-[1120px] mx-auto px-4 py-8">
@@ -235,6 +258,12 @@ export default function Home() {
             </Link>
             <Link href="/rewards" className="text-ink hover:text-brand">
               Оноо, купон
+            </Link>
+            <Link href="/auth/shop-register" className="text-ink hover:text-brand">
+              Газраа бүртгүүлэх
+            </Link>
+            <Link href="/auth/admin" className="text-subtle hover:text-brand">
+              Түнш нэвтрэх
             </Link>
           </div>
           <p className="text-subtle text-[12px]">

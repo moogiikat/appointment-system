@@ -252,7 +252,7 @@ export default function ShopDetailPage({ params }: { params: Promise<{ id: strin
             <div className="flex items-start gap-3 p-3 bg-surface rounded-card">
               <Users className="w-5 h-5 text-brand mt-0.5" />
               <div>
-                <p className="text-xs text-subtle mb-1">Нэг цагийн багтаамж</p>
+                <p className="text-xs text-subtle mb-1">Зэрэг үйлчлэх хүний тоо</p>
                 <p className="text-ink font-medium">{shop.max_capacity} хүн</p>
               </div>
             </div>
@@ -284,7 +284,7 @@ export default function ShopDetailPage({ params }: { params: Promise<{ id: strin
             <div className="flex items-start gap-3 p-3 bg-surface rounded-card border border-line">
               <CheckCircle className="w-5 h-5 text-subtle mt-0.5 shrink-0" />
               <p className="text-ink text-sm">
-                Нэг цагийн үйлчилгээний хугацаа <strong>{shop.slot_duration} минут</strong> байна.
+                Нэг захиалгын үргэлжлэх хугацаа <strong>{shop.slot_duration} минут</strong> байна.
               </p>
             </div>
             
