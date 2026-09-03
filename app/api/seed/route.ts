@@ -479,7 +479,7 @@ export async function GET() {
         superAdmin: {
           email: 'admin@example.com',
           password: superAdminPassword,
-          role: 'Систем админ - бүх үйлчилгээний газрыг удирдах',
+          role: 'Системийн админ - бүх үйлчилгээний газрыг удирдах',
         },
         shopAdmin: {
           email: 'shop@example.com',

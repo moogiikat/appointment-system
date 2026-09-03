@@ -124,7 +124,7 @@ export default function Home() {
 
       {/* ---- ジャンルから探す（search-genre-list）---- */}
       <section className="max-w-[1120px] mx-auto px-4 py-6 md:py-10">
-        <h2 className="epark-section-title mb-4 md:mb-6">Ангилалаар хайх</h2>
+        <h2 className="epark-section-title mb-4 md:mb-6">Ангиллаар хайх</h2>
         <GenreGrid
           categories={categories}
           selected={categoryFilter}

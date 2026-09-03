@@ -138,7 +138,7 @@ export default function DashboardStats({
               color="bg-linear-to-br from-red-400 to-rose-500"
             />
             <StatCard
-              label="Дууссан хувь (30 хоног)"
+              label="Гүйцэтгэлийн хувь (30 хоног)"
               value={stats.completion_rate}
               suffix="%"
               icon={CheckCircle2}
@@ -207,7 +207,7 @@ export default function DashboardStats({
 
           <Card variant="elevated" className="p-5!">
             <h3 className="text-sm font-bold text-ink mb-3">
-              Статусын хуваарь (30 хоног) — Нийт {monthTotal} захиалга
+              Төлөвийн хуваарь (30 хоног) — Нийт {monthTotal} захиалга
             </h3>
             <div className="flex flex-wrap gap-3">
               {[

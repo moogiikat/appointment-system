@@ -116,9 +116,9 @@ export default function ShopAdminPage() {
         prev.map((r) => (r.id === id ? { ...r, status: newStatus as Reservation['status'] } : r))
       );
       setStatsRefreshKey((k) => k + 1);
-      showToast('Статус амжилттай шинэчлэгдлээ', 'success');
+      showToast('Төлөв амжилттай шинэчлэгдлээ', 'success');
     } else {
-      showToast('Статус шинэчлэхэд алдаа гарлаа', 'error');
+      showToast('Төлөв шинэчлэхэд алдаа гарлаа', 'error');
     }
   };
 
@@ -180,7 +180,7 @@ export default function ShopAdminPage() {
   if (status === 'loading') {
     return (
       <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="animate-pulse text-placeholder">Уншиж байна...</div>
+        <div className="animate-pulse text-placeholder">Ачаалж байна...</div>
       </div>
     );
   }

@@ -624,7 +624,7 @@ export default function AdminPage() {
                     </div>
                     <Input
                       id="slot"
-                      label="Нэг цагийн хугацаа (минут)"
+                      label="Нэг захиалгын үргэлжлэх хугацаа (минут)"
                       type="number"
                       min="15"
                       max="120"
@@ -634,7 +634,7 @@ export default function AdminPage() {
                     />
                     <Input
                       id="capacity"
-                      label="Нэг цагт авах хүний тоо"
+                      label="Нэг цагт зэрэг үйлчлэх хүний тоо"
                       type="number"
                       min="1"
                       max="100"
@@ -1000,7 +1000,7 @@ export default function AdminPage() {
                         required
                       >
                         <option value="shop_admin">Үйлчилгээний газрын админ</option>
-                        <option value="super_admin">Систем админ</option>
+                        <option value="super_admin">Системийн админ</option>
                       </select>
                     </div>
                     {userForm.role === 'shop_admin' && (
@@ -1072,7 +1072,7 @@ export default function AdminPage() {
                   className="h-10 px-3 border border-line rounded-control text-sm text-ink bg-white focus:border-brand focus:outline-none"
                 >
                   <option value="">Бүх эрх</option>
-                  <option value="super_admin">Систем админ</option>
+                  <option value="super_admin">Системийн админ</option>
                   <option value="shop_admin">Үйлчилгээний газрын админ</option>
                   <option value="customer">Хэрэглэгч</option>
                 </select>
@@ -1117,7 +1117,7 @@ export default function AdminPage() {
                               }`}
                             >
                               {user.role === 'super_admin'
-                                ? 'Систем админ'
+                                ? 'Системийн админ'
                                 : user.role === 'shop_admin'
                                 ? 'Үйлчилгээний газрын админ'
                                 : 'Хэрэглэгч'}
