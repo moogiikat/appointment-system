@@ -17,6 +17,12 @@ interface ShopCardProps {
  * CTA ボタンは置かない。カード全体がリンクで、hover は opacity 0.7。
  */
 export default function ShopCard({ shop }: ShopCardProps) {
+  /*
+   * 写真とロゴでは扱いが違う。写真は枠いっぱいに敷いて切り抜いてよいが、
+   * ロゴを object-cover すると上下が切れて図形も社名も欠ける。
+   * 写真が無くてロゴに落ちたときは、白地に収めて表示する。
+   */
+  const hasPhoto = !!shop.photos?.[0];
   const photo = shop.photos?.[0] || shop.icon;
   const { color } = categoryStyle(shop.category);
 
@@ -29,7 +35,15 @@ export default function ShopCard({ shop }: ShopCardProps) {
     >
       <div className="relative h-[120px] md:h-[182px] bg-surface">
         {photo ? (
-          <img src={photo} alt={shop.name} className="w-full h-full object-cover" />
+          <img
+            src={photo}
+            alt={shop.name}
+            className={
+              hasPhoto
+                ? 'w-full h-full object-cover'
+                : 'w-full h-full object-contain bg-white p-4'
+            }
+          />
         ) : (
           <div
             className="w-full h-full flex items-center justify-center"
