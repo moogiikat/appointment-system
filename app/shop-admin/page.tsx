@@ -43,6 +43,20 @@ export default function ShopAdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { toasts, showToast, dismissToast } = useToast();
+  // 設定タブに未保存の編集があるとき、タブ移動で黙って捨てないようにする
+  const [settingsDirty, setSettingsDirty] = useState(false);
+
+  const changeTab = (next: Tab) => {
+    if (
+      activeTab === 'settings' &&
+      next !== 'settings' &&
+      settingsDirty &&
+      !confirm('Хадгалаагүй өөрчлөлт байна. Хаях уу?')
+    ) {
+      return;
+    }
+    setActiveTab(next);
+  };
 
   const [shop, setShop] = useState<Shop | null>(null);
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -214,7 +228,7 @@ export default function ShopAdminPage() {
                   <button
                     key={key}
                     type="button"
-                    onClick={() => setActiveTab(key)}
+                    onClick={() => changeTab(key)}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-control text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
                       activeTab === key
                         ? 'bg-white text-brand-dark shadow-sm'
@@ -274,6 +288,7 @@ export default function ShopAdminPage() {
 
         {activeTab === 'settings' && shop && (
           <ShopSettingsPanel
+            onDirtyChange={setSettingsDirty}
             shop={shop}
             onSaved={(updated) => setShop(updated)}
             onSuccess={(msg) => showToast(msg, 'success')}
@@ -413,7 +428,7 @@ export default function ShopAdminPage() {
                       {reservations.length === 0 ? 'Шинэ захиалга нэмнэ үү' : 'Шүүлтүүр эсвэл хайлт өөрчилнө үү'}
                     </p>
                     {reservations.length === 0 && (
-                      <Button variant="primary" size="sm" onClick={() => setActiveTab('phone')} className="gap-1.5">
+                      <Button variant="primary" size="sm" onClick={() => changeTab('phone')} className="gap-1.5">
                         <Plus className="w-4 h-4" /> Захиалга нэмэх
                       </Button>
                     )}

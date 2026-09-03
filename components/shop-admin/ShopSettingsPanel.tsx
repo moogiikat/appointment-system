@@ -1,18 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Shop } from '@/lib/types';
 import { UB_DISTRICTS, SUGGESTED_CATEGORIES } from '@/lib/constants';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Store, Clock, Users, MapPin, Phone, FileText, Check, Image as ImageIcon, Plus, X, Tag, Coins } from 'lucide-react';
+import { Store, Clock, Users, MapPin, Phone, FileText, Check, Image as ImageIcon, Plus, X, Tag, Coins, AlertTriangle } from 'lucide-react';
 
 interface ShopSettingsPanelProps {
   shop: Shop;
   onSaved: (shop: Shop) => void;
   onError: (message: string) => void;
   onSuccess: (message: string) => void;
+  /** 未保存の編集があるかを親に伝える。タブ移動で黙って捨てないため */
+  onDirtyChange?: (dirty: boolean) => void;
 }
 
 export default function ShopSettingsPanel({
@@ -20,6 +22,7 @@ export default function ShopSettingsPanel({
   onSaved,
   onError,
   onSuccess,
+  onDirtyChange,
 }: ShopSettingsPanelProps) {
   const [saving, setSaving] = useState(false);
   const [shopName, setShopName] = useState('');
@@ -49,6 +52,30 @@ export default function ShopSettingsPanel({
     setMaxCapacity(shop.max_capacity || 1);
     setPointsPerVisit(shop.points_per_visit || 0);
   }, [shop]);
+
+  const savedPhotos = useMemo(
+    () => (shop.photos && shop.photos.length > 0 ? shop.photos : ['']),
+    [shop.photos]
+  );
+
+  const isDirty =
+    shopName !== shop.name ||
+    shopDescription !== (shop.description || '') ||
+    shopAddress !== (shop.address || '') ||
+    shopPhone !== (shop.phone || '') ||
+    shopCategory !== (shop.category || '') ||
+    shopDistrict !== (shop.district || '') ||
+    photos.join('\u0000') !== savedPhotos.join('\u0000') ||
+    openingTime !== (shop.opening_time?.slice(0, 5) || '09:00') ||
+    closingTime !== (shop.closing_time?.slice(0, 5) || '18:00') ||
+    slotDuration !== (shop.slot_duration || 30) ||
+    maxCapacity !== (shop.max_capacity || 1) ||
+    pointsPerVisit !== (shop.points_per_visit || 0);
+
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+    return () => onDirtyChange?.(false);
+  }, [isDirty, onDirtyChange]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,6 +115,12 @@ export default function ShopSettingsPanel({
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-5 pb-6">
+      {isDirty && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-control text-sm text-amber-800 sticky top-16 z-10">
+          <AlertTriangle className="w-4 h-4 shrink-0" />
+          <span>Хадгалаагүй өөрчлөлт байна</span>
+        </div>
+      )}
       <Card variant="elevated" className="p-5!">
         <h2 className="text-sm font-bold text-ink mb-4 flex items-center gap-2">
           <Store className="w-4 h-4 text-brand" />
