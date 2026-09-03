@@ -16,7 +16,9 @@ export async function GET(request: NextRequest) {
         COALESCE(rv.rating_count, 0) AS rating_count
       FROM shops s
       LEFT JOIN (
-        SELECT shop_id, ROUND(AVG(rating)::numeric, 1) AS rating_avg, COUNT(*) AS rating_count
+        SELECT shop_id,
+               ROUND(AVG(rating)::numeric, 1)::float8 AS rating_avg,
+               COUNT(*)::int AS rating_count
         FROM reviews
         GROUP BY shop_id
       ) rv ON rv.shop_id = s.id
