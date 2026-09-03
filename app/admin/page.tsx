@@ -9,7 +9,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { ToastContainer, useToast } from '@/components/Toast';
-import { Store, Users, Plus, Edit2, Trash2, MapPin, Clock, X, Key, Copy, Check, Tag, Search, EyeOff, AlertTriangle } from 'lucide-react';
+import { Store, Users, Plus, Edit2, Trash2, MapPin, Clock, X, Key, Copy, Check, Tag, Search, EyeOff, AlertTriangle, ShieldCheck, Ban, Clock3 } from 'lucide-react';
 
 type AdminTab = 'shops' | 'users';
 
@@ -33,6 +33,8 @@ export default function AdminPage() {
   const [shopCategory, setShopCategory] = useState('');
   const [shopDistrict, setShopDistrict] = useState('');
   const [onlyHidden, setOnlyHidden] = useState(false);
+  const [onlyPending, setOnlyPending] = useState(false);
+  const [decidingId, setDecidingId] = useState<number | null>(null);
   const [userQuery, setUserQuery] = useState('');
   const [userRole, setUserRole] = useState('');
 
@@ -128,9 +130,16 @@ export default function AdminPage() {
     [shops]
   );
 
+  // 自己登録された店舗は status='pending' で入ってくる。承認するまで客には出ない
+  const pendingShops = useMemo(
+    () => shops.filter((s) => s.status === 'pending'),
+    [shops]
+  );
+
   const filteredShops = useMemo(() => {
     const q = shopQuery.trim().toLowerCase();
     return shops.filter((s) => {
+      if (onlyPending && s.status !== 'pending') return false;
       if (onlyHidden && s.category && s.district) return false;
       if (shopCategory && s.category !== shopCategory) return false;
       if (shopDistrict && s.district !== shopDistrict) return false;
@@ -141,7 +150,7 @@ export default function AdminPage() {
         s.phone?.toLowerCase().includes(q)
       );
     });
-  }, [shops, shopQuery, shopCategory, shopDistrict, onlyHidden]);
+  }, [shops, shopQuery, shopCategory, shopDistrict, onlyHidden, onlyPending]);
 
   const filteredUsers = useMemo(() => {
     const q = userQuery.trim().toLowerCase();
@@ -220,6 +229,44 @@ export default function AdminPage() {
       showToast('Хадгалахад алдаа гарлаа', 'error');
     } finally {
       setFormLoading(false);
+    }
+  };
+
+  const handleDecide = async (shop: Shop, status: 'approved' | 'rejected') => {
+    let reason = '';
+    if (status === 'rejected') {
+      const input = prompt(`"${shop.name}"-г татгалзах шалтгаан:`);
+      if (input === null) return;
+      reason = input.trim();
+      if (!reason) {
+        showToast('Шалтгаан шаардлагатай', 'error');
+        return;
+      }
+    }
+
+    setDecidingId(shop.id);
+    try {
+      const res = await fetch(`/api/shops/${shop.id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, rejection_reason: reason }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setShops((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+        showToast(
+          status === 'approved'
+            ? `"${shop.name}" баталгаажлаа. Одоо үйлчлүүлэгчдэд харагдана.`
+            : `"${shop.name}"-г татгалзлаа`,
+          status === 'approved' ? 'success' : 'info'
+        );
+      } else {
+        showToast('Төлөв шинэчлэхэд алдаа гарлаа', 'error');
+      }
+    } catch {
+      showToast('Төлөв шинэчлэхэд алдаа гарлаа', 'error');
+    } finally {
+      setDecidingId(null);
     }
   };
 
@@ -642,6 +689,28 @@ export default function AdminPage() {
               </Button>
             )}
 
+            {/* 審査待ちの申請 */}
+            {!loading && pendingShops.length > 0 && (
+              <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-brand-band border border-brand rounded-card">
+                <div className="flex items-start gap-2 text-ink">
+                  <Clock3 className="w-5 h-5 shrink-0 mt-0.5 text-brand-dark" />
+                  <span className="text-sm">
+                    <strong>{pendingShops.length} газар</strong> баталгаажуулахыг хүлээж байна.
+                    Баталгаажих хүртэл үйлчлүүлэгчдэд харагдахгүй.
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setOnlyPending((v) => !v)}
+                  className="gap-1.5 shrink-0"
+                >
+                  <Clock3 className="w-4 h-4" />
+                  {onlyPending ? 'Бүгдийг харах' : 'Зөвхөн эдгээрийг харах'}
+                </Button>
+              </div>
+            )}
+
             {/* 客から見つからない店舗の警告 */}
             {!loading && hiddenShops.length > 0 && (
               <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-card">
@@ -774,6 +843,59 @@ export default function AdminPage() {
                       </div>
                     </div>
                     <h3 className="font-bold text-ink-strong mb-2">{shop.name}</h3>
+                    {shop.status === 'pending' && (
+                      <div className="mb-2">
+                        <div className="flex items-center gap-1.5 mb-2 text-xs font-bold text-brand-dark bg-brand-band border border-brand rounded-control px-2 py-1">
+                          <Clock3 className="w-3.5 h-3.5 shrink-0" />
+                          Баталгаажуулахыг хүлээж байна
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            className="flex-1 gap-1.5"
+                            isLoading={decidingId === shop.id}
+                            onClick={() => handleDecide(shop, 'approved')}
+                          >
+                            <ShieldCheck className="w-3.5 h-3.5" />
+                            Баталгаажуулах
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-1.5"
+                            disabled={decidingId === shop.id}
+                            onClick={() => handleDecide(shop, 'rejected')}
+                          >
+                            <Ban className="w-3.5 h-3.5" />
+                            Татгалзах
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    {shop.status === 'rejected' && (
+                      <div className="mb-2">
+                        <div className="flex items-start gap-1.5 mb-2 text-xs font-bold text-red-700 bg-red-50 border border-red-200 rounded-control px-2 py-1">
+                          <Ban className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                          <span>
+                            Татгалзсан
+                            {shop.rejection_reason && (
+                              <span className="block font-normal mt-0.5">{shop.rejection_reason}</span>
+                            )}
+                          </span>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full gap-1.5"
+                          isLoading={decidingId === shop.id}
+                          onClick={() => handleDecide(shop, 'approved')}
+                        >
+                          <ShieldCheck className="w-3.5 h-3.5" />
+                          Дахин баталгаажуулах
+                        </Button>
+                      </div>
+                    )}
                     {(!shop.category || !shop.district) && (
                       <div className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-control px-2 py-1">
                         <EyeOff className="w-3.5 h-3.5 shrink-0" />

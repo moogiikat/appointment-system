@@ -3,6 +3,7 @@
 import { signIn } from 'next-auth/react';
 import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -87,6 +88,13 @@ function AdminSignInContent() {
           Нэвтрэх
         </Button>
       </form>
+
+      <p className="text-center text-sm text-subtle mt-6 pt-5 border-t border-line">
+        Үйлчилгээний газраа бүртгүүлэх үү?{' '}
+        <Link href="/auth/shop-register" className="text-brand-dark font-bold hover:opacity-70">
+          Шинээр бүртгүүлэх
+        </Link>
+      </p>
     </Card>
   );
 }

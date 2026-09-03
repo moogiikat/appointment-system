@@ -33,8 +33,7 @@ import {
   Clock,
   Tag,
   MessageCircle,
-  Ticket,
-} from 'lucide-react';
+  Ticket, Clock3, Ban } from 'lucide-react';
 
 type Tab = 'schedule' | 'phone' | 'stats' | 'services' | 'reviews' | 'coupons' | 'settings';
 type StatusFilter = 'all' | Reservation['status'];
@@ -246,6 +245,31 @@ export default function ShopAdminPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* 審査の状況。自己登録した店舗はここで自分の状態が分かる */}
+        {shop?.status === 'pending' && (
+          <div className="mb-5 flex items-start gap-2.5 px-4 py-3 bg-amber-50 border border-amber-200 rounded-card">
+            <Clock3 className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+            <div className="text-sm text-amber-900">
+              <p className="font-bold mb-0.5">Баталгаажуулахыг хүлээж байна</p>
+              <p>
+                Админ шалгаж баталгаажуулах хүртэл таны газар үйлчлүүлэгчдэд харагдахгүй,
+                захиалга ирэхгүй. Энэ хооронд <strong>Тохиргоо</strong> хэсэгт мэдээллээ
+                гүйцээж, <strong>Үйлчилгээ</strong> хэсэгт үнийн жагсаалтаа оруулж болно.
+              </p>
+            </div>
+          </div>
+        )}
+        {shop?.status === 'rejected' && (
+          <div className="mb-5 flex items-start gap-2.5 px-4 py-3 bg-red-50 border border-red-200 rounded-card">
+            <Ban className="w-5 h-5 text-red-700 shrink-0 mt-0.5" />
+            <div className="text-sm text-red-900">
+              <p className="font-bold mb-0.5">Бүртгэл татгалзсан</p>
+              {shop.rejection_reason && <p className="mb-1">{shop.rejection_reason}</p>}
+              <p>Мэдээллээ засаад админтай холбогдоно уу.</p>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'phone' && shopId && (
           <PhoneReservationPanel
             shopId={shopId}

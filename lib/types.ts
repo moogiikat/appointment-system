@@ -26,6 +26,8 @@ export interface Shop {
   slot_duration: number;
   max_capacity: number;
   is_active: boolean;
+  status: 'pending' | 'approved' | 'rejected';
+  rejection_reason?: string;
   created_at: Date;
   rating_avg?: number;
   rating_count?: number;
