@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { Calendar, User, LogOut, Settings, Store, ChevronDown } from 'lucide-react';
+import { Calendar, User, LogOut, Settings, Store, ChevronDown, Heart } from 'lucide-react';
 import Button from './ui/Button';
+import PointsBadge from './PointsBadge';
 
 export default function Navbar() {
   const { data: session, status } = useSession();
@@ -47,50 +48,54 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <nav className="bg-white border-b border-line sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-12 md:h-16">
           <div className="flex items-center">
            {userRole !== 'shop_admin' && (
             <Link href={logoHref} className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-linear-to-br from-sky-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/30">
+              <div className="w-8 h-8 md:w-9 md:h-9 bg-brand rounded-control flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold text-xl text-slate-800">Цаг Захиалга</span>
+              <span className="font-bold text-[15px] md:text-[18px] text-ink-strong">Цаг Захиалга</span>
             </Link>
             )}
           </div>
 
           <div className="flex items-center gap-3">
             {status === 'loading' ? (
-              <div className="w-8 h-8 rounded-full bg-slate-200 animate-pulse" />
+              <div className="w-8 h-8 rounded-full bg-line animate-pulse" />
             ) : session?.user ? (
               <>
                 {userRole === 'super_admin' && (
-                  <Link href="/admin">
-                    <Button variant="ghost" size="sm" className="gap-2">
-                      <Settings className="w-4 h-4" />
-                      <span className="hidden sm:inline">Удирдлага</span>
-                    </Button>
-                  </Link>
+                  <Link href="/admin" className="flex flex-col items-center justify-center px-2 min-w-[46px] md:min-w-[60px] hover:opacity-70 transition-opacity">
+                      <Settings className="w-5 h-5 md:w-6 md:h-6 text-brand" />
+                      <span className="text-[9px] md:text-[11px] font-bold text-muted mt-0.5 whitespace-nowrap">Удирдлага</span>
+                    </Link>
                 )}
                 
                 {userRole === 'shop_admin' && (
-                  <Link href="/shop-admin">
-                    <Button variant="ghost" size="sm" className="gap-2">
-                      <Store className="w-4 h-4" />
-                      <span className="hidden sm:inline">Үйлчилгээний газар</span>
-                    </Button>
-                  </Link>
+                  <Link href="/shop-admin" className="flex flex-col items-center justify-center px-2 min-w-[46px] md:min-w-[60px] hover:opacity-70 transition-opacity">
+                      <Store className="w-5 h-5 md:w-6 md:h-6 text-brand" />
+                      <span className="text-[9px] md:text-[11px] font-bold text-muted mt-0.5 whitespace-nowrap">Үйлчилгээний газар</span>
+                    </Link>
                 )}
                 
                 {userRole !== 'shop_admin' && (
-                  <Link href="/my-reservations">
-                    <Button variant="ghost" size="sm" className="gap-2">
-                      <Calendar className="w-4 h-4" />
-                      <span className="hidden sm:inline">Миний захиалга</span>
-                    </Button>
-                  </Link>
+                  <Link href="/my-reservations" className="flex flex-col items-center justify-center px-2 min-w-[46px] md:min-w-[60px] hover:opacity-70 transition-opacity">
+                      <Calendar className="w-5 h-5 md:w-6 md:h-6 text-brand" />
+                      <span className="text-[9px] md:text-[11px] font-bold text-muted mt-0.5 whitespace-nowrap">Миний захиалга</span>
+                    </Link>
+                )}
+
+                {userRole !== 'shop_admin' && userRole !== 'super_admin' && (
+                  <>
+                    <Link href="/favorites" className="flex flex-col items-center justify-center px-2 min-w-[46px] md:min-w-[60px] hover:opacity-70 transition-opacity">
+                      <Heart className="w-5 h-5 md:w-6 md:h-6 text-brand" />
+                      <span className="text-[9px] md:text-[11px] font-bold text-muted mt-0.5 whitespace-nowrap">Хадгалсан</span>
+                    </Link>
+                    <PointsBadge />
+                  </>
                 )}
                 
                 {/* User Dropdown */}
@@ -98,10 +103,10 @@ export default function Navbar() {
                   <button
                     type="button"
                     onClick={() => setShowDropdown(!showDropdown)}
-                    className="flex items-center gap-2 px-2 py-1.5 hover:bg-slate-100 rounded-full transition-colors"
+                    className="flex items-center gap-2 px-2 py-1.5 hover:bg-surface rounded-full transition-colors"
                   >
                     {/* Avatar */}
-                    <div className="w-9 h-9 rounded-full overflow-hidden bg-linear-to-br from-sky-400 to-cyan-400 flex items-center justify-center ring-2 ring-sky-200">
+                    <div className="w-9 h-9 rounded-full overflow-hidden bg-brand flex items-center justify-center ring-2 ring-line">
                       {avatar ? (
                         <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
                       ) : (
@@ -110,19 +115,19 @@ export default function Navbar() {
                         </span>
                       )}
                     </div>
-                    <span className="text-sm font-medium text-slate-700 hidden sm:inline max-w-[100px] truncate">
+                    <span className="text-sm font-medium text-ink hidden sm:inline max-w-[100px] truncate">
                       {session.user.name}
                     </span>
-                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 text-placeholder transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
                   </button>
 
                   {/* Dropdown Menu */}
                   {showDropdown && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50">
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-card shadow-lg border border-line py-2 z-50">
                       {/* User Info */}
-                      <div className="px-4 py-2 border-b border-slate-100">
-                        <div className="font-medium text-slate-800">{session.user.name}</div>
-                        <div className="text-sm text-slate-500 truncate">{session.user.email}</div>
+                      <div className="px-4 py-2 border-b border-line">
+                        <div className="font-medium text-ink-strong">{session.user.name}</div>
+                        <div className="text-sm text-subtle truncate">{session.user.email}</div>
                       </div>
 
                       {/* Menu Items */}
@@ -130,7 +135,7 @@ export default function Navbar() {
                         <Link
                           href="/profile"
                           onClick={() => setShowDropdown(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-sky-50 hover:text-sky-600 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-ink hover:bg-brand-band hover:text-brand-dark transition-colors"
                         >
                           <User className="w-4 h-4" />
                           <span>Профайл засах</span>
@@ -138,7 +143,7 @@ export default function Navbar() {
                       </div>
 
                       {/* Logout */}
-                      <div className="border-t border-slate-100 pt-1">
+                      <div className="border-t border-line pt-1">
                         <button
                           type="button"
                           onClick={() => {

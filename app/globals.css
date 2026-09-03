@@ -1,108 +1,136 @@
 @import "tailwindcss";
 
-:root {
-  --background: #f8fafc;
-  --foreground: #1e293b;
-  --primary: #0ea5e9;
-  --primary-dark: #0284c7;
-  --accent: #06b6d4;
-}
+/*
+ * EPARK 準拠のデザイントークン。
+ * 値は epark.jp の配信CSS（common.css / top/style.css）から抽出した実測値。
+ */
+@theme {
+  /* ブランド */
+  --color-brand: #55bb66;        /* #5b6 ボタン・アクティブ枠・アイコン */
+  --color-brand-dark: #47a557;
+  --color-brand-band: #eff7ef;   /* モーダルヘッダー・セクション帯 */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: "Inter", system-ui, sans-serif;
+  /* テキスト */
+  --color-ink: #424242;          /* 本文・カード見出し */
+  --color-ink-strong: #000000;   /* セクション見出し */
+  --color-muted: #757575;        /* アイコンラベル */
+  --color-subtle: #999999;       /* ジャンル名・補助 */
+  --color-placeholder: #c5c5c5;
+
+  /* 罫線・面 */
+  --color-line: #e5e5e5;
+  --color-line-strong: #d5d5d5;
+  --color-line-card: #e0e0e0;
+  --color-line-circle: #bdbdbd;
+  --color-surface: #f5f5f5;
+
+  /* 通知バッジ */
+  --color-badge: #ee4444;
+  --color-badge-header: #d91e18;
+
+  /* ジャンル色（EPARK の icon-0xx 定義そのまま） */
+  --color-genre-gourmet: #ee6611;
+  --color-genre-takeout: #dd4422;
+  --color-genre-cake: #cc0000;
+  --color-genre-relax: #995511;
+  --color-genre-sekkotsu: #2266aa;
+  --color-genre-medical: #ff7777;
+  --color-genre-dentistry: #00aa66;
+  --color-genre-pharmacy: #33aabb;
+  --color-genre-pet: #bb8811;
+  --color-genre-odekake: #ee4477;
+  --color-genre-beauty: #ff64b4;
+  --color-genre-hotel: #9b2bb7;
+  --color-genre-lesson: #088fd5;
+
+  /* 角丸：EPARK はボタン 4px / カード 8px の2種類しか使わない */
+  --radius-card: 8px;
+  --radius-control: 4px;
+
+  /* 影 */
+  --shadow-card: 0 0 16px rgba(0, 0, 0, 0.2);
+  --shadow-control: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-arrow: 0 0 8px rgba(0, 0, 0, 0.3);
+
+  /* モンゴル語キリル向け。日本語フォントは混ぜない（字形が合わない） */
+  --font-sans: var(--font-mn), "Segoe UI", "Helvetica Neue", Arial, system-ui, sans-serif;
 }
 
 body {
-  background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
-  color: var(--foreground);
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  /* EPARK の地は白。グラデーション背景は使わない */
+  background: #ffffff;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
   min-height: 100vh;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+@media (max-width: 767px) {
+  body { font-size: 13px; }
 }
 
-::-webkit-scrollbar-track {
-  background: #e2e8f0;
-  border-radius: 4px;
+/* ---- EPARK のカード（popular_shops_box）---- */
+.epark-card {
+  border: 1px solid var(--color-line-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  background: #fff;
+  transition: opacity 0.2s;
+}
+.epark-card:hover { opacity: 0.7; }
+
+/* ---- セクション見出し（section_title）---- */
+.epark-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-ink-strong);
+}
+@media (max-width: 767px) {
+  .epark-section-title { font-size: 15px; }
 }
 
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #0ea5e9, #06b6d4);
-  border-radius: 4px;
+/* ---- 横スクロールのカードレール（SP の #popular_shops_result）---- */
+.epark-rail {
+  display: flex;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+.epark-rail::-webkit-scrollbar { display: none; }
 
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #0284c7, #0891b2);
+/* ---- ジャンル円アイコン（modal__item__button）---- */
+.epark-genre-circle {
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--color-line-circle);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 20px 10px rgba(14, 165, 233, 0);
-  }
-}
+.animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+.animate-slide-in { animation: slideIn 0.4s ease-out forwards; }
 
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
-}
-
-.animate-slide-in {
-  animation: slideIn 0.4s ease-out forwards;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s infinite;
-}
-
-/* Staggered animations */
 .stagger-1 { animation-delay: 0.1s; }
 .stagger-2 { animation-delay: 0.2s; }
 .stagger-3 { animation-delay: 0.3s; }
 .stagger-4 { animation-delay: 0.4s; }
 .stagger-5 { animation-delay: 0.5s; }
 
-/* Glass morphism */
-.glass {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-in { animation: none; opacity: 1; }
 }

@@ -32,7 +32,8 @@ export async function GET(request: NextRequest) {
       `;
     } else if (userId) {
       reservations = await sql`
-        SELECT r.*, s.name as shop_name
+        SELECT r.*, s.name as shop_name,
+          EXISTS(SELECT 1 FROM reviews rv WHERE rv.reservation_id = r.id) AS has_review
         FROM reservations r
         JOIN shops s ON r.shop_id = s.id
         WHERE r.user_id = ${userId}

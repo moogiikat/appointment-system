@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Shop, User } from '@/lib/types';
+import { UB_DISTRICTS, SUGGESTED_CATEGORIES } from '@/lib/constants';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Store, Users, Plus, Edit2, Trash2, MapPin, Clock, X, Key, Copy, Check } from 'lucide-react';
+import { Store, Users, Plus, Edit2, Trash2, MapPin, Clock, X, Key, Copy, Check, Tag } from 'lucide-react';
 
 type AdminTab = 'shops' | 'users';
 
@@ -39,6 +40,8 @@ export default function AdminPage() {
     address: '',
     phone: '',
     icon: '',
+    category: '',
+    district: '',
     opening_time: '09:00',
     closing_time: '18:00',
     slot_duration: 30,
@@ -249,6 +252,8 @@ export default function AdminPage() {
       address: '',
       phone: '',
       icon: '',
+      category: '',
+      district: '',
       opening_time: '09:00',
       closing_time: '18:00',
       slot_duration: 30,
@@ -274,6 +279,8 @@ export default function AdminPage() {
       address: shop.address || '',
       phone: shop.phone || '',
       icon: shop.icon || '',
+      category: shop.category || '',
+      district: shop.district || '',
       opening_time: shop.opening_time?.slice(0, 5) || '09:00',
       closing_time: shop.closing_time?.slice(0, 5) || '18:00',
       slot_duration: shop.slot_duration || 30,
@@ -287,8 +294,8 @@ export default function AdminPage() {
       <div className="min-h-screen py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-slate-200 rounded w-1/3" />
-            <div className="h-64 bg-slate-200 rounded-2xl" />
+            <div className="h-8 bg-line rounded w-1/3" />
+            <div className="h-64 bg-line rounded-card" />
           </div>
         </div>
       </div>
@@ -303,8 +310,8 @@ export default function AdminPage() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <Card variant="elevated" className="w-full max-w-md animate-fade-in">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Key className="w-5 h-5 text-sky-500" />
+                <h2 className="text-lg font-bold text-ink-strong flex items-center gap-2">
+                  <Key className="w-5 h-5 text-brand" />
                   Шинэ нууц үг
                 </h2>
                 <button
@@ -313,13 +320,13 @@ export default function AdminPage() {
                     setPasswordInfo(null);
                     setCopied(false);
                   }}
-                  className="text-slate-400 hover:text-slate-600"
+                  className="text-placeholder hover:text-subtle"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-card p-4 mb-4">
                 <p className="text-amber-800 text-sm font-medium">
                   ⚠️ Анхааруулга: Энэ нууц үгийг одоо хадгалж аваарай! Дахин харагдахгүй.
                 </p>
@@ -327,17 +334,17 @@ export default function AdminPage() {
 
               <div className="space-y-3 mb-6">
                 <div>
-                  <label className="text-xs text-slate-500">Хэрэглэгч</label>
-                  <p className="font-medium text-slate-800">{passwordInfo.name}</p>
+                  <label className="text-xs text-subtle">Хэрэглэгч</label>
+                  <p className="font-medium text-ink-strong">{passwordInfo.name}</p>
                 </div>
                 <div>
-                  <label className="text-xs text-slate-500">И-мэйл</label>
-                  <p className="font-medium text-slate-800">{passwordInfo.email}</p>
+                  <label className="text-xs text-subtle">И-мэйл</label>
+                  <p className="font-medium text-ink-strong">{passwordInfo.email}</p>
                 </div>
                 <div>
-                  <label className="text-xs text-slate-500">Нууц үг</label>
+                  <label className="text-xs text-subtle">Нууц үг</label>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 px-4 py-3 bg-slate-100 rounded-xl font-mono text-lg font-bold text-slate-800">
+                    <code className="flex-1 px-4 py-3 bg-surface rounded-card font-mono text-lg font-bold text-ink-strong">
                       {passwordInfo.password}
                     </code>
                     <Button
@@ -379,8 +386,8 @@ export default function AdminPage() {
 
         {/* Header */}
         <div className="mb-8 animate-fade-in">
-          <h1 className="text-3xl font-bold text-slate-800">Систем удирдлага</h1>
-          <p className="text-slate-600">Бүх үйлчилгээний газрын, хэрэглэгчдийн удирдлага</p>
+          <h1 className="text-3xl font-bold text-ink-strong">Систем удирдлага</h1>
+          <p className="text-subtle">Бүх үйлчилгээний газрын, хэрэглэгчдийн удирдлага</p>
         </div>
 
         {/* Tabs */}
@@ -410,7 +417,7 @@ export default function AdminPage() {
             {showShopForm && (
               <Card variant="elevated" className="mb-6 animate-fade-in">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-bold text-slate-800">
+                  <h2 className="text-lg font-bold text-ink-strong">
                     {editingShop ? 'Үйлчилгээний газар засах' : 'Шинэ үйлчилгээний газар нэмэх'}
                   </h2> 
                   <button
@@ -419,7 +426,7 @@ export default function AdminPage() {
                       setEditingShop(null);
                       resetShopForm();
                     }}
-                    className="text-slate-400 hover:text-slate-600"
+                    className="text-placeholder hover:text-subtle"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -452,6 +459,32 @@ export default function AdminPage() {
                       value={shopForm.address}
                       onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
                     />
+                    <div>
+                      <label className="block text-sm font-medium text-ink mb-1.5">Ангилал</label>
+                      <select
+                        className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:outline-none"
+                        value={shopForm.category}
+                        onChange={(e) => setShopForm({ ...shopForm, category: e.target.value })}
+                      >
+                        <option value="">Сонгоно уу</option>
+                        {SUGGESTED_CATEGORIES.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-ink mb-1.5">Дүүрэг</label>
+                      <select
+                        className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:outline-none"
+                        value={shopForm.district}
+                        onChange={(e) => setShopForm({ ...shopForm, district: e.target.value })}
+                      >
+                        <option value="">Сонгоно уу</option>
+                        {UB_DISTRICTS.map((d) => (
+                          <option key={d} value={d}>{d}</option>
+                        ))}
+                      </select>
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
                       <Input
                         id="opening"
@@ -488,9 +521,9 @@ export default function AdminPage() {
                       onChange={(e) => setShopForm({ ...shopForm, max_capacity: Number(e.target.value) })}
                     />
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">Тайлбар</label>
+                      <label className="block text-sm font-medium text-ink mb-1.5">Тайлбар</label>
                       <textarea
-                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none resize-none"
+                        className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:outline-none resize-none"
                         rows={2}
                         value={shopForm.description}
                         onChange={(e) => setShopForm({ ...shopForm, description: e.target.value })}
@@ -533,14 +566,14 @@ export default function AdminPage() {
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-48 bg-slate-200 rounded-2xl animate-pulse" />
+                  <div key={i} className="h-48 bg-line rounded-card animate-pulse" />
                 ))}
               </div>
             ) : shops.length === 0 ? (
               <Card variant="elevated" className="text-center py-12">
-                <Store className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                <h3 className="font-semibold text-slate-700">Үйлчилгээний газар бүртгэгдээгүй</h3>
-                <p className="text-slate-500 text-sm">Шинэ үйлчилгээний газар нэмэх товч дарна уу</p>
+                <Store className="w-12 h-12 text-placeholder mx-auto mb-4" />
+                <h3 className="font-semibold text-ink">Үйлчилгээний газар бүртгэгдээгүй</h3>
+                <p className="text-subtle text-sm">Шинэ үйлчилгээний газар нэмэх товч дарна уу</p>
               </Card>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -551,11 +584,11 @@ export default function AdminPage() {
                     className={`animate-fade-in stagger-${(index % 5) + 1} opacity-0`}
                   >
                     <div className="flex items-start justify-between mb-3">
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-md overflow-hidden">
+                      <div className="w-12 h-12 rounded-card flex items-center justify-center shadow-md overflow-hidden">
                         {shop.icon ? (
                           <img src={shop.icon} alt={shop.name} className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full bg-linear-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
+                          <div className="w-full h-full bg-brand flex items-center justify-center">
                             <span className="text-lg font-bold text-white">{shop.name.charAt(0)}</span>
                           </div>
                         )}
@@ -563,33 +596,48 @@ export default function AdminPage() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => editShop(shop)}
-                          className="p-2 text-slate-400 hover:text-sky-600 transition-colors"
+                          className="p-2 text-placeholder hover:text-brand-dark transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteShop(shop.id)}
-                          className="p-2 text-slate-400 hover:text-red-600 transition-colors"
+                          className="p-2 text-placeholder hover:text-red-600 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
-                    <h3 className="font-bold text-slate-800 mb-2">{shop.name}</h3>
-                    <div className="space-y-1 text-sm text-slate-600">
+                    <h3 className="font-bold text-ink-strong mb-2">{shop.name}</h3>
+                    {(shop.category || shop.district) && (
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {shop.category && (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-brand-band text-brand-dark">
+                            <Tag className="w-3 h-3" />
+                            {shop.category}
+                          </span>
+                        )}
+                        {shop.district && (
+                          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-surface text-subtle">
+                            {shop.district}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    <div className="space-y-1 text-sm text-subtle">
                       {shop.address && (
                         <div className="flex items-center gap-2">
-                          <MapPin className="w-3 h-3 text-sky-500" />
+                          <MapPin className="w-3 h-3 text-brand" />
                           <span>{shop.address}</span>
                         </div>
                       )}
                       <div className="flex items-center gap-2">
-                        <Clock className="w-3 h-3 text-sky-500" />
+                        <Clock className="w-3 h-3 text-brand" />
                         <span>
                           {shop.opening_time?.slice(0, 5)} - {shop.closing_time?.slice(0, 5)}
                         </span>
                       </div>
-                      <div className="text-xs text-slate-500">
+                      <div className="text-xs text-subtle">
                         Нэг цагт: {shop.max_capacity} хүн, {shop.slot_duration} минут
                       </div>
                     </div>
@@ -607,19 +655,19 @@ export default function AdminPage() {
             {showUserForm && (
               <Card variant="elevated" className="mb-6 animate-fade-in">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-bold text-slate-800">Шинэ админ хэрэглэгч нэмэх</h2>
+                  <h2 className="text-lg font-bold text-ink-strong">Шинэ админ хэрэглэгч нэмэх</h2>
                   <button
                     onClick={() => {
                       setShowUserForm(false);
                       resetUserForm();
                     }}
-                    className="text-slate-400 hover:text-slate-600"
+                    className="text-placeholder hover:text-subtle"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-                <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 mb-4">
-                  <p className="text-sky-800 text-sm">
+                <div className="bg-brand-band border border-line rounded-card p-4 mb-4">
+                  <p className="text-brand-dark text-sm">
                     💡 新規ユーザーを作成すると、自動的にパスワードが生成されます。
                   </p>
                 </div>
@@ -647,9 +695,9 @@ export default function AdminPage() {
                       onChange={(e) => setUserForm({ ...userForm, phone: e.target.value })}
                     />
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">Эрх *</label>
+                      <label className="block text-sm font-medium text-ink mb-1.5">Эрх *</label>
                       <select
-                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none"
+                        className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:outline-none"
                         value={userForm.role}
                         onChange={(e) => setUserForm({ ...userForm, role: e.target.value })}
                         required
@@ -660,9 +708,9 @@ export default function AdminPage() {
                     </div>
                     {userForm.role === 'shop_admin' && (
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1.5">Үйлчилгээний газар</label>
+                        <label className="block text-sm font-medium text-ink mb-1.5">Үйлчилгээний газар</label>
                         <select
-                          className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none"
+                          className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:outline-none"
                           value={userForm.shop_id}
                           onChange={(e) => setUserForm({ ...userForm, shop_id: e.target.value })}
                         >
@@ -710,27 +758,27 @@ export default function AdminPage() {
             {/* Users List */}
             {users.length === 0 ? (
               <Card variant="elevated" className="text-center py-12">
-                <Users className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                <h3 className="font-semibold text-slate-700">Хэрэглэгч байхгүй</h3>
+                <Users className="w-12 h-12 text-placeholder mx-auto mb-4" />
+                <h3 className="font-semibold text-ink">Хэрэглэгч байхгүй</h3>
               </Card>
             ) : (
               <Card variant="elevated">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-slate-200">
-                        <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Нэр</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">И-мэйл</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Эрх</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Үйлчилгээний газар</th>
-                        <th className="text-right py-3 px-4 text-sm font-medium text-slate-600">Үйлдэл</th>
+                      <tr className="border-b border-line">
+                        <th className="text-left py-3 px-4 text-sm font-medium text-subtle">Нэр</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-subtle">И-мэйл</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-subtle">Эрх</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-subtle">Үйлчилгээний газар</th>
+                        <th className="text-right py-3 px-4 text-sm font-medium text-subtle">Үйлдэл</th>
                       </tr>
                     </thead>
                     <tbody>
                       {users.map((user) => (
-                        <tr key={user.id} className="border-b border-slate-100 last:border-0">
-                          <td className="py-3 px-4 font-medium text-slate-800">{user.name}</td>
-                          <td className="py-3 px-4 text-slate-600">{user.email}</td>
+                        <tr key={user.id} className="border-b border-line last:border-0">
+                          <td className="py-3 px-4 font-medium text-ink-strong">{user.name}</td>
+                          <td className="py-3 px-4 text-subtle">{user.email}</td>
                           <td className="py-3 px-4">
                             <span
                               className={`text-xs px-2 py-1 rounded-full font-medium ${
@@ -738,7 +786,7 @@ export default function AdminPage() {
                                   ? 'bg-purple-100 text-purple-800'
                                   : user.role === 'shop_admin'
                                   ? 'bg-blue-100 text-blue-800'
-                                  : 'bg-slate-100 text-slate-800'
+                                  : 'bg-surface text-ink-strong'
                               }`}
                             >
                               {user.role === 'super_admin'
@@ -748,7 +796,7 @@ export default function AdminPage() {
                                 : 'Хэрэглэгч'}
                             </span>
                           </td>
-                          <td className="py-3 px-4 text-slate-600">
+                          <td className="py-3 px-4 text-subtle">
                             {(user as { shop_name?: string }).shop_name || '-'}
                           </td>
                           <td className="py-3 px-4 text-right">
@@ -758,7 +806,7 @@ export default function AdminPage() {
                                 size="sm"
                                 onClick={() => handleResetPassword(user.id, user.name, user.email || '')}
                                 isLoading={resetLoading === user.id}
-                                className="gap-1 text-sky-600 hover:text-sky-700 hover:bg-sky-50"
+                                className="gap-1 text-brand-dark hover:text-brand-dark hover:bg-brand-band"
                               >
                                 <Key className="w-4 h-4" />
                                 <span className="hidden sm:inline">Нууц үг шинэчлэх</span>

@@ -19,8 +19,8 @@ export default function TimeSlotPicker({
 
   if (timeSlots.length === 0) {
     return (
-      <div className="text-center py-8 text-slate-500">
-        <Clock className="w-10 h-10 mx-auto mb-3 text-slate-300" />
+      <div className="text-center py-8 text-subtle">
+        <Clock className="w-10 h-10 mx-auto mb-3 text-line-strong" />
         <p className="font-medium">Боломжит цаг байхгүй байна</p>
         <p className="text-sm mt-1">Өөр огноо сонгоно уу</p>
       </div>
@@ -35,8 +35,8 @@ export default function TimeSlotPicker({
           Сул: {availableCount}
         </span>
         {fullCount > 0 && (
-          <span className="flex items-center gap-1.5 text-slate-400">
-            <span className="w-2 h-2 bg-slate-300 rounded-full" />
+          <span className="flex items-center gap-1.5 text-placeholder">
+            <span className="w-2 h-2 bg-line-strong rounded-full" />
             Дүүрсэн: {fullCount}
           </span>
         )}
@@ -50,13 +50,13 @@ export default function TimeSlotPicker({
             onClick={() => slot.available && onSelectTime(slot.time)}
             disabled={!slot.available}
             className={`
-              relative py-3 px-2 rounded-xl text-sm font-semibold transition-all duration-200
+              relative py-3 px-2 rounded-card text-sm font-semibold transition-all duration-200
               ${
                 selectedTime === slot.time
-                  ? 'bg-linear-to-r from-sky-500 to-cyan-500 text-white shadow-lg shadow-sky-500/30 scale-105'
+                  ? 'bg-brand text-white shadow-lg scale-105'
                   : slot.available
-                  ? 'bg-white border-2 border-slate-200 text-slate-700 hover:border-sky-400 hover:text-sky-600 hover:bg-sky-50'
-                  : 'bg-slate-100 text-slate-400 cursor-not-allowed line-through'
+                  ? 'bg-white border-2 border-line text-ink hover:border-brand hover:text-brand-dark hover:bg-brand-band'
+                  : 'bg-surface text-placeholder cursor-not-allowed line-through'
               }
             `}
           >

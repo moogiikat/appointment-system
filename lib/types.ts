@@ -18,12 +18,89 @@ export interface Shop {
   address?: string;
   phone?: string;
   icon?: string;
+  category?: string;
+  district?: string;
+  photos?: string[];
   opening_time: string;
   closing_time: string;
   slot_duration: number;
   max_capacity: number;
   is_active: boolean;
   created_at: Date;
+  rating_avg?: number;
+  rating_count?: number;
+  points_per_visit?: number;
+}
+
+export interface ShopService {
+  id: number;
+  shop_id: number;
+  name: string;
+  price?: number;
+  duration_minutes?: number;
+  description?: string;
+  is_active: boolean;
+  created_at: Date;
+}
+
+export interface Review {
+  id: number;
+  shop_id: number;
+  user_id: number;
+  reservation_id?: number;
+  rating: number;
+  comment?: string;
+  shop_reply?: string;
+  shop_reply_at?: Date;
+  created_at: Date;
+  user_name?: string;
+  user_avatar?: string;
+}
+
+export interface Favorite {
+  id: number;
+  user_id: number;
+  shop_id: number;
+  created_at: Date;
+}
+
+export interface PointTransaction {
+  id: number;
+  user_id: number;
+  shop_id: number;
+  reservation_id?: number;
+  amount: number;
+  reason: 'visit' | 'coupon_redeem' | 'adjustment';
+  description?: string;
+  created_at: Date;
+  shop_name?: string;
+}
+
+export interface ShopCoupon {
+  id: number;
+  shop_id: number;
+  title: string;
+  description?: string;
+  points_cost: number;
+  max_claims?: number;
+  claimed_count: number;
+  is_active: boolean;
+  created_at: Date;
+  shop_name?: string;
+}
+
+export interface UserCoupon {
+  id: number;
+  user_id: number;
+  coupon_id: number;
+  shop_id: number;
+  code: string;
+  points_spent: number;
+  claimed_at: Date;
+  used_at?: Date;
+  title?: string;
+  description?: string;
+  shop_name?: string;
 }
 
 export interface Reservation {
@@ -39,6 +116,7 @@ export interface Reservation {
   notes?: string;
   created_at: Date;
   shop_name?: string;
+  has_review?: boolean;
 }
 
 export interface TimeSlot {

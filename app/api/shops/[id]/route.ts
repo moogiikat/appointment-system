@@ -10,7 +10,18 @@ export async function GET(
   try {
     const { id } = await params;
     const shops = await sql`
-      SELECT * FROM shops WHERE id = ${id}
+      SELECT s.*,
+        COALESCE(rv.rating_avg, 0) AS rating_avg,
+        COALESCE(rv.rating_count, 0) AS rating_count
+      FROM shops s
+      LEFT JOIN (
+        SELECT shop_id,
+               ROUND(AVG(rating)::numeric, 1)::float8 AS rating_avg,
+               COUNT(*)::int AS rating_count
+        FROM reviews
+        GROUP BY shop_id
+      ) rv ON rv.shop_id = s.id
+      WHERE s.id = ${id}
     `;
 
     if (shops.length === 0) {
@@ -56,6 +67,9 @@ export async function PUT(
       address,
       phone,
       icon,
+      category,
+      district,
+      photos,
       opening_time,
       closing_time,
       slot_duration,
@@ -64,12 +78,15 @@ export async function PUT(
     } = body;
 
     const result = await sql`
-      UPDATE shops 
-      SET name = ${name}, 
+      UPDATE shops
+      SET name = ${name},
           description = ${description || ''},
           address = ${address || ''},
           phone = ${phone || ''},
           icon = ${icon || null},
+          category = ${category || null},
+          district = ${district || null},
+          photos = ${Array.isArray(photos) ? photos : []},
           opening_time = ${opening_time || '09:00'},
           closing_time = ${closing_time || '18:00'},
           slot_duration = ${slot_duration || 30},

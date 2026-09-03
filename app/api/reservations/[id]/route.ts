@@ -84,7 +84,22 @@ export async function PUT(
       return NextResponse.json({ error: 'Захиалга олдсонгүй' }, { status: 404 });
     }
 
-    return NextResponse.json(result[0]);
+    const reservation = result[0];
+
+    // Award loyalty points on completion (idempotent, no real payment involved)
+    if (status === 'completed' && reservation.user_id) {
+      const shops = await sql`SELECT points_per_visit FROM shops WHERE id = ${reservation.shop_id}`;
+      const pointsPerVisit = shops[0]?.points_per_visit || 0;
+      if (pointsPerVisit > 0) {
+        await sql`
+          INSERT INTO point_transactions (user_id, shop_id, reservation_id, amount, reason, description)
+          VALUES (${reservation.user_id}, ${reservation.shop_id}, ${reservation.id}, ${pointsPerVisit}, 'visit', 'Захиалга дуусгасны оноо')
+          ON CONFLICT (reservation_id, reason) DO NOTHING
+        `;
+      }
+    }
+
+    return NextResponse.json(reservation);
   } catch (error) {
     console.error('Error updating reservation:', error);
     return NextResponse.json(

@@ -44,10 +44,10 @@ export default function DatePicker({
         type="button"
         onClick={() => setStartIndex(Math.max(0, startIndex - daysToShow))}
         disabled={!canGoPrev}
-        className={`p-2 rounded-xl transition-all duration-200 shrink-0 ${
+        className={`p-2 rounded-card transition-all duration-200 shrink-0 ${
           canGoPrev
-            ? 'bg-white border-2 border-slate-200 text-slate-700 hover:border-sky-400 hover:text-sky-600 hover:bg-sky-50'
-            : 'bg-slate-100 text-slate-300 cursor-not-allowed'
+            ? 'bg-white border-2 border-line text-ink hover:border-brand hover:text-brand-dark hover:bg-brand-band'
+            : 'bg-surface text-line-strong cursor-not-allowed'
         }`}
       >
         <ChevronLeft className="w-5 h-5" />
@@ -66,20 +66,20 @@ export default function DatePicker({
               onClick={() => !isPast && onSelectDate(date)}
               disabled={isPast}
               className={`
-                flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all duration-200 min-w-0
+                flex flex-col items-center justify-center py-2 px-1 rounded-card transition-all duration-200 min-w-0
                 ${
                   isSelected
-                    ? 'bg-linear-to-r from-sky-500 to-cyan-500 text-white shadow-lg shadow-sky-500/30 scale-105'
+                    ? 'bg-brand text-white shadow-lg scale-105'
                     : isPast
-                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-sky-400 hover:text-sky-600 hover:bg-sky-50'
+                    ? 'bg-surface text-placeholder cursor-not-allowed'
+                    : 'bg-white border-2 border-line text-ink hover:border-brand hover:text-brand-dark hover:bg-brand-band'
                 }
               `}
             >
               <span className="text-[10px] sm:text-xs font-semibold whitespace-nowrap">
                 {dayNames[date.getDay()]}
               </span>
-              <span className={`text-base sm:text-lg font-bold ${isTodayDate && !isSelected ? 'text-sky-500' : ''}`}>
+              <span className={`text-base sm:text-lg font-bold ${isTodayDate && !isSelected ? 'text-brand' : ''}`}>
                 {format(date, 'd')}
               </span>
               <span className="text-[10px] sm:text-xs opacity-70 whitespace-nowrap">
@@ -99,10 +99,10 @@ export default function DatePicker({
         type="button"
         onClick={() => setStartIndex(Math.min(dates.length - daysToShow, startIndex + daysToShow))}
         disabled={!canGoNext}
-        className={`p-2 rounded-xl transition-all duration-200 shrink-0 ${
+        className={`p-2 rounded-card transition-all duration-200 shrink-0 ${
           canGoNext
-            ? 'bg-white border-2 border-slate-200 text-slate-700 hover:border-sky-400 hover:text-sky-600 hover:bg-sky-50'
-            : 'bg-slate-100 text-slate-300 cursor-not-allowed'
+            ? 'bg-white border-2 border-line text-ink hover:border-brand hover:text-brand-dark hover:bg-brand-band'
+            : 'bg-surface text-line-strong cursor-not-allowed'
         }`}
       >
         <ChevronRight className="w-5 h-5" />

@@ -14,6 +14,9 @@ import WeekDateStrip from '@/components/shop-admin/WeekDateStrip';
 import ReservationCard from '@/components/shop-admin/ReservationCard';
 import ShopSettingsPanel from '@/components/shop-admin/ShopSettingsPanel';
 import PhoneReservationPanel from '@/components/shop-admin/PhoneReservationPanel';
+import ServicesPanel from '@/components/shop-admin/ServicesPanel';
+import ReviewsPanel from '@/components/shop-admin/ReviewsPanel';
+import CouponsPanel from '@/components/shop-admin/CouponsPanel';
 import {
   Calendar,
   Settings,
@@ -28,9 +31,12 @@ import {
   Search,
   CheckCheck,
   Clock,
+  Tag,
+  MessageCircle,
+  Ticket,
 } from 'lucide-react';
 
-type Tab = 'schedule' | 'phone' | 'stats' | 'settings';
+type Tab = 'schedule' | 'phone' | 'stats' | 'services' | 'reviews' | 'coupons' | 'settings';
 type StatusFilter = 'all' | Reservation['status'];
 
 export default function ShopAdminPage() {
@@ -160,32 +166,32 @@ export default function ShopAdminPage() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="animate-pulse text-slate-400">Уншиж байна...</div>
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="animate-pulse text-placeholder">Уншиж байна...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-surface">
       {/* Sticky header */}
-      <div className="sticky top-16 z-40 bg-white border-b border-slate-200 shadow-sm">
+      <div className="sticky top-16 z-40 bg-white border-b border-line shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-linear-to-br from-sky-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg shadow-sky-500/20 shrink-0">
+              <div className="w-12 h-12 bg-brand rounded-card flex items-center justify-center shadow-lg shrink-0">
                 {shop?.icon ? (
-                  <img src={shop.icon} alt="" className="w-full h-full object-cover rounded-2xl" />
+                  <img src={shop.icon} alt="" className="w-full h-full object-cover rounded-card" />
                 ) : (
                   <Store className="w-6 h-6 text-white" />
                 )}
               </div>
               <div>
-                <h1 className="text-xl font-bold text-slate-800 leading-tight">
+                <h1 className="text-xl font-bold text-ink-strong leading-tight">
                   {shop?.name || 'Үйлчилгээний газар'}
                 </h1>
                 {shop && (
-                  <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                  <p className="text-xs text-subtle flex items-center gap-1 mt-0.5">
                     <Clock className="w-3 h-3" />
                     {shop.opening_time.slice(0, 5)} – {shop.closing_time.slice(0, 5)}
                     · {shop.slot_duration} мин/цаг
@@ -195,21 +201,24 @@ export default function ShopAdminPage() {
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex bg-slate-100 rounded-xl p-1 overflow-x-auto max-w-full">
+              <div className="flex bg-surface rounded-card p-1 overflow-x-auto max-w-full">
                 {([
                   { key: 'schedule' as Tab, label: 'Хуваарь', icon: LayoutList },
                   { key: 'phone' as Tab, label: 'Утсаар', icon: PhoneCall },
                   { key: 'stats' as Tab, label: 'Статистик', icon: BarChart3 },
+                  { key: 'services' as Tab, label: 'Үйлчилгээ', icon: Tag },
+                  { key: 'reviews' as Tab, label: 'Сэтгэгдэл', icon: MessageCircle },
+                  { key: 'coupons' as Tab, label: 'Купон', icon: Ticket },
                   { key: 'settings' as Tab, label: 'Тохиргоо', icon: Settings },
                 ]).map(({ key, label, icon: Icon }) => (
                   <button
                     key={key}
                     type="button"
                     onClick={() => setActiveTab(key)}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-control text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
                       activeTab === key
-                        ? 'bg-white text-sky-600 shadow-sm'
-                        : 'text-slate-500 hover:text-slate-700'
+                        ? 'bg-white text-brand-dark shadow-sm'
+                        : 'text-subtle hover:text-ink'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -239,6 +248,30 @@ export default function ShopAdminPage() {
           <DashboardStats shopId={shop.id} refreshKey={statsRefreshKey} defaultExpanded hideToggle />
         )}
 
+        {activeTab === 'services' && shop && (
+          <ServicesPanel
+            shopId={shop.id}
+            onSuccess={(msg) => showToast(msg, 'success')}
+            onError={(msg) => showToast(msg, 'error')}
+          />
+        )}
+
+        {activeTab === 'reviews' && shop && (
+          <ReviewsPanel
+            shopId={shop.id}
+            onSuccess={(msg) => showToast(msg, 'success')}
+            onError={(msg) => showToast(msg, 'error')}
+          />
+        )}
+
+        {activeTab === 'coupons' && shop && (
+          <CouponsPanel
+            shopId={shop.id}
+            onSuccess={(msg) => showToast(msg, 'success')}
+            onError={(msg) => showToast(msg, 'error')}
+          />
+        )}
+
         {activeTab === 'settings' && shop && (
           <ShopSettingsPanel
             shop={shop}
@@ -252,7 +285,7 @@ export default function ShopAdminPage() {
           <>
             {/* Pending alert */}
             {pendingCount > 0 && (
-              <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-2xl">
+              <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-card">
                 <div className="flex items-center gap-2 text-amber-800">
                   <AlertCircle className="w-5 h-5 shrink-0" />
                   <span className="font-semibold text-sm">
@@ -273,38 +306,38 @@ export default function ShopAdminPage() {
             )}
 
             {/* Date strip + today stats */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 shadow-sm">
+            <div className="bg-white rounded-card border border-line p-4 mb-4 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-sky-500" />
-                  <span className="font-bold text-slate-800">
+                  <Calendar className="w-5 h-5 text-brand" />
+                  <span className="font-bold text-ink-strong">
                     {format(parseISO(selectedDate), 'yyyy.MM.dd')}
                   </span>
                   {!isToday && (
                     <button
                       type="button"
                       onClick={() => setSelectedDate(today)}
-                      className="text-xs font-semibold text-sky-600 bg-sky-50 px-2 py-1 rounded-lg hover:bg-sky-100"
+                      className="text-xs font-semibold text-brand-dark bg-brand-band px-2 py-1 rounded-control hover:bg-brand-band"
                     >
                       Өнөөдөр
                     </button>
                   )}
                   {isToday && (
-                    <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
+                    <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-control">
                       Өнөөдөр
                     </span>
                   )}
                 </div>
                 <div className="flex gap-2 flex-wrap">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-50 text-amber-700">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-control text-xs font-semibold bg-amber-50 text-amber-700">
                     <AlertCircle className="w-3.5 h-3.5" />
                     {pendingCount} хүлээгдэж
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-50 text-green-700">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-control text-xs font-semibold bg-green-50 text-green-700">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     {confirmedCount} баталгаажсан
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-control text-xs font-semibold bg-surface text-ink">
                     <Users className="w-3.5 h-3.5" />
                     {reservations.length} нийт
                   </span>
@@ -330,15 +363,15 @@ export default function ShopAdminPage() {
               {/* Reservation list */}
               <div className="xl:col-span-3 space-y-3">
                 {/* Search + filter */}
-                <div className="bg-white rounded-2xl border border-slate-200 p-3 shadow-sm space-y-3">
+                <div className="bg-white rounded-card border border-line p-3 shadow-sm space-y-3">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-placeholder" />
                     <input
                       type="text"
                       placeholder="Нэр эсвэл утсаар хайх..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      className="w-full pl-9 pr-4 py-2.5 border border-line rounded-card text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand-band"
                     />
                   </div>
                   <div className="flex gap-1.5 overflow-x-auto pb-0.5">
@@ -347,15 +380,15 @@ export default function ShopAdminPage() {
                         key={key}
                         type="button"
                         onClick={() => setStatusFilter(key)}
-                        className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                        className={`shrink-0 px-3 py-1.5 rounded-control text-xs font-semibold transition-all ${
                           statusFilter === key
-                            ? 'bg-sky-500 text-white shadow-sm'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                            ? 'bg-brand text-white shadow-sm'
+                            : 'bg-surface text-subtle hover:bg-line'
                         }`}
                       >
                         {label}
                         {count !== undefined && count > 0 && (
-                          <span className={`ml-1 ${statusFilter === key ? 'text-sky-100' : 'text-slate-400'}`}>
+                          <span className={`ml-1 ${statusFilter === key ? 'text-brand-band' : 'text-placeholder'}`}>
                             ({count})
                           </span>
                         )}
@@ -367,16 +400,16 @@ export default function ShopAdminPage() {
                 {loading ? (
                   <div className="space-y-3">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="h-24 bg-white rounded-2xl animate-pulse border border-slate-200" />
+                      <div key={i} className="h-24 bg-white rounded-card animate-pulse border border-line" />
                     ))}
                   </div>
                 ) : filteredReservations.length === 0 ? (
-                  <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center">
-                    <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                    <h3 className="font-semibold text-slate-700 mb-1">
+                  <div className="bg-white rounded-card border border-line p-10 text-center">
+                    <Calendar className="w-12 h-12 text-line-strong mx-auto mb-3" />
+                    <h3 className="font-semibold text-ink mb-1">
                       {reservations.length === 0 ? 'Энэ өдөр захиалга байхгүй' : 'Үр дүн олдсонгүй'}
                     </h3>
-                    <p className="text-sm text-slate-500 mb-4">
+                    <p className="text-sm text-subtle mb-4">
                       {reservations.length === 0 ? 'Шинэ захиалга нэмнэ үү' : 'Шүүлтүүр эсвэл хайлт өөрчилнө үү'}
                     </p>
                     {reservations.length === 0 && (
