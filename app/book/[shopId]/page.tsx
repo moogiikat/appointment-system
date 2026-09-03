@@ -193,14 +193,14 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
       <div className="min-h-screen py-12 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-slate-200 rounded w-1/4" />
-            <div className="h-20 bg-slate-200 rounded-2xl" />
+            <div className="h-8 bg-line rounded w-1/4" />
+            <div className="h-20 bg-line rounded-card" />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
-                <div className="h-32 bg-slate-200 rounded-2xl" />
-                <div className="h-48 bg-slate-200 rounded-2xl" />
+                <div className="h-32 bg-line rounded-card" />
+                <div className="h-48 bg-line rounded-card" />
               </div>
-              <div className="h-64 bg-slate-200 rounded-2xl" />
+              <div className="h-64 bg-line rounded-card" />
             </div>
           </div>
         </div>
@@ -216,32 +216,32 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
             <div className="w-20 h-20 bg-green-100 rounded-full mx-auto mb-6 flex items-center justify-center animate-pulse-glow">
               <CheckCircle className="w-10 h-10 text-green-500" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-800 mb-2">
+            <h1 className="text-2xl font-bold text-ink-strong mb-2">
               Захиалга амжилттай!
             </h1>
-            <p className="text-slate-600 mb-6">
+            <p className="text-subtle mb-6">
               Таны захиалга бүртгэгдлээ. Баярлалаа!
             </p>
 
-            <div className="bg-slate-50 rounded-xl p-4 mb-6 text-left">
+            <div className="bg-surface rounded-card p-4 mb-6 text-left">
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Үйлчилгээний газар:</span>
-                  <span className="font-medium text-slate-700">{shop?.name}</span>
+                  <span className="text-subtle">Үйлчилгээний газар:</span>
+                  <span className="font-medium text-ink">{shop?.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Огноо:</span>
-                  <span className="font-medium text-slate-700">
+                  <span className="text-subtle">Огноо:</span>
+                  <span className="font-medium text-ink">
                     {format(selectedDate, 'yyyy-MM-dd')}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Цаг:</span>
-                  <span className="font-medium text-slate-700">{selectedTime}</span>
+                  <span className="text-subtle">Цаг:</span>
+                  <span className="font-medium text-ink">{selectedTime}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Захиалгын дугаар:</span>
-                  <span className="font-medium text-sky-600">#{reservationId}</span>
+                  <span className="text-subtle">Захиалгын дугаар:</span>
+                  <span className="font-medium text-brand-dark">#{reservationId}</span>
                 </div>
               </div>
             </div>
@@ -267,7 +267,7 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <Link href={`/shop/${shopId}`} className="inline-flex items-center gap-2 text-slate-600 hover:text-sky-600 mb-6 transition-colors">
+        <Link href={`/shop/${shopId}`} className="inline-flex items-center gap-2 text-subtle hover:text-brand-dark mb-6 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           Буцах
         </Link>
@@ -275,31 +275,31 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
         {shop && (
           <div className="mb-8 animate-fade-in">
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg shadow-sky-500/25 overflow-hidden">
+              <div className="w-16 h-16 rounded-card flex items-center justify-center shadow-lg overflow-hidden">
                 {shop.icon ? (
                   <img src={shop.icon} alt={shop.name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-linear-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
+                  <div className="w-full h-full bg-brand flex items-center justify-center">
                     <span className="text-2xl font-bold text-white">{shop.name.charAt(0)}</span>
                   </div>
                 )}
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-slate-800 mb-1">{shop.name}</h1>
-                <div className="flex flex-wrap gap-4 text-sm text-slate-600">
+                <h1 className="text-2xl font-bold text-ink-strong mb-1">{shop.name}</h1>
+                <div className="flex flex-wrap gap-4 text-sm text-subtle">
                   {shop.address && (
                     <span className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4 text-sky-500" />
+                      <MapPin className="w-4 h-4 text-brand" />
                       {shop.address}
                     </span>
                   )}
                   <span className="flex items-center gap-1">
-                    <Clock className="w-4 h-4 text-sky-500" />
+                    <Clock className="w-4 h-4 text-brand" />
                     {shop.opening_time.slice(0, 5)} - {shop.closing_time.slice(0, 5)}
                   </span>
                   {shop.phone && (
                     <span className="flex items-center gap-1">
-                      <Phone className="w-4 h-4 text-sky-500" />
+                      <Phone className="w-4 h-4 text-brand" />
                       {shop.phone}
                     </span>
                   )}
@@ -314,7 +314,7 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
             {/* Date & Time Selection */}
             <div className="lg:col-span-2 space-y-6">
               <Card variant="elevated" className="animate-fade-in stagger-1 opacity-0">
-                <h2 className="text-lg font-bold text-slate-800 mb-4">1. Огноо сонгох</h2>
+                <h2 className="text-lg font-bold text-ink-strong mb-4">1. Огноо сонгох</h2>
                 <DatePicker
                   selectedDate={selectedDate}
                   onSelectDate={setSelectedDate}
@@ -322,11 +322,11 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
               </Card>
 
               <Card variant="elevated" className="animate-fade-in stagger-2 opacity-0">
-                <h2 className="text-lg font-bold text-slate-800 mb-4">2. Цаг сонгох</h2>
+                <h2 className="text-lg font-bold text-ink-strong mb-4">2. Цаг сонгох</h2>
                 {loading ? (
                   <div className="grid grid-cols-4 gap-2">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                      <div key={i} className="h-12 bg-slate-100 rounded-xl animate-pulse" />
+                      <div key={i} className="h-12 bg-surface rounded-card animate-pulse" />
                     ))}
                   </div>
                 ) : (
@@ -342,7 +342,7 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
             {/* Customer Info */}
             <div className="space-y-6">
               <Card variant="elevated" className="animate-fade-in stagger-3 opacity-0">
-                <h2 className="text-lg font-bold text-slate-800 mb-4">3. Мэдээлэл оруулах</h2>
+                <h2 className="text-lg font-bold text-ink-strong mb-4">3. Мэдээлэл оруулах</h2>
                 <div className="space-y-4">
                   <Input
                     id="name"
@@ -362,11 +362,11 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
                     required
                   />
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                    <label className="block text-sm font-medium text-ink mb-1.5">
                       Нэмэлт тэмдэглэл
                     </label>
                     <textarea
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:outline-none transition-all duration-200 placeholder:text-slate-400 resize-none bg-white"
+                      className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none transition-all duration-200 placeholder:text-placeholder resize-none bg-white"
                       placeholder="Нэмэлт мэдээлэл..."
                       rows={3}
                       value={notes}
@@ -377,26 +377,26 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
               </Card>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm animate-fade-in">
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-card text-sm animate-fade-in">
                   {error}
                 </div>
               )}
 
               {selectedTime && (
-                <div className="bg-linear-to-br from-sky-50 to-cyan-50 rounded-xl p-4 border border-sky-100">
-                  <h3 className="text-sm font-bold text-slate-700 mb-3">Захиалгын хураангуй</h3>
+                <div className="bg-brand rounded-card p-4 border border-brand-band">
+                  <h3 className="text-sm font-bold text-ink mb-3">Захиалгын хураангуй</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Огноо:</span>
-                      <span className="font-semibold text-slate-800">{format(selectedDate, 'yyyy-MM-dd')}</span>
+                      <span className="text-subtle">Огноо:</span>
+                      <span className="font-semibold text-ink-strong">{format(selectedDate, 'yyyy-MM-dd')}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Цаг:</span>
-                      <span className="font-semibold text-sky-600">{selectedTime}</span>
+                      <span className="text-subtle">Цаг:</span>
+                      <span className="font-semibold text-brand-dark">{selectedTime}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Үйлчилгээний газар:</span>
-                      <span className="font-semibold text-slate-800 truncate ml-2">{shop?.name}</span>
+                      <span className="text-subtle">Үйлчилгээний газар:</span>
+                      <span className="font-semibold text-ink-strong truncate ml-2">{shop?.name}</span>
                     </div>
                   </div>
                 </div>

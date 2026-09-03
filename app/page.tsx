@@ -5,19 +5,11 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Shop } from "@/lib/types";
-import { UB_DISTRICTS, SUGGESTED_CATEGORIES } from "@/lib/constants";
+import { UB_DISTRICTS, SUGGESTED_CATEGORIES, categoryStyle } from "@/lib/constants";
 import ShopCard from "@/components/ShopCard";
+import GenreGrid from "@/components/GenreGrid";
 import Button from "@/components/ui/Button";
-import {
-  Calendar,
-  Clock,
-  Users,
-  Shield,
-  Search,
-  Store,
-  ArrowRight,
-  Sparkles,
-} from "lucide-react";
+import { Search, MapPin, X, Store, Clock } from "lucide-react";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -73,259 +65,179 @@ export default function Home() {
 
   const hasActiveFilters = !!(searchQuery || categoryFilter || districtFilter);
 
-  const features = [
-    {
-      icon: Calendar,
-      title: "Хялбар захиалга",
-      description: "Хүссэн өдөр, цагаа сонгоод шууд захиална",
-    },
-    {
-      icon: Clock,
-      title: "Бодит цагийн мэдээлэл",
-      description: "Боломжит цагуудыг шууд харж, сонгох",
-    },
-    {
-      icon: Users,
-      title: "Google-ээр нэвтрэх",
-      description: "Google хаягаараа хурдан нэвтэрч захиалга хийх",
-    },
-    {
-      icon: Shield,
-      title: "Баталгаатай",
-      description: "Захиалга хийсний дараа баталгаажуулалт авна",
-    },
-  ];
+  const clearFilters = () => {
+    setSearchQuery("");
+    setCategoryFilter("");
+    setDistrictFilter("");
+  };
+
+  /* 新着（登録が新しい順の先頭6件）— EPARK の「最近見た施設」枠に相当 */
+  const newShops = useMemo(() => shops.slice(0, 6), [shops]);
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative py-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-br from-sky-100/50 via-transparent to-cyan-100/50" />
-        <div className="absolute top-20 left-10 w-72 h-72 bg-sky-200/40 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-200/40 rounded-full blur-3xl" />
+    <div className="min-h-screen bg-white">
+      {/* ---- 検索バンド（EPARK の #eff7ef ヘッダー帯）---- */}
+      <section className="bg-brand-band">
+        <div className="max-w-[1120px] mx-auto px-4 py-4 md:py-6">
+          <h1 className="text-[15px] md:text-[18px] font-bold text-ink-strong mb-3">
+            Үйлчилгээний газраа хайж, цагаа захиалаарай
+          </h1>
 
-        <div className="max-w-7xl mx-auto relative">
-          <div className="text-center animate-fade-in">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/80 backdrop-blur rounded-full shadow-sm border border-sky-100 text-sm text-sky-700 font-medium mb-6">
-              <Sparkles className="w-4 h-4" />
-              Монголын #1 цаг захиалгын систем
+          <div className="flex flex-col md:flex-row gap-2">
+            <div className="flex items-center bg-white rounded-control h-9 md:h-12 flex-1 min-w-0">
+              <Search className="w-4 h-4 md:w-5 md:h-5 text-placeholder ml-3 shrink-0" />
+              <input
+                type="search"
+                placeholder="Нэр, хаяг, түлхүүр үгээр хайх"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 min-w-0 h-full bg-transparent border-none outline-none px-2 text-[13px] md:text-[14px] text-ink placeholder:text-placeholder"
+              />
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-extrabold text-slate-800 mb-6">
-              <span className="gradient-text">Цаг захиалах</span>
-              <br />
-              <span className="text-slate-700">систем</span>
-            </h1>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
-              Үйлчилгээний газар руу онлайнаар цаг захиалаарай. Хурдан, хялбар,
-              найдвартай.
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-4 mb-8">
-              {status === "authenticated" && userRole !== "shop_admin" ? (
-                <>
-                  <Link href="/my-reservations">
-                    <Button variant="primary" size="lg" className="gap-2">
-                      <Calendar className="w-5 h-5" />
-                      Миний захиалгууд
-                    </Button>
-                  </Link>
-                  <a href="#shops">
-                    <Button variant="outline" size="lg" className="gap-2">
-                      <Store className="w-5 h-5" />
-                      Үйлчилгээний газар сонгох
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </a>
-                </>
-              ) : status !== "loading" ? (
-                <Link href="/auth/signin">
-                  <Button variant="primary" size="lg" className="gap-2">
-                    <Users className="w-5 h-5" />
-                    Нэвтэрч захиалга хийх
-                  </Button>
-                </Link>
-              ) : null}
+            <div className="flex items-center bg-white rounded-control h-9 md:h-12 md:w-[242px] shrink-0">
+              <MapPin className="w-4 h-4 md:w-5 md:h-5 text-placeholder ml-3 shrink-0" />
+              <select
+                value={districtFilter}
+                onChange={(e) => setDistrictFilter(e.target.value)}
+                aria-label="Дүүрэг"
+                className="flex-1 min-w-0 h-full bg-transparent border-none outline-none px-2 text-[13px] md:text-[14px] text-ink appearance-none cursor-pointer"
+              >
+                <option value="">Бүх дүүрэг</option>
+                {UB_DISTRICTS.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-4 text-sm font-medium">
-              <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md border border-slate-100">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                <span className="text-slate-700">Монгол цаг (UTC+8)</span>
-              </div>
-              {!loading && shops.length > 0 && (
-                <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md border border-slate-100">
-                  <Store className="w-4 h-4 text-sky-500" />
-                  <span className="text-slate-700">{shops.length} үйлчилгээний газар</span>
-                </div>
-              )}
-            </div>
+            <a href="#shops" className="shrink-0">
+              <Button variant="primary" size="lg" className="w-full md:w-[160px]">
+                <Search className="w-4 h-4" />
+                Хайх
+              </Button>
+            </a>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
-              <div
-                key={feature.title}
-                className={`animate-fade-in stagger-${
-                  index + 1
-                } opacity-0 bg-white rounded-2xl p-6 shadow-lg border border-slate-100 hover:shadow-xl hover:border-sky-200 transition-all duration-300 hover:-translate-y-1`}
-              >
-                <div className="w-12 h-12 bg-linear-to-br from-sky-500 to-cyan-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-sky-500/25">
-                  <feature.icon className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-bold text-slate-800 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-slate-600">{feature.description}</p>
+      {/* ---- ジャンルから探す（search-genre-list）---- */}
+      <section className="max-w-[1120px] mx-auto px-4 py-6 md:py-10">
+        <h2 className="epark-section-title mb-4 md:mb-6">Ангилалаар хайх</h2>
+        <GenreGrid
+          categories={categories}
+          selected={categoryFilter}
+          onSelect={setCategoryFilter}
+        />
+      </section>
+
+      {/* ---- 新着（横スクロールレール）---- */}
+      {!loading && newShops.length > 0 && !hasActiveFilters && (
+        <section className="max-w-[1120px] mx-auto px-4 pb-6 md:pb-10">
+          <h2 className="epark-section-title mb-4 flex items-center gap-2">
+            <Clock className="w-5 h-5 text-brand" />
+            Шинээр нэмэгдсэн
+          </h2>
+          <div className="epark-rail gap-4 pb-4 -mx-4 px-4 md:mx-0 md:px-0">
+            {newShops.map((shop) => (
+              <div key={shop.id} className="w-[211px] md:w-[244px] shrink-0">
+                <ShopCard shop={shop} />
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Shops Section */}
-      <section className="py-16 px-4" id="shops">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-slate-800 mb-4">
-              Үйлчилгээний газрын жагсаалт
-            </h2>
-            <p className="text-slate-600">
-              Захиалга хийх үйлчилгээний газрыг сонгоно уу
+      {/* ---- 一覧 ---- */}
+      <section id="shops" className="max-w-[1120px] mx-auto px-4 pb-12">
+        <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+          <h2 className="epark-section-title flex items-center gap-2">
+            {categoryFilter ? (
+              <span
+                className="w-5 h-5 rounded-full shrink-0"
+                style={{ backgroundColor: categoryStyle(categoryFilter).color }}
+              />
+            ) : (
+              <Store className="w-5 h-5 text-brand" />
+            )}
+            {categoryFilter || "Бүх үйлчилгээний газар"}
+            {!loading && (
+              <span className="text-[13px] font-normal text-subtle">
+                {filteredShops.length} газар
+              </span>
+            )}
+          </h2>
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="inline-flex items-center gap-1 text-[13px] text-brand font-bold hover:opacity-70"
+            >
+              <X className="w-3.5 h-3.5" />
+              Шүүлтүүр цэвэрлэх
+            </button>
+          )}
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="epark-card overflow-hidden">
+                <div className="h-[120px] md:h-[182px] bg-surface animate-pulse" />
+                <div className="p-3 space-y-2">
+                  <div className="h-3 bg-surface rounded w-1/3 animate-pulse" />
+                  <div className="h-4 bg-surface rounded w-3/4 animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : shops.length === 0 ? (
+          <div className="text-center py-16 border border-line rounded-card">
+            <Store className="w-12 h-12 text-line-strong mx-auto mb-4" />
+            <h3 className="text-[15px] font-bold text-ink mb-1">
+              Үйлчилгээний газар бүртгэгдээгүй байна
+            </h3>
+            <p className="text-subtle text-[13px]">
+              Удахгүй үйлчилгээний газрын жагсаалт нэмэгдэх болно
             </p>
           </div>
-
-          {!loading && shops.length > 0 && (
-            <div className="max-w-3xl mx-auto mb-8">
-              <div className="relative mb-3">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Нэр, хаяг, тайлбараар хайх..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-slate-200 rounded-2xl focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:outline-none transition-all placeholder:text-slate-400 shadow-sm"
-                />
-              </div>
-              <div className="flex flex-wrap gap-3 justify-center">
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="px-4 py-2.5 bg-white border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none text-sm text-slate-700 shadow-sm"
-                >
-                  <option value="">Бүх ангилал</option>
-                  {categories.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-                <select
-                  value={districtFilter}
-                  onChange={(e) => setDistrictFilter(e.target.value)}
-                  className="px-4 py-2.5 bg-white border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none text-sm text-slate-700 shadow-sm"
-                >
-                  <option value="">Бүх дүүрэг</option>
-                  {UB_DISTRICTS.map((d) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-                {hasActiveFilters && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchQuery("");
-                      setCategoryFilter("");
-                      setDistrictFilter("");
-                    }}
-                    className="px-4 py-2.5 text-sm font-semibold text-sky-600 hover:bg-sky-50 rounded-xl transition-colors"
-                  >
-                    Шүүлтүүр цэвэрлэх
-                  </button>
-                )}
-              </div>
-              {hasActiveFilters && (
-                <p className="text-sm text-slate-500 mt-3 text-center">
-                  {filteredShops.length} үр дүн олдлоо
-                </p>
-              )}
-            </div>
-          )}
-
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded-2xl p-6 shadow-lg animate-pulse border border-slate-100"
-                >
-                  <div className="w-14 h-14 bg-slate-200 rounded-2xl mb-4" />
-                  <div className="h-6 bg-slate-200 rounded mb-2 w-3/4" />
-                  <div className="h-4 bg-slate-200 rounded mb-4 w-full" />
-                  <div className="h-10 bg-slate-200 rounded-xl w-full" />
-                </div>
-              ))}
-            </div>
-          ) : shops.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="w-24 h-24 bg-slate-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-                <Calendar className="w-12 h-12 text-slate-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-slate-700 mb-2">
-                Үйлчилгээний газар бүртгэгдээгүй байна
-              </h3>
-              <p className="text-slate-500">
-                Удахгүй үйлчилгээний газрын жагсаалт нэмэгдэх болно
-              </p>
-            </div>
-          ) : filteredShops.length === 0 ? (
-            <div className="text-center py-12">
-              <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-slate-700 mb-2">
-                Хайлтаар үр дүн олдсонгүй
-              </h3>
-              <p className="text-slate-500 mb-4">Өөр түлхүүр үгээр оролдоно уу</p>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSearchQuery("");
-                  setCategoryFilter("");
-                  setDistrictFilter("");
-                }}
-              >
-                Хайлт цэвэрлэх
-              </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredShops.map((shop, index) => (
-                <div
-                  key={shop.id}
-                  className={`animate-fade-in stagger-${
-                    (index % 5) + 1
-                  } opacity-0`}
-                >
-                  <ShopCard shop={shop} />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        ) : filteredShops.length === 0 ? (
+          <div className="text-center py-16 border border-line rounded-card">
+            <Search className="w-12 h-12 text-line-strong mx-auto mb-4" />
+            <h3 className="text-[15px] font-bold text-ink mb-1">
+              Хайлтаар үр дүн олдсонгүй
+            </h3>
+            <p className="text-subtle text-[13px] mb-4">Өөр түлхүүр үгээр оролдоно уу</p>
+            <Button variant="outline" onClick={clearFilters}>
+              Хайлт цэвэрлэх
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {filteredShops.map((shop) => (
+              <ShopCard key={shop.id} shop={shop} />
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 px-4 border-t border-slate-200 bg-white">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <div className="w-8 h-8 bg-linear-to-br from-sky-500 to-cyan-500 rounded-lg flex items-center justify-center">
-              <Calendar className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-slate-700">Цаг Захиалга</span>
+      {/* ---- フッター ---- */}
+      <footer className="border-t border-line bg-white">
+        <div className="max-w-[1120px] mx-auto px-4 py-8">
+          <div className="flex flex-wrap gap-x-6 gap-y-2 mb-4 text-[13px]">
+            <Link href="/my-reservations" className="text-ink hover:text-brand">
+              Миний захиалга
+            </Link>
+            <Link href="/favorites" className="text-ink hover:text-brand">
+              Хадгалсан
+            </Link>
+            <Link href="/rewards" className="text-ink hover:text-brand">
+              Оноо, купон
+            </Link>
           </div>
-          <p className="text-slate-500 text-sm">
+          <p className="text-subtle text-[12px]">
             © 2026 Цаг Захиалга. Бүх эрх хуулиар хамгаалагдсан.
           </p>
         </div>

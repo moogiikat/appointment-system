@@ -13,8 +13,8 @@ export default function PhotoGallery({ photos, alt }: PhotoGalleryProps) {
 
   if (!photos || photos.length === 0) {
     return (
-      <div className="w-full h-64 rounded-2xl bg-slate-100 flex items-center justify-center">
-        <ImageOff className="w-10 h-10 text-slate-300" />
+      <div className="w-full h-64 rounded-card bg-surface flex items-center justify-center">
+        <ImageOff className="w-10 h-10 text-line-strong" />
       </div>
     );
   }
@@ -24,7 +24,7 @@ export default function PhotoGallery({ photos, alt }: PhotoGalleryProps) {
 
   return (
     <div>
-      <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden bg-slate-100">
+      <div className="relative w-full h-64 sm:h-80 rounded-card overflow-hidden bg-surface">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={photos[index]} alt={`${alt} ${index + 1}`} className="w-full h-full object-cover" />
         {photos.length > 1 && (
@@ -35,7 +35,7 @@ export default function PhotoGallery({ photos, alt }: PhotoGalleryProps) {
               className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow-md"
               aria-label="Өмнөх зураг"
             >
-              <ChevronLeft className="w-5 h-5 text-slate-700" />
+              <ChevronLeft className="w-5 h-5 text-ink" />
             </button>
             <button
               type="button"
@@ -43,7 +43,7 @@ export default function PhotoGallery({ photos, alt }: PhotoGalleryProps) {
               className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow-md"
               aria-label="Дараагийн зураг"
             >
-              <ChevronRight className="w-5 h-5 text-slate-700" />
+              <ChevronRight className="w-5 h-5 text-ink" />
             </button>
             <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-black/50 text-white text-xs font-medium">
               {index + 1} / {photos.length}
@@ -58,8 +58,8 @@ export default function PhotoGallery({ photos, alt }: PhotoGalleryProps) {
               key={i}
               type="button"
               onClick={() => setIndex(i)}
-              className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-colors ${
-                i === index ? 'border-sky-500' : 'border-transparent opacity-70 hover:opacity-100'
+              className={`shrink-0 w-16 h-16 rounded-card overflow-hidden border-2 transition-colors ${
+                i === index ? 'border-brand' : 'border-transparent opacity-70 hover:opacity-100'
               }`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}

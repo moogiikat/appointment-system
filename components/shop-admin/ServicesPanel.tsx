@@ -109,8 +109,8 @@ export default function ServicesPanel({ shopId, onError, onSuccess }: ServicesPa
     <div className="max-w-2xl mx-auto space-y-5 pb-6">
       <Card variant="elevated" className="p-5!">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-slate-700 flex items-center gap-2">
-            <Tag className="w-4 h-4 text-sky-500" />
+          <h2 className="text-sm font-bold text-ink flex items-center gap-2">
+            <Tag className="w-4 h-4 text-brand" />
             Үйлчилгээ, үнийн жагсаалт
           </h2>
           {!showForm && (
@@ -122,7 +122,7 @@ export default function ServicesPanel({ shopId, onError, onSuccess }: ServicesPa
         </div>
 
         {showForm && (
-          <form onSubmit={handleSubmit} className="space-y-3 mb-5 p-4 bg-slate-50 rounded-xl">
+          <form onSubmit={handleSubmit} className="space-y-3 mb-5 p-4 bg-surface rounded-card">
             <Input
               id="serviceName"
               label="Нэр"
@@ -149,9 +149,9 @@ export default function ServicesPanel({ shopId, onError, onSuccess }: ServicesPa
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Тайлбар</label>
+              <label className="block text-sm font-medium text-ink mb-1.5">Тайлбар</label>
               <textarea
-                className="w-full px-4 py-2.5 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none resize-none text-sm"
+                className="w-full px-4 py-2.5 border-2 border-line rounded-card focus:border-brand focus:outline-none resize-none text-sm"
                 rows={2}
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -172,18 +172,18 @@ export default function ServicesPanel({ shopId, onError, onSuccess }: ServicesPa
         {loading ? (
           <div className="space-y-2">
             {[1, 2].map((i) => (
-              <div key={i} className="h-14 bg-slate-100 rounded-xl animate-pulse" />
+              <div key={i} className="h-14 bg-surface rounded-card animate-pulse" />
             ))}
           </div>
         ) : services.length === 0 ? (
-          <p className="text-sm text-slate-500 text-center py-6">Одоогоор үйлчилгээ нэмээгүй байна</p>
+          <p className="text-sm text-subtle text-center py-6">Одоогоор үйлчилгээ нэмээгүй байна</p>
         ) : (
           <div className="space-y-2">
             {services.map((service) => (
-              <div key={service.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+              <div key={service.id} className="flex items-center justify-between p-3 bg-surface rounded-card">
                 <div className="min-w-0">
-                  <p className="font-medium text-slate-800 truncate">{service.name}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="font-medium text-ink-strong truncate">{service.name}</p>
+                  <p className="text-xs text-subtle">
                     {typeof service.price === 'number' && `${service.price.toLocaleString()}₮`}
                     {service.duration_minutes && ` · ${service.duration_minutes} мин`}
                   </p>
@@ -192,14 +192,14 @@ export default function ServicesPanel({ shopId, onError, onSuccess }: ServicesPa
                   <button
                     type="button"
                     onClick={() => handleEdit(service)}
-                    className="p-2 text-slate-400 hover:text-sky-600 transition-colors"
+                    className="p-2 text-placeholder hover:text-brand-dark transition-colors"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDelete(service.id)}
-                    className="p-2 text-slate-400 hover:text-red-600 transition-colors"
+                    className="p-2 text-placeholder hover:text-red-600 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

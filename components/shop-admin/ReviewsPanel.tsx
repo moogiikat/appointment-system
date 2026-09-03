@@ -56,35 +56,35 @@ export default function ReviewsPanel({ shopId, onError, onSuccess }: ReviewsPane
   return (
     <div className="max-w-2xl mx-auto space-y-5 pb-6">
       <Card variant="elevated" className="p-5!">
-        <h2 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-          <MessageCircle className="w-4 h-4 text-sky-500" />
+        <h2 className="text-sm font-bold text-ink mb-4 flex items-center gap-2">
+          <MessageCircle className="w-4 h-4 text-brand" />
           Сэтгэгдэл ({reviews.length})
         </h2>
 
         {loading ? (
           <div className="space-y-2">
             {[1, 2].map((i) => (
-              <div key={i} className="h-20 bg-slate-100 rounded-xl animate-pulse" />
+              <div key={i} className="h-20 bg-surface rounded-card animate-pulse" />
             ))}
           </div>
         ) : reviews.length === 0 ? (
-          <p className="text-sm text-slate-500 text-center py-6">Одоогоор сэтгэгдэл байхгүй байна</p>
+          <p className="text-sm text-subtle text-center py-6">Одоогоор сэтгэгдэл байхгүй байна</p>
         ) : (
           <div className="space-y-4">
             {reviews.map((review) => (
-              <div key={review.id} className="p-4 bg-slate-50 rounded-xl">
+              <div key={review.id} className="p-4 bg-surface rounded-card">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-slate-800 text-sm">{review.user_name}</span>
+                  <span className="font-semibold text-ink-strong text-sm">{review.user_name}</span>
                   <StarRating value={review.rating} size={14} />
                 </div>
                 {review.comment && (
-                  <p className="text-sm text-slate-700 mb-3 whitespace-pre-line">{review.comment}</p>
+                  <p className="text-sm text-ink mb-3 whitespace-pre-line">{review.comment}</p>
                 )}
 
                 {review.shop_reply ? (
-                  <div className="p-3 bg-white rounded-lg border border-sky-100">
-                    <p className="text-xs font-semibold text-sky-600 mb-1">Таны хариу</p>
-                    <p className="text-sm text-slate-600 whitespace-pre-line">{review.shop_reply}</p>
+                  <div className="p-3 bg-white rounded-control border border-brand-band">
+                    <p className="text-xs font-semibold text-brand-dark mb-1">Таны хариу</p>
+                    <p className="text-sm text-subtle whitespace-pre-line">{review.shop_reply}</p>
                   </div>
                 ) : (
                   <div className="flex gap-2">
@@ -95,7 +95,7 @@ export default function ReviewsPanel({ shopId, onError, onSuccess }: ReviewsPane
                       onChange={(e) =>
                         setReplyDrafts((prev) => ({ ...prev, [review.id]: e.target.value }))
                       }
-                      className="flex-1 px-3 py-2 border-2 border-slate-200 rounded-lg text-sm focus:border-sky-500 focus:outline-none"
+                      className="flex-1 px-3 py-2 border-2 border-line rounded-control text-sm focus:border-brand focus:outline-none"
                     />
                     <Button
                       type="button"

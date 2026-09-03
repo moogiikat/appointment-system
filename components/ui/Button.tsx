@@ -8,22 +8,29 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
 }
 
+/*
+ * EPARK のボタン仕様：
+ * - 角丸 4px（カードの 8px とは別）
+ * - 影は 0 2px 4px rgba(0,0,0,.2) のみ。グラデーションは使わない
+ * - 無効時は #e5e5e5 / #c5c5c5 で影を消す
+ */
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className = '', variant = 'primary', size = 'md', isLoading, children, disabled, ...props }, ref) => {
-    const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-    
+    const baseClasses =
+      'inline-flex items-center justify-center font-bold rounded-[4px] transition-opacity duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 hover:opacity-70 disabled:opacity-100 disabled:cursor-not-allowed disabled:hover:opacity-100';
+
     const variantClasses = {
-      primary: 'bg-linear-to-r from-sky-500 to-cyan-500 text-white hover:from-sky-600 hover:to-cyan-600 focus:ring-sky-500 shadow-lg shadow-sky-500/30',
-      secondary: 'bg-slate-700 text-white hover:bg-slate-600 focus:ring-slate-500',
-      outline: 'border-2 border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400 focus:ring-slate-500',
-      danger: 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500',
-      ghost: 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:ring-slate-500',
+      primary: 'bg-brand text-white shadow-control disabled:bg-line disabled:text-placeholder disabled:shadow-none',
+      secondary: 'bg-ink text-white disabled:bg-line disabled:text-placeholder',
+      outline: 'bg-white border border-line-strong text-ink disabled:text-placeholder',
+      danger: 'bg-badge text-white shadow-control disabled:bg-line disabled:text-placeholder disabled:shadow-none',
+      ghost: 'text-ink hover:bg-surface',
     };
-    
+
     const sizeClasses = {
-      sm: 'px-3 py-1.5 text-sm',
-      md: 'px-5 py-2.5 text-base',
-      lg: 'px-7 py-3.5 text-lg',
+      sm: 'px-3 h-8 text-[12px] gap-1',
+      md: 'px-4 h-10 text-[14px] gap-1.5',
+      lg: 'px-6 h-[45px] md:h-12 text-[15px] md:text-[16px] gap-2',
     };
 
     return (

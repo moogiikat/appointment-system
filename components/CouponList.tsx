@@ -31,15 +31,15 @@ export default function CouponList({ shopId }: CouponListProps) {
   if (loading) {
     return (
       <div className="space-y-2">
-        <div className="h-16 bg-slate-100 rounded-xl animate-pulse" />
+        <div className="h-16 bg-surface rounded-card animate-pulse" />
       </div>
     );
   }
 
   if (coupons.length === 0) {
     return (
-      <div className="text-center py-6 text-slate-500 text-sm">
-        <Ticket className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+      <div className="text-center py-6 text-subtle text-sm">
+        <Ticket className="w-8 h-8 mx-auto mb-2 text-line-strong" />
         Одоогоор идэвхтэй купон байхгүй байна
       </div>
     );
@@ -75,14 +75,14 @@ export default function CouponList({ shopId }: CouponListProps) {
         return (
           <div
             key={coupon.id}
-            className="flex items-center justify-between gap-3 p-4 rounded-xl border-2 border-dashed border-amber-200 bg-amber-50"
+            className="flex items-center justify-between gap-3 p-4 rounded-card border-2 border-dashed border-amber-200 bg-amber-50"
           >
             <div className="flex items-start gap-3 min-w-0">
               <Ticket className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />
               <div className="min-w-0">
-                <p className="font-semibold text-slate-800">{coupon.title}</p>
+                <p className="font-semibold text-ink-strong">{coupon.title}</p>
                 {coupon.description && (
-                  <p className="text-sm text-slate-600">{coupon.description}</p>
+                  <p className="text-sm text-subtle">{coupon.description}</p>
                 )}
                 <p className="text-xs text-amber-700 font-semibold mt-1">
                   {coupon.points_cost > 0 ? `${coupon.points_cost} оноо` : 'Үнэгүй'}

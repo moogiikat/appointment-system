@@ -39,23 +39,23 @@ export default function RewardsPage() {
     return (
       <div className="min-h-screen py-12 px-4">
         <div className="max-w-3xl mx-auto animate-pulse space-y-4">
-          <div className="h-8 bg-slate-200 rounded w-1/3" />
-          <div className="h-32 bg-slate-200 rounded-2xl" />
-          <div className="h-32 bg-slate-200 rounded-2xl" />
+          <div className="h-8 bg-line rounded w-1/3" />
+          <div className="h-32 bg-line rounded-card" />
+          <div className="h-32 bg-line rounded-card" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 bg-linear-to-b from-slate-50 to-white">
+    <div className="min-h-screen py-12 px-4 bg-white">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+          <h1 className="text-4xl font-bold text-ink-strong mb-2 flex items-center gap-2">
             <Coins className="w-8 h-8 text-amber-500" />
             Оноо, купон
           </h1>
-          <p className="text-slate-600 text-lg">Таны хуримтлуулсан оноо болон авсан купонууд</p>
+          <p className="text-subtle text-lg">Таны хуримтлуулсан оноо болон авсан купонууд</p>
         </div>
 
         {/* Balance */}
@@ -66,34 +66,34 @@ export default function RewardsPage() {
 
         {/* Coupon wallet */}
         <Card variant="elevated" className="mb-6">
-          <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-bold text-ink-strong mb-4 flex items-center gap-2">
             <Ticket className="w-5 h-5 text-amber-500" />
             Миний купон
           </h2>
           {coupons.length === 0 ? (
-            <p className="text-sm text-slate-500 text-center py-6">Одоогоор купон аваагүй байна</p>
+            <p className="text-sm text-subtle text-center py-6">Одоогоор купон аваагүй байна</p>
           ) : (
             <div className="space-y-3">
               {coupons.map((coupon) => (
                 <div
                   key={coupon.id}
-                  className={`p-4 rounded-xl border-2 border-dashed ${
-                    coupon.used_at ? 'border-slate-200 bg-slate-50' : 'border-amber-200 bg-amber-50'
+                  className={`p-4 rounded-card border-2 border-dashed ${
+                    coupon.used_at ? 'border-line bg-surface' : 'border-amber-200 bg-amber-50'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="font-semibold text-slate-800">{coupon.title}</p>
-                      <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                      <p className="font-semibold text-ink-strong">{coupon.title}</p>
+                      <p className="text-xs text-subtle flex items-center gap-1 mt-0.5">
                         <Store className="w-3 h-3" />
                         {coupon.shop_name}
                       </p>
-                      <p className="text-xs font-mono font-bold text-slate-600 mt-2 tracking-wider">
+                      <p className="text-xs font-mono font-bold text-subtle mt-2 tracking-wider">
                         {coupon.code}
                       </p>
                     </div>
                     {coupon.used_at ? (
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-slate-200 text-slate-600">
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-line text-subtle">
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         Ашигласан
                       </span>
@@ -112,21 +112,21 @@ export default function RewardsPage() {
 
         {/* Points history */}
         <Card variant="elevated">
-          <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-bold text-ink-strong mb-4 flex items-center gap-2">
             <Coins className="w-5 h-5 text-amber-500" />
             Ононы түүх
           </h2>
           {transactions.length === 0 ? (
-            <p className="text-sm text-slate-500 text-center py-6">Ононы түүх байхгүй байна</p>
+            <p className="text-sm text-subtle text-center py-6">Ононы түүх байхгүй байна</p>
           ) : (
             <div className="space-y-2">
               {transactions.map((t) => (
-                <div key={t.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                <div key={t.id} className="flex items-center justify-between p-3 bg-surface rounded-card">
                   <div>
-                    <p className="text-sm font-medium text-slate-800">
+                    <p className="text-sm font-medium text-ink-strong">
                       {t.description || (t.reason === 'visit' ? 'Захиалга дуусгасны оноо' : t.reason)}
                     </p>
-                    <p className="text-xs text-slate-500">{t.shop_name}</p>
+                    <p className="text-xs text-subtle">{t.shop_name}</p>
                   </div>
                   <span className={`font-bold ${t.amount >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                     {t.amount >= 0 ? '+' : ''}

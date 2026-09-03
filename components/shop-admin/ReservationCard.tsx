@@ -43,29 +43,29 @@ export default function ReservationCard({
   const borderColor = {
     pending: 'border-l-amber-400',
     confirmed: 'border-l-emerald-400',
-    completed: 'border-l-slate-400',
+    completed: 'border-l-placeholder',
     cancelled: 'border-l-red-400',
-  }[reservation.status] || 'border-l-slate-200';
+  }[reservation.status] || 'border-l-line';
 
   return (
     <div
       id={`reservation-${reservation.id}`}
-      className={`bg-white rounded-2xl border border-slate-200 border-l-4 ${borderColor} p-4 transition-all hover:shadow-md ${
-        highlighted ? 'ring-2 ring-sky-400 shadow-lg' : ''
+      className={`bg-white rounded-card border border-line border-l-4 ${borderColor} p-4 transition-all hover:shadow-md ${
+        highlighted ? 'ring-2 ring-brand shadow-lg' : ''
       } ${isLocked ? 'opacity-75' : ''}`}
     >
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         {/* Time block */}
         <div className="flex items-center gap-3 sm:w-28 shrink-0">
           <div
-            className={`w-11 h-11 rounded-xl flex items-center justify-center ${
-              isLocked ? 'bg-slate-100' : 'bg-sky-100'
+            className={`w-11 h-11 rounded-card flex items-center justify-center ${
+              isLocked ? 'bg-surface' : 'bg-brand-band'
             }`}
           >
-            <Clock className={`w-5 h-5 ${isLocked ? 'text-slate-400' : 'text-sky-600'}`} />
+            <Clock className={`w-5 h-5 ${isLocked ? 'text-placeholder' : 'text-brand-dark'}`} />
           </div>
           <div>
-            <div className={`text-xl font-bold ${isLocked ? 'text-slate-400' : 'text-slate-800'}`}>
+            <div className={`text-xl font-bold ${isLocked ? 'text-placeholder' : 'text-ink-strong'}`}>
               {reservation.reservation_time.slice(0, 5)}
             </div>
             {isPhoneReservation && (
@@ -79,10 +79,10 @@ export default function ReservationCard({
         {/* Customer */}
         <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <User className="w-4 h-4 text-slate-400 shrink-0" />
+            <User className="w-4 h-4 text-placeholder shrink-0" />
             <div className="min-w-0">
-              <p className="text-xs text-slate-400">Үйлчлүүлэгч</p>
-              <p className="font-semibold text-slate-800 truncate">{reservation.customer_name}</p>
+              <p className="text-xs text-placeholder">Үйлчлүүлэгч</p>
+              <p className="font-semibold text-ink-strong truncate">{reservation.customer_name}</p>
             </div>
           </div>
           {reservation.customer_phone && (
@@ -90,10 +90,10 @@ export default function ReservationCard({
               href={`tel:${reservation.customer_phone.replace(/\s/g, '')}`}
               className="flex items-center gap-2 min-w-0 group"
             >
-              <Phone className="w-4 h-4 text-slate-400 shrink-0 group-hover:text-sky-500" />
+              <Phone className="w-4 h-4 text-placeholder shrink-0 group-hover:text-brand" />
               <div className="min-w-0">
-                <p className="text-xs text-slate-400">Утас — дарж залгах</p>
-                <p className="font-semibold text-sky-600 truncate group-hover:underline">
+                <p className="text-xs text-placeholder">Утас — дарж залгах</p>
+                <p className="font-semibold text-brand-dark truncate group-hover:underline">
                   {reservation.customer_phone}
                 </p>
               </div>
@@ -155,13 +155,13 @@ export default function ReservationCard({
               </Button>
             </>
           )}
-          {isLocked && <Lock className="w-4 h-4 text-slate-300 self-center" />}
+          {isLocked && <Lock className="w-4 h-4 text-line-strong self-center" />}
         </div>
       </div>
 
       {reservation.notes && !isPhoneReservation && (
-        <div className="mt-3 flex items-start gap-2 px-3 py-2 bg-slate-50 rounded-xl text-sm text-slate-600">
-          <FileText className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+        <div className="mt-3 flex items-start gap-2 px-3 py-2 bg-surface rounded-card text-sm text-subtle">
+          <FileText className="w-4 h-4 text-placeholder mt-0.5 shrink-0" />
           <p>{reservation.notes}</p>
         </div>
       )}

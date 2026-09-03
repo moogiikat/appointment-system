@@ -28,16 +28,16 @@ export default function StarRating({ value, onChange, size = 16, showValue = fal
             <Star
               width={size}
               height={size}
-              className={star <= Math.round(value) ? 'fill-amber-400 text-amber-400' : 'fill-slate-200 text-slate-200'}
+              className={star <= Math.round(value) ? 'fill-amber-400 text-amber-400' : 'fill-line text-line'}
             />
           </button>
         ))}
       </div>
       {showValue && (
-        <span className="text-sm font-semibold text-slate-700 ml-1">
+        <span className="text-sm font-semibold text-ink ml-1">
           {value > 0 ? value.toFixed(1) : '–'}
           {typeof count === 'number' && (
-            <span className="text-slate-400 font-normal"> ({count})</span>
+            <span className="text-placeholder font-normal"> ({count})</span>
           )}
         </span>
       )}

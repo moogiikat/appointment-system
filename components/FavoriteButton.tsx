@@ -62,7 +62,7 @@ export default function FavoriteButton({ shopId, className = '' }: FavoriteButto
     >
       <Heart
         className={`w-5 h-5 transition-colors ${
-          isFavorite ? 'fill-red-500 text-red-500' : 'text-slate-400'
+          isFavorite ? 'fill-red-500 text-red-500' : 'text-placeholder'
         }`}
       />
     </button>
