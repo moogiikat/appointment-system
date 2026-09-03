@@ -74,10 +74,23 @@ export default function Home() {
   /* 新着（登録が新しい順の先頭6件）— EPARK の「最近見た施設」枠に相当 */
   const newShops = useMemo(() => shops.slice(0, 6), [shops]);
 
+  /*
+   * 検索帯の地色を、選択中のカテゴリ色で淡く染める。
+   * 濃度は 10%（16進で 1A）。EPARK の帯 #eff7ef が緑をおよそ 10% 重ねた濃さなので、
+   * それに合わせている。見出しのコントラストは最悪でも 15:1 で AA を大きく上回る。
+   * 未選択のときは既定の緑帯に戻す。
+   */
+  const bandColor = categoryFilter
+    ? `${categoryStyle(categoryFilter).color}1A`
+    : undefined;
+
   return (
     <div className="min-h-screen bg-white">
       {/* ---- 検索バンド（EPARK の #eff7ef ヘッダー帯）---- */}
-      <section className="bg-brand-band">
+      <section
+        className="bg-brand-band transition-colors duration-300"
+        style={bandColor ? { backgroundColor: bandColor } : undefined}
+      >
         <div className="max-w-[1120px] mx-auto px-4 py-4 md:py-6">
           <h1 className="text-[15px] md:text-[18px] font-bold text-ink-strong mb-3">
             Үйлчилгээний газраа хайж, цагаа захиалаарай
