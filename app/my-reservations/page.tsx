@@ -156,7 +156,7 @@ export default function MyReservationsPage() {
 
         {reservations.length === 0 ? (
           <Card variant="elevated" className="text-center py-16 animate-fade-in">
-            <div className="w-24 h-24 bg-brand rounded-full mx-auto mb-6 flex items-center justify-center">
+            <div className="w-24 h-24 bg-brand-band rounded-full mx-auto mb-6 flex items-center justify-center">
               <Calendar className="w-12 h-12 text-brand" />
             </div>
             <h2 className="text-2xl font-semibold text-ink-strong mb-3">
@@ -262,7 +262,7 @@ export default function MyReservationsPage() {
                   {/* Main Information Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     {/* Date & Time Section */}
-                    <div className="bg-brand rounded-card p-5 border border-brand-band">
+                    <div className="bg-brand-band rounded-card p-5 border border-line">
                       <h4 className="text-xs font-semibold text-subtle uppercase tracking-wider mb-4">
                         Огноо ба Цаг
                       </h4>

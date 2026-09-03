@@ -4,13 +4,12 @@ import { useState, useEffect, use } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
-import { Shop, TimeSlot } from '@/lib/types';
-import { getMongoliaStartOfDay, isValidMongoliaPhone } from '@/lib/utils';
+import { Shop } from '@/lib/types';
+import { isValidMongoliaPhone } from '@/lib/utils';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import DatePicker from '@/components/DatePicker';
-import TimeSlotPicker from '@/components/TimeSlotPicker';
+import AvailabilityGrid from '@/components/AvailabilityGrid';
 import { ArrowLeft, MapPin, Clock, Phone, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 
@@ -22,13 +21,11 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
 
   // All useState hooks must be at the top, before any conditional returns
   const [shop, setShop] = useState<Shop | null>(null);
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date>(getMongoliaStartOfDay());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [notes, setNotes] = useState('');
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -66,49 +63,6 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
     }
   }, [shopId, status]);
 
-  // Fetch time slots when date changes
-  useEffect(() => {
-    async function fetchTimeSlots() {
-      setLoading(true);
-      try {
-        const dateStr = format(selectedDate, 'yyyy-MM-dd');
-        const res = await fetch(`/api/timeslots?shop_id=${shopId}&date=${dateStr}`);
-        if (res.ok) {
-          const data = await res.json();
-          setTimeSlots(data);
-        }
-      } catch (error) {
-        console.error('Error fetching time slots:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    if (shopId && status === 'authenticated') {
-      fetchTimeSlots();
-      setSelectedTime(null);
-    }
-  }, [shopId, selectedDate, status]);
-
-  // Auto-refresh time slots every 30 seconds
-  useEffect(() => {
-    if (!shopId || status !== 'authenticated') return;
-
-    const interval = setInterval(async () => {
-      try {
-        const dateStr = format(selectedDate, 'yyyy-MM-dd');
-        const res = await fetch(`/api/timeslots?shop_id=${shopId}&date=${dateStr}`);
-        if (res.ok) {
-          const data = await res.json();
-          setTimeSlots(data);
-        }
-      } catch (error) {
-        console.error('Error refreshing time slots:', error);
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [shopId, selectedDate, status]);
-
   // Update customer info from session and profile
   useEffect(() => {
     async function loadCustomerInfo() {
@@ -134,8 +88,8 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
     e.preventDefault();
     setError('');
 
-    if (!selectedTime) {
-      setError('Цаг сонгоно уу');
+    if (!selectedDate || !selectedTime) {
+      setError('Огноо, цагаа сонгоно уу');
       return;
     }
 
@@ -232,7 +186,7 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
                 <div className="flex justify-between">
                   <span className="text-subtle">Огноо:</span>
                   <span className="font-medium text-ink">
-                    {format(selectedDate, 'yyyy-MM-dd')}
+                    {selectedDate && format(selectedDate, 'yyyy-MM-dd')}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -311,38 +265,29 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Date & Time Selection */}
-            <div className="lg:col-span-2 space-y-6">
-              <Card variant="elevated" className="animate-fade-in stagger-1 opacity-0">
-                <h2 className="text-lg font-bold text-ink-strong mb-4">1. Огноо сонгох</h2>
-                <DatePicker
+            {/* 空き状況表：EPARK と同じく日付×時間の一覧から直接選ぶ */}
+            <div className="lg:col-span-2">
+              <div className="bg-white border border-line rounded-card p-4 md:p-5">
+                <h2 className="epark-section-title mb-1">Огноо, цагаа сонгоно уу</h2>
+                <p className="text-[12px] text-subtle mb-4">
+                  Хүснэгтээс сул цагийг дарж сонгоно уу
+                </p>
+                <AvailabilityGrid
+                  shopId={shopId}
                   selectedDate={selectedDate}
-                  onSelectDate={setSelectedDate}
+                  selectedTime={selectedTime}
+                  onSelect={(date, time) => {
+                    setSelectedDate(date);
+                    setSelectedTime(time);
+                  }}
                 />
-              </Card>
-
-              <Card variant="elevated" className="animate-fade-in stagger-2 opacity-0">
-                <h2 className="text-lg font-bold text-ink-strong mb-4">2. Цаг сонгох</h2>
-                {loading ? (
-                  <div className="grid grid-cols-4 gap-2">
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                      <div key={i} className="h-12 bg-surface rounded-card animate-pulse" />
-                    ))}
-                  </div>
-                ) : (
-                  <TimeSlotPicker
-                    timeSlots={timeSlots}
-                    selectedTime={selectedTime}
-                    onSelectTime={setSelectedTime}
-                  />
-                )}
-              </Card>
+              </div>
             </div>
 
             {/* Customer Info */}
-            <div className="space-y-6">
-              <Card variant="elevated" className="animate-fade-in stagger-3 opacity-0">
-                <h2 className="text-lg font-bold text-ink-strong mb-4">3. Мэдээлэл оруулах</h2>
+            <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+              <Card variant="elevated">
+                <h2 className="epark-section-title mb-4">Мэдээлэл оруулах</h2>
                 <div className="space-y-4">
                   <Input
                     id="name"
@@ -383,12 +328,12 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
               )}
 
               {selectedTime && (
-                <div className="bg-brand rounded-card p-4 border border-brand-band">
-                  <h3 className="text-sm font-bold text-ink mb-3">Захиалгын хураангуй</h3>
+                <div className="bg-brand-band rounded-card p-4 border border-line">
+                  <h3 className="text-[13px] font-bold text-ink-strong mb-3">Захиалгын хураангуй</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-subtle">Огноо:</span>
-                      <span className="font-semibold text-ink-strong">{format(selectedDate, 'yyyy-MM-dd')}</span>
+                      <span className="font-bold text-ink-strong tabular-nums">{selectedDate && format(selectedDate, 'yyyy-MM-dd')}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-subtle">Цаг:</span>
