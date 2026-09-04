@@ -59,7 +59,7 @@ interface SeedShop {
 
 /*
  * category は lib/constants.ts の SUGGESTED_CATEGORIES と、
- * district は UB_DISTRICTS と完全一致させること。
+ * district は LOCATIONS と完全一致させること。
  * 一致しないとトップのジャンル絞り込みと色分けから外れる。
  * 価格は ₮（төгрөг）。
  */

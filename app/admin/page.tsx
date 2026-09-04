@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Shop, User } from '@/lib/types';
-import { UB_DISTRICTS, SUGGESTED_CATEGORIES } from '@/lib/constants';
+import { LOCATIONS, SUGGESTED_CATEGORIES } from '@/lib/constants';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -594,14 +594,14 @@ export default function AdminPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-ink mb-1.5">Дүүрэг</label>
+                      <label className="block text-sm font-medium text-ink mb-1.5">Байршил</label>
                       <select
                         className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:outline-none"
                         value={shopForm.district}
                         onChange={(e) => setShopForm({ ...shopForm, district: e.target.value })}
                       >
                         <option value="">Сонгоно уу</option>
-                        {UB_DISTRICTS.map((d) => (
+                        {LOCATIONS.map((d) => (
                           <option key={d} value={d}>{d}</option>
                         ))}
                       </select>
@@ -717,7 +717,7 @@ export default function AdminPage() {
                 <div className="flex items-start gap-2 text-amber-800">
                   <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
                   <span className="text-sm">
-                    <strong>{hiddenShops.length} газар</strong> ангилал эсвэл дүүрэггүй байна.
+                    <strong>{hiddenShops.length} газар</strong> ангилал эсвэл байршилгүй байна.
                     Эдгээр нь нүүр хуудасны хайлтад <strong>харагдахгүй</strong>.
                   </span>
                 </div>
@@ -761,11 +761,11 @@ export default function AdminPage() {
                   <select
                     value={shopDistrict}
                     onChange={(e) => setShopDistrict(e.target.value)}
-                    aria-label="Дүүрэг"
+                    aria-label="Байршил"
                     className="h-9 px-3 border border-line rounded-control text-sm text-ink bg-white focus:border-brand focus:outline-none"
                   >
-                    <option value="">Бүх дүүрэг</option>
-                    {UB_DISTRICTS.map((d) => (
+                    <option value="">Бүх байршил</option>
+                    {LOCATIONS.map((d) => (
                       <option key={d} value={d}>{d}</option>
                     ))}
                   </select>
@@ -900,10 +900,10 @@ export default function AdminPage() {
                       <div className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-control px-2 py-1">
                         <EyeOff className="w-3.5 h-3.5 shrink-0" />
                         {!shop.category && !shop.district
-                          ? 'Ангилал, дүүрэг алга'
+                          ? 'Ангилал, байршил алга'
                           : !shop.category
                             ? 'Ангилал алга'
-                            : 'Дүүрэг алга'}
+                            : 'Байршил алга'}
                       </div>
                     )}
                     {(shop.category || shop.district) && (

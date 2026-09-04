@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { UB_DISTRICTS, SUGGESTED_CATEGORIES } from '@/lib/constants';
+import { LOCATIONS, SUGGESTED_CATEGORIES } from '@/lib/constants';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -148,7 +148,7 @@ export default function ShopRegisterPage() {
                 </div>
                 <div>
                   <label htmlFor="district" className="block text-sm font-medium text-ink mb-1.5">
-                    Дүүрэг
+                    Байршил
                   </label>
                   <select
                     id="district"
@@ -157,7 +157,7 @@ export default function ShopRegisterPage() {
                     className="w-full h-12 px-3 border-2 border-line rounded-card bg-white text-ink focus:border-brand focus:outline-none"
                   >
                     <option value="">Сонгоно уу</option>
-                    {UB_DISTRICTS.map((d) => (
+                    {LOCATIONS.map((d) => (
                       <option key={d} value={d}>{d}</option>
                     ))}
                   </select>

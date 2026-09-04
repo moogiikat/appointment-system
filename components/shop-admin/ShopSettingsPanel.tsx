@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Shop } from '@/lib/types';
-import { UB_DISTRICTS, SUGGESTED_CATEGORIES } from '@/lib/constants';
+import { LOCATIONS, SUGGESTED_CATEGORIES } from '@/lib/constants';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -150,7 +150,7 @@ export default function ShopSettingsPanel({
             <div>
               <label className="flex text-sm font-medium text-ink mb-1.5 items-center gap-1.5">
                 <MapPin className="w-4 h-4 text-placeholder" />
-                Дүүрэг
+                Байршил
               </label>
               <select
                 className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:outline-none text-base"
@@ -158,7 +158,7 @@ export default function ShopSettingsPanel({
                 onChange={(e) => setShopDistrict(e.target.value)}
               >
                 <option value="">Сонгоно уу</option>
-                {UB_DISTRICTS.map((d) => (
+                {LOCATIONS.map((d) => (
                   <option key={d} value={d}>{d}</option>
                 ))}
               </select>

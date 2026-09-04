@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Shop } from "@/lib/types";
-import { UB_DISTRICTS, SUGGESTED_CATEGORIES, categoryStyle } from "@/lib/constants";
+import { LOCATIONS, SUGGESTED_CATEGORIES, categoryStyle } from "@/lib/constants";
 import ShopCard from "@/components/ShopCard";
 import GenreGrid from "@/components/GenreGrid";
 import Button from "@/components/ui/Button";
@@ -113,11 +113,11 @@ export default function Home() {
               <select
                 value={districtFilter}
                 onChange={(e) => setDistrictFilter(e.target.value)}
-                aria-label="Дүүрэг"
+                aria-label="Байршил"
                 className="flex-1 min-w-0 h-full bg-transparent border-none outline-none px-2 text-[13px] md:text-[14px] text-ink appearance-none cursor-pointer"
               >
-                <option value="">Бүх дүүрэг</option>
-                {UB_DISTRICTS.map((d) => (
+                <option value="">Бүх байршил</option>
+                {LOCATIONS.map((d) => (
                   <option key={d} value={d}>
                     {d}
                   </option>
