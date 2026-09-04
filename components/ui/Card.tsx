@@ -6,18 +6,22 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'elevated' | 'bordered';
 }
 
+/*
+ * EPARK のカード仕様：角丸 8px、1px #e0e0e0 の枠、影 0 0 16px rgba(0,0,0,.2)。
+ * hover は transform ではなく opacity 0.7 で落とす。
+ */
 const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ className = '', variant = 'default', children, ...props }, ref) => {
     const variantClasses = {
-      default: 'bg-white shadow-sm',
-      elevated: 'bg-white shadow-xl shadow-slate-200/50',
-      bordered: 'bg-white border-2 border-slate-200',
+      default: 'bg-white border border-line-card',
+      elevated: 'bg-white border border-line-card shadow-card',
+      bordered: 'bg-white border border-line-strong',
     };
 
     return (
       <div
         ref={ref}
-        className={`rounded-2xl p-6 ${variantClasses[variant]} ${className}`}
+        className={`rounded-card p-4 md:p-6 ${variantClasses[variant]} ${className}`}
         {...props}
       >
         {children}
@@ -29,4 +33,3 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
 Card.displayName = 'Card';
 
 export default Card;
-

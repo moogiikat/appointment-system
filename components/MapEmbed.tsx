@@ -6,7 +6,7 @@ export default function MapEmbed({ address }: MapEmbedProps) {
   const src = `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
 
   return (
-    <div className="w-full h-56 rounded-2xl overflow-hidden border border-slate-200">
+    <div className="w-full h-56 rounded-card overflow-hidden border border-line">
       <iframe
         title="Байршил"
         src={src}

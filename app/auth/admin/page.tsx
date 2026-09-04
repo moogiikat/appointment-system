@@ -3,6 +3,7 @@
 import { signIn } from 'next-auth/react';
 import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -42,13 +43,13 @@ function AdminSignInContent() {
   };
 
   return (
-    <Card variant="elevated" className="w-full max-w-md relative animate-fade-in border border-slate-200">
+    <Card variant="elevated" className="w-full max-w-md relative animate-fade-in border border-line">
       <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-linear-to-br from-slate-700 to-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-slate-500/30">
+        <div className="w-16 h-16 bg-surface rounded-card flex items-center justify-center mx-auto mb-4 shadow-lg">
           <Shield className="w-8 h-8 text-white" />
         </div>
-        <h1 className="text-2xl font-bold text-slate-800">Админ нэвтрэлт</h1>
-        <p className="text-slate-500 mt-2">Удирдлагын хэсэгт нэвтрэх</p>
+        <h1 className="text-2xl font-bold text-ink-strong">Админ нэвтрэлт</h1>
+        <p className="text-subtle mt-2">Удирдлагын хэсэгт нэвтрэх</p>
       </div>
 
       <form onSubmit={handleAdminLogin} className="space-y-4">
@@ -72,7 +73,7 @@ function AdminSignInContent() {
         />
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm font-medium">
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-card text-sm font-medium">
             {error}
           </div>
         )}
@@ -81,28 +82,35 @@ function AdminSignInContent() {
           type="submit"
           variant="primary"
           size="lg"
-          className="w-full bg-slate-800 hover:bg-slate-900"
+          className="w-full bg-ink-strong hover:bg-ink-strong"
           isLoading={loading}
         >
           Нэвтрэх
         </Button>
       </form>
+
+      <p className="text-center text-sm text-subtle mt-6 pt-5 border-t border-line">
+        Үйлчилгээний газраа бүртгүүлэх үү?{' '}
+        <Link href="/auth/shop-register" className="text-brand-dark font-bold hover:opacity-70">
+          Шинээр бүртгүүлэх
+        </Link>
+      </p>
     </Card>
   );
 }
 
 function LoadingFallback() {
   return (
-    <Card variant="elevated" className="w-full max-w-md relative animate-pulse border border-slate-200">
+    <Card variant="elevated" className="w-full max-w-md relative animate-pulse border border-line">
       <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-slate-200 rounded-2xl mx-auto mb-4" />
-        <div className="h-8 bg-slate-200 rounded w-48 mx-auto mb-2" />
-        <div className="h-4 bg-slate-200 rounded w-56 mx-auto" />
+        <div className="w-16 h-16 bg-line rounded-card mx-auto mb-4" />
+        <div className="h-8 bg-line rounded w-48 mx-auto mb-2" />
+        <div className="h-4 bg-line rounded w-56 mx-auto" />
       </div>
       <div className="space-y-4">
-        <div className="h-12 bg-slate-200 rounded-xl" />
-        <div className="h-12 bg-slate-200 rounded-xl" />
-        <div className="h-12 bg-slate-200 rounded-xl" />
+        <div className="h-12 bg-line rounded-card" />
+        <div className="h-12 bg-line rounded-card" />
+        <div className="h-12 bg-line rounded-card" />
       </div>
     </Card>
   );
@@ -111,9 +119,9 @@ function LoadingFallback() {
 export default function AdminSignInPage() {
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4">
-      <div className="absolute inset-0 bg-linear-to-br from-slate-100/50 via-transparent to-slate-200/50" />
-      <div className="absolute top-20 left-10 w-72 h-72 bg-slate-300/30 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-slate-300/30 rounded-full blur-3xl" />
+      <div className="absolute inset-0 bg-surface" />
+      <div className="absolute top-20 left-10 w-72 h-72 bg-line-strong/30 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-line-strong/30 rounded-full blur-3xl" />
 
       <Suspense fallback={<LoadingFallback />}>
         <AdminSignInContent />

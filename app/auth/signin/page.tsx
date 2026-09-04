@@ -17,21 +17,21 @@ function SignInContent() {
   };
 
   return (
-    <Card variant="elevated" className="w-full max-w-md relative animate-fade-in border border-slate-100">
+    <Card variant="elevated" className="w-full max-w-md relative animate-fade-in border border-line">
       <div className="text-center mb-8">
         <Link href="/" className="inline-block">
-          <div className="w-16 h-16 bg-linear-to-br from-sky-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-sky-500/30">
+          <div className="w-16 h-16 bg-brand rounded-card flex items-center justify-center mx-auto mb-4 shadow-lg">
             <Calendar className="w-8 h-8 text-white" />
           </div>
         </Link>
-        <h1 className="text-2xl font-bold text-slate-800">Тавтай морил</h1>
-        <p className="text-slate-500 mt-2">Цаг захиалах системд нэвтэрнэ үү</p>
+        <h1 className="text-2xl font-bold text-ink-strong">Тавтай морил</h1>
+        <p className="text-subtle mt-2">Цаг захиалах системд нэвтэрнэ үү</p>
       </div>
 
       {/* Google Login Button */}
       <button
         onClick={handleGoogleLogin}
-        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border-2 border-slate-200 rounded-xl text-slate-700 font-semibold hover:border-slate-300 hover:bg-slate-50 transition-all duration-200 mb-3"
+        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border-2 border-line rounded-card text-ink font-semibold hover:border-line-strong hover:bg-surface transition-all duration-200 mb-3"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path
@@ -54,9 +54,9 @@ function SignInContent() {
         Google-ээр нэвтрэх
       </button>
 
-      <p className="text-center text-xs text-slate-500 mt-6">
+      <p className="text-center text-xs text-subtle mt-6">
         Нэвтрэхээр бол{' '}
-        <span className="text-sky-600 font-medium">үйлчилгээний нөхцөл</span>-ийг зөвшөөрч байна
+        <span className="text-brand-dark font-medium">үйлчилгээний нөхцөл</span>-ийг зөвшөөрч байна
       </p>
     </Card>
   );
@@ -64,14 +64,14 @@ function SignInContent() {
 
 function LoadingFallback() {
   return (
-    <Card variant="elevated" className="w-full max-w-md relative animate-pulse border border-slate-100">
+    <Card variant="elevated" className="w-full max-w-md relative animate-pulse border border-line">
       <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-slate-200 rounded-2xl mx-auto mb-4" />
-        <div className="h-8 bg-slate-200 rounded w-48 mx-auto mb-2" />
-        <div className="h-4 bg-slate-200 rounded w-64 mx-auto" />
+        <div className="w-16 h-16 bg-line rounded-card mx-auto mb-4" />
+        <div className="h-8 bg-line rounded w-48 mx-auto mb-2" />
+        <div className="h-4 bg-line rounded w-64 mx-auto" />
       </div>
-      <div className="h-12 bg-slate-200 rounded-xl mb-3" />
-      <div className="h-12 bg-slate-200 rounded-xl mb-6" />
+      <div className="h-12 bg-line rounded-card mb-3" />
+      <div className="h-12 bg-line rounded-card mb-6" />
     </Card>
   );
 }
@@ -79,9 +79,9 @@ function LoadingFallback() {
 export default function SignInPage() {
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4">
-      <div className="absolute inset-0 bg-linear-to-br from-sky-100/50 via-transparent to-cyan-100/50" />
-      <div className="absolute top-20 left-10 w-72 h-72 bg-sky-200/40 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-200/40 rounded-full blur-3xl" />
+      <div className="absolute inset-0 bg-brand-band/40" />
+      <div className="absolute top-20 left-10 w-72 h-72 bg-line/40 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-line/40 rounded-full blur-3xl" />
       
       <Suspense fallback={<LoadingFallback />}>
         <SignInContent />

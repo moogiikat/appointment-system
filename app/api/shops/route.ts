@@ -5,6 +5,10 @@ import { auth } from "@/auth";
 // Get all shops (optionally filtered by category, district, keyword)
 export async function GET(request: NextRequest) {
   try {
+    // 管理者は審査待ち・却下も含めて全件見る必要がある（承認作業がここで止まるため）
+    const session = await auth();
+    const isSuperAdmin = (session?.user as { role?: string })?.role === 'super_admin';
+
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const district = searchParams.get('district');
@@ -16,11 +20,13 @@ export async function GET(request: NextRequest) {
         COALESCE(rv.rating_count, 0) AS rating_count
       FROM shops s
       LEFT JOIN (
-        SELECT shop_id, ROUND(AVG(rating)::numeric, 1) AS rating_avg, COUNT(*) AS rating_count
+        SELECT shop_id,
+               ROUND(AVG(rating)::numeric, 1)::float8 AS rating_avg,
+               COUNT(*)::int AS rating_count
         FROM reviews
         GROUP BY shop_id
       ) rv ON rv.shop_id = s.id
-      WHERE s.is_active = true
+      WHERE (${isSuperAdmin} OR (s.is_active = true AND s.status = 'approved'))
         AND (${category}::text IS NULL OR s.category = ${category})
         AND (${district}::text IS NULL OR s.district = ${district})
         AND (

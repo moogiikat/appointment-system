@@ -26,7 +26,7 @@ export default function ReviewList({ shopId, refreshKey }: ReviewListProps) {
     return (
       <div className="space-y-3">
         {[1, 2].map((i) => (
-          <div key={i} className="h-20 bg-slate-100 rounded-xl animate-pulse" />
+          <div key={i} className="h-20 bg-surface rounded-card animate-pulse" />
         ))}
       </div>
     );
@@ -34,8 +34,8 @@ export default function ReviewList({ shopId, refreshKey }: ReviewListProps) {
 
   if (reviews.length === 0) {
     return (
-      <div className="text-center py-8 text-slate-500">
-        <MessageCircle className="w-10 h-10 mx-auto mb-2 text-slate-300" />
+      <div className="text-center py-8 text-subtle">
+        <MessageCircle className="w-10 h-10 mx-auto mb-2 text-line-strong" />
         Одоогоор сэтгэгдэл байхгүй байна
       </div>
     );
@@ -44,10 +44,10 @@ export default function ReviewList({ shopId, refreshKey }: ReviewListProps) {
   return (
     <div className="space-y-4">
       {reviews.map((review) => (
-        <div key={review.id} className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+        <div key={review.id} className="p-4 bg-surface rounded-card border border-line">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-linear-to-br from-sky-400 to-cyan-400 flex items-center justify-center overflow-hidden shrink-0">
+              <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center overflow-hidden shrink-0">
                 {review.user_avatar ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={review.user_avatar} alt={review.user_name} className="w-full h-full object-cover" />
@@ -57,20 +57,20 @@ export default function ReviewList({ shopId, refreshKey }: ReviewListProps) {
                   </span>
                 )}
               </div>
-              <span className="font-semibold text-slate-800 text-sm">{review.user_name}</span>
+              <span className="font-semibold text-ink-strong text-sm">{review.user_name}</span>
             </div>
             <StarRating value={review.rating} size={14} />
           </div>
           {review.comment && (
-            <p className="text-slate-700 text-sm leading-relaxed whitespace-pre-line">{review.comment}</p>
+            <p className="text-ink text-sm leading-relaxed whitespace-pre-line">{review.comment}</p>
           )}
           {review.shop_reply && (
-            <div className="mt-3 ml-4 p-3 bg-white rounded-lg border border-sky-100">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-600 mb-1">
+            <div className="mt-3 ml-4 p-3 bg-white rounded-control border border-brand-band">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-brand-dark mb-1">
                 <Store className="w-3.5 h-3.5" />
                 Үйлчилгээний газрын хариу
               </div>
-              <p className="text-sm text-slate-600 whitespace-pre-line">{review.shop_reply}</p>
+              <p className="text-sm text-subtle whitespace-pre-line">{review.shop_reply}</p>
             </div>
           )}
         </div>

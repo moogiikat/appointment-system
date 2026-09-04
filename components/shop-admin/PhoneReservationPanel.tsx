@@ -87,30 +87,30 @@ export default function PhoneReservationPanel({
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-5 pb-6">
       <div className="flex items-center gap-3 px-1">
-        <div className="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center">
+        <div className="w-10 h-10 bg-brand rounded-card flex items-center justify-center">
           <PhoneCall className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h2 className="font-bold text-slate-800">Утсаар захиалга бүртгэх</h2>
-          <p className="text-sm text-slate-500">Үйлчлүүлэгчийн мэдээллийг оруулна уу</p>
+          <h2 className="font-bold text-ink-strong">Утсаар захиалга бүртгэх</h2>
+          <p className="text-sm text-subtle">Үйлчлүүлэгчийн мэдээллийг оруулна уу</p>
         </div>
       </div>
 
       <Card variant="elevated" className="p-5!">
-        <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-sky-500" />
+        <h3 className="text-sm font-bold text-ink mb-4 flex items-center gap-2">
+          <Calendar className="w-4 h-4 text-brand" />
           Огноо ба цаг
         </h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Огноо</label>
+            <label className="block text-sm font-medium text-ink mb-1.5">Огноо</label>
             <select
               value={manualDate}
               onChange={(e) => {
                 setManualDate(e.target.value);
                 setManualTime('');
               }}
-              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none bg-white text-base"
+              className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:outline-none bg-white text-base"
             >
               {futureDateOptions.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -120,9 +120,9 @@ export default function PhoneReservationPanel({
             </select>
           </div>
           <div>
-            <label className="flex text-sm font-medium text-slate-700 mb-1.5 items-center justify-between">
+            <label className="flex text-sm font-medium text-ink mb-1.5 items-center justify-between">
               <span className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-slate-400" />
+                <Clock className="w-4 h-4 text-placeholder" />
                 Цаг
               </span>
               {!slotsLoading && (
@@ -130,11 +130,11 @@ export default function PhoneReservationPanel({
               )}
             </label>
             {slotsLoading ? (
-              <div className="px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-400 text-sm animate-pulse">
-                Уншиж байна...
+              <div className="px-4 py-3 border-2 border-line rounded-card bg-surface text-placeholder text-sm animate-pulse">
+                Ачаалж байна...
               </div>
             ) : availableSlots.length === 0 ? (
-              <div className="px-4 py-3 border-2 border-amber-200 rounded-xl bg-amber-50 text-amber-700 text-sm">
+              <div className="px-4 py-3 border-2 border-amber-200 rounded-card bg-amber-50 text-amber-700 text-sm">
                 Энэ өдөр боломжит цаг байхгүй
               </div>
             ) : (
@@ -145,12 +145,12 @@ export default function PhoneReservationPanel({
                     type="button"
                     disabled={!slot.available}
                     onClick={() => setManualTime(slot.time)}
-                    className={`py-2.5 px-2 rounded-xl text-sm font-semibold transition-all ${
+                    className={`py-2.5 px-2 rounded-card text-sm font-semibold transition-all ${
                       manualTime === slot.time
-                        ? 'bg-sky-500 text-white shadow-md scale-105'
+                        ? 'bg-brand text-white shadow-md scale-105'
                         : slot.available
-                        ? 'bg-white border-2 border-slate-200 text-slate-700 hover:border-sky-400'
-                        : 'bg-slate-100 text-slate-400 line-through cursor-not-allowed'
+                        ? 'bg-white border-2 border-line text-ink hover:border-brand'
+                        : 'bg-surface text-placeholder line-through cursor-not-allowed'
                     }`}
                   >
                     {slot.time}
@@ -163,8 +163,8 @@ export default function PhoneReservationPanel({
       </Card>
 
       <Card variant="elevated" className="p-5!">
-        <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-          <User className="w-4 h-4 text-sky-500" />
+        <h3 className="text-sm font-bold text-ink mb-4 flex items-center gap-2">
+          <User className="w-4 h-4 text-brand" />
           Үйлчлүүлэгчийн мэдээлэл
         </h3>
         <div className="space-y-4">
@@ -185,12 +185,12 @@ export default function PhoneReservationPanel({
             type="tel"
           />
           <div>
-            <label className="flex text-sm font-medium text-slate-700 mb-1.5 items-center gap-1.5">
-              <FileText className="w-4 h-4 text-slate-400" />
+            <label className="flex text-sm font-medium text-ink mb-1.5 items-center gap-1.5">
+              <FileText className="w-4 h-4 text-placeholder" />
               Тэмдэглэл
             </label>
             <textarea
-              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none resize-none text-base"
+              className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:outline-none resize-none text-base"
               rows={3}
               value={manualNotes}
               onChange={(e) => setManualNotes(e.target.value)}
@@ -201,11 +201,11 @@ export default function PhoneReservationPanel({
       </Card>
 
       {manualTime && manualName.trim() && (
-        <Card variant="bordered" className="p-4! bg-sky-50 border-sky-200">
-          <p className="text-xs font-semibold text-sky-600 uppercase tracking-wider mb-2">Баталгаажуулах</p>
-          <p className="text-sm text-slate-700">
+        <Card variant="bordered" className="p-4! bg-brand-band border-line">
+          <p className="text-xs font-semibold text-brand-dark uppercase tracking-wider mb-2">Баталгаажуулах</p>
+          <p className="text-sm text-ink">
             <span className="font-bold">{manualName}</span> — {manualDate} {manualTime}
-            {manualPhone && <span className="text-slate-500"> · {manualPhone}</span>}
+            {manualPhone && <span className="text-subtle"> · {manualPhone}</span>}
           </p>
         </Card>
       )}

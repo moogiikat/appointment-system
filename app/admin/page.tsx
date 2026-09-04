@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Shop, User } from '@/lib/types';
@@ -8,7 +8,8 @@ import { UB_DISTRICTS, SUGGESTED_CATEGORIES } from '@/lib/constants';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Store, Users, Plus, Edit2, Trash2, MapPin, Clock, X, Key, Copy, Check, Tag } from 'lucide-react';
+import { ToastContainer, useToast } from '@/components/Toast';
+import { Store, Users, Plus, Edit2, Trash2, MapPin, Clock, X, Key, Copy, Check, Tag, Search, EyeOff, AlertTriangle, ShieldCheck, Ban, Clock3 } from 'lucide-react';
 
 type AdminTab = 'shops' | 'users';
 
@@ -25,6 +26,17 @@ export default function AdminPage() {
   const [shops, setShops] = useState<Shop[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toasts, showToast, dismissToast } = useToast();
+
+  // 一覧の絞り込み
+  const [shopQuery, setShopQuery] = useState('');
+  const [shopCategory, setShopCategory] = useState('');
+  const [shopDistrict, setShopDistrict] = useState('');
+  const [onlyHidden, setOnlyHidden] = useState(false);
+  const [onlyPending, setOnlyPending] = useState(false);
+  const [decidingId, setDecidingId] = useState<number | null>(null);
+  const [userQuery, setUserQuery] = useState('');
+  const [userRole, setUserRole] = useState('');
 
   // Password display state
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -109,6 +121,59 @@ export default function AdminPage() {
     }
   }, [activeTab, session]);
 
+  /*
+   * category か district が空の店舗は、トップのジャンル検索・地区絞り込みから漏れる。
+   * 一覧には並ぶので気づきにくく、実際に客から見つけてもらえない状態になる。
+   */
+  const hiddenShops = useMemo(
+    () => shops.filter((s) => !s.category || !s.district),
+    [shops]
+  );
+
+  // 自己登録された店舗は status='pending' で入ってくる。承認するまで客には出ない
+  const pendingShops = useMemo(
+    () => shops.filter((s) => s.status === 'pending'),
+    [shops]
+  );
+
+  const filteredShops = useMemo(() => {
+    const q = shopQuery.trim().toLowerCase();
+    return shops.filter((s) => {
+      if (onlyPending && s.status !== 'pending') return false;
+      if (onlyHidden && s.category && s.district) return false;
+      if (shopCategory && s.category !== shopCategory) return false;
+      if (shopDistrict && s.district !== shopDistrict) return false;
+      if (!q) return true;
+      return (
+        s.name.toLowerCase().includes(q) ||
+        s.address?.toLowerCase().includes(q) ||
+        s.phone?.toLowerCase().includes(q)
+      );
+    });
+  }, [shops, shopQuery, shopCategory, shopDistrict, onlyHidden, onlyPending]);
+
+  const filteredUsers = useMemo(() => {
+    const q = userQuery.trim().toLowerCase();
+    return users.filter((u) => {
+      if (userRole && u.role !== userRole) return false;
+      if (!q) return true;
+      return (
+        u.name.toLowerCase().includes(q) ||
+        u.email?.toLowerCase().includes(q) ||
+        u.phone?.toLowerCase().includes(q)
+      );
+    });
+  }, [users, userQuery, userRole]);
+
+  // 一意制約がないので同名を作れてしまう。作る前に気づけるようにする
+  const duplicateName = useMemo(() => {
+    const name = shopForm.name.trim().toLowerCase();
+    if (!name) return false;
+    return shops.some(
+      (s) => s.name.trim().toLowerCase() === name && s.id !== editingShop?.id
+    );
+  }, [shopForm.name, shops, editingShop]);
+
   const handleCreateShop = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormLoading(true);
@@ -125,9 +190,13 @@ export default function AdminPage() {
         setShops([...shops, newShop]);
         setShowShopForm(false);
         resetShopForm();
+        showToast(`"${newShop.name}" нэмэгдлээ`, 'success');
+      } else {
+        showToast('Үйлчилгээний газар нэмэхэд алдаа гарлаа', 'error');
       }
     } catch (error) {
       console.error('Error creating shop:', error);
+      showToast('Үйлчилгээний газар нэмэхэд алдаа гарлаа', 'error');
     } finally {
       setFormLoading(false);
     }
@@ -151,24 +220,72 @@ export default function AdminPage() {
         setEditingShop(null);
         setShowShopForm(false);
         resetShopForm();
+        showToast('Хадгаллаа', 'success');
+      } else {
+        showToast('Хадгалахад алдаа гарлаа', 'error');
       }
     } catch (error) {
       console.error('Error updating shop:', error);
+      showToast('Хадгалахад алдаа гарлаа', 'error');
     } finally {
       setFormLoading(false);
     }
   };
 
+  const handleDecide = async (shop: Shop, status: 'approved' | 'rejected') => {
+    let reason = '';
+    if (status === 'rejected') {
+      const input = prompt(`"${shop.name}"-г татгалзах шалтгаан:`);
+      if (input === null) return;
+      reason = input.trim();
+      if (!reason) {
+        showToast('Шалтгаан шаардлагатай', 'error');
+        return;
+      }
+    }
+
+    setDecidingId(shop.id);
+    try {
+      const res = await fetch(`/api/shops/${shop.id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, rejection_reason: reason }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setShops((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+        showToast(
+          status === 'approved'
+            ? `"${shop.name}" баталгаажлаа. Одоо үйлчлүүлэгчдэд харагдана.`
+            : `"${shop.name}"-г татгалзлаа`,
+          status === 'approved' ? 'success' : 'info'
+        );
+      } else {
+        showToast('Төлөв шинэчлэхэд алдаа гарлаа', 'error');
+      }
+    } catch {
+      showToast('Төлөв шинэчлэхэд алдаа гарлаа', 'error');
+    } finally {
+      setDecidingId(null);
+    }
+  };
+
   const handleDeleteShop = async (id: number) => {
-    if (!confirm('Энэ үйлчилгээний газрыг устгах уу? Бүх захиалга устана!')) return;
+    const target = shops.find((s) => s.id === id);
+    // どの店を消すのか分からないまま確認させないよう、名前を出す
+    if (!confirm(`"${target?.name ?? ''}"-г устгах уу? Энэ газрын бүх захиалга хамт устана!`)) return;
 
     try {
       const res = await fetch(`/api/shops/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setShops(shops.filter((s) => s.id !== id));
+        showToast(`"${target?.name ?? ''}" устлаа`, 'success');
+      } else {
+        showToast('Устгахад алдаа гарлаа', 'error');
       }
     } catch (error) {
       console.error('Error deleting shop:', error);
+      showToast('Устгахад алдаа гарлаа', 'error');
     }
   };
 
@@ -201,9 +318,13 @@ export default function AdminPage() {
           });
           setShowPasswordModal(true);
         }
+        showToast(`${data.user.name} нэмэгдлээ`, 'success');
+      } else {
+        showToast('Хэрэглэгч нэмэхэд алдаа гарлаа', 'error');
       }
     } catch (error) {
       console.error('Error creating user:', error);
+      showToast('Хэрэглэгч нэмэхэд алдаа гарлаа', 'error');
     } finally {
       setFormLoading(false);
     }
@@ -227,11 +348,11 @@ export default function AdminPage() {
         });
         setShowPasswordModal(true);
       } else {
-        alert('Нууц үг шинэчлэхэд алдаа гарлаа');
+        showToast('Нууц үг шинэчлэхэд алдаа гарлаа', 'error');
       }
     } catch (error) {
       console.error('Error resetting password:', error);
-      alert('Нууц үг шинэчлэхэд алдаа гарлаа');
+      showToast('Нууц үг шинэчлэхэд алдаа гарлаа', 'error');
     } finally {
       setResetLoading(null);
     }
@@ -294,8 +415,8 @@ export default function AdminPage() {
       <div className="min-h-screen py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-slate-200 rounded w-1/3" />
-            <div className="h-64 bg-slate-200 rounded-2xl" />
+            <div className="h-8 bg-line rounded w-1/3" />
+            <div className="h-64 bg-line rounded-card" />
           </div>
         </div>
       </div>
@@ -310,8 +431,8 @@ export default function AdminPage() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <Card variant="elevated" className="w-full max-w-md animate-fade-in">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Key className="w-5 h-5 text-sky-500" />
+                <h2 className="text-lg font-bold text-ink-strong flex items-center gap-2">
+                  <Key className="w-5 h-5 text-brand" />
                   Шинэ нууц үг
                 </h2>
                 <button
@@ -320,13 +441,13 @@ export default function AdminPage() {
                     setPasswordInfo(null);
                     setCopied(false);
                   }}
-                  className="text-slate-400 hover:text-slate-600"
+                  className="text-placeholder hover:text-subtle"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-card p-4 mb-4">
                 <p className="text-amber-800 text-sm font-medium">
                   ⚠️ Анхааруулга: Энэ нууц үгийг одоо хадгалж аваарай! Дахин харагдахгүй.
                 </p>
@@ -334,17 +455,17 @@ export default function AdminPage() {
 
               <div className="space-y-3 mb-6">
                 <div>
-                  <label className="text-xs text-slate-500">Хэрэглэгч</label>
-                  <p className="font-medium text-slate-800">{passwordInfo.name}</p>
+                  <label className="text-xs text-subtle">Хэрэглэгч</label>
+                  <p className="font-medium text-ink-strong">{passwordInfo.name}</p>
                 </div>
                 <div>
-                  <label className="text-xs text-slate-500">И-мэйл</label>
-                  <p className="font-medium text-slate-800">{passwordInfo.email}</p>
+                  <label className="text-xs text-subtle">И-мэйл</label>
+                  <p className="font-medium text-ink-strong">{passwordInfo.email}</p>
                 </div>
                 <div>
-                  <label className="text-xs text-slate-500">Нууц үг</label>
+                  <label className="text-xs text-subtle">Нууц үг</label>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 px-4 py-3 bg-slate-100 rounded-xl font-mono text-lg font-bold text-slate-800">
+                    <code className="flex-1 px-4 py-3 bg-surface rounded-card font-mono text-lg font-bold text-ink-strong">
                       {passwordInfo.password}
                     </code>
                     <Button
@@ -386,8 +507,8 @@ export default function AdminPage() {
 
         {/* Header */}
         <div className="mb-8 animate-fade-in">
-          <h1 className="text-3xl font-bold text-slate-800">Систем удирдлага</h1>
-          <p className="text-slate-600">Бүх үйлчилгээний газрын, хэрэглэгчдийн удирдлага</p>
+          <h1 className="text-3xl font-bold text-ink-strong">Систем удирдлага</h1>
+          <p className="text-subtle">Бүх үйлчилгээний газрын, хэрэглэгчдийн удирдлага</p>
         </div>
 
         {/* Tabs */}
@@ -417,7 +538,7 @@ export default function AdminPage() {
             {showShopForm && (
               <Card variant="elevated" className="mb-6 animate-fade-in">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-bold text-slate-800">
+                  <h2 className="text-lg font-bold text-ink-strong">
                     {editingShop ? 'Үйлчилгээний газар засах' : 'Шинэ үйлчилгээний газар нэмэх'}
                   </h2> 
                   <button
@@ -426,7 +547,7 @@ export default function AdminPage() {
                       setEditingShop(null);
                       resetShopForm();
                     }}
-                    className="text-slate-400 hover:text-slate-600"
+                    className="text-placeholder hover:text-subtle"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -460,9 +581,9 @@ export default function AdminPage() {
                       onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
                     />
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">Ангилал</label>
+                      <label className="block text-sm font-medium text-ink mb-1.5">Ангилал</label>
                       <select
-                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none"
+                        className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:outline-none"
                         value={shopForm.category}
                         onChange={(e) => setShopForm({ ...shopForm, category: e.target.value })}
                       >
@@ -473,9 +594,9 @@ export default function AdminPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">Дүүрэг</label>
+                      <label className="block text-sm font-medium text-ink mb-1.5">Дүүрэг</label>
                       <select
-                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none"
+                        className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:outline-none"
                         value={shopForm.district}
                         onChange={(e) => setShopForm({ ...shopForm, district: e.target.value })}
                       >
@@ -503,7 +624,7 @@ export default function AdminPage() {
                     </div>
                     <Input
                       id="slot"
-                      label="Нэг цагийн хугацаа (минут)"
+                      label="Нэг захиалгын үргэлжлэх хугацаа (минут)"
                       type="number"
                       min="15"
                       max="120"
@@ -513,7 +634,7 @@ export default function AdminPage() {
                     />
                     <Input
                       id="capacity"
-                      label="Нэг цагт авах хүний тоо"
+                      label="Нэг цагт зэрэг үйлчлэх хүний тоо"
                       type="number"
                       min="1"
                       max="100"
@@ -521,15 +642,21 @@ export default function AdminPage() {
                       onChange={(e) => setShopForm({ ...shopForm, max_capacity: Number(e.target.value) })}
                     />
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">Тайлбар</label>
+                      <label className="block text-sm font-medium text-ink mb-1.5">Тайлбар</label>
                       <textarea
-                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none resize-none"
+                        className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:outline-none resize-none"
                         rows={2}
                         value={shopForm.description}
                         onChange={(e) => setShopForm({ ...shopForm, description: e.target.value })}
                       />
                     </div>
                   </div>
+                  {duplicateName && (
+                    <div className="flex items-start gap-2 px-3 py-2 mb-4 bg-amber-50 border border-amber-200 rounded-control text-sm text-amber-800">
+                      <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                      <span>Ижил нэртэй газар аль хэдийн бүртгэлтэй байна. Давхардуулах уу?</span>
+                    </div>
+                  )}
                   <div className="flex justify-end gap-3">
                     <Button
                       type="button"
@@ -562,33 +689,140 @@ export default function AdminPage() {
               </Button>
             )}
 
+            {/* 審査待ちの申請 */}
+            {!loading && pendingShops.length > 0 && (
+              <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-brand-band border border-brand rounded-card">
+                <div className="flex items-start gap-2 text-ink">
+                  <Clock3 className="w-5 h-5 shrink-0 mt-0.5 text-brand-dark" />
+                  <span className="text-sm">
+                    <strong>{pendingShops.length} газар</strong> баталгаажуулахыг хүлээж байна.
+                    Баталгаажих хүртэл үйлчлүүлэгчдэд харагдахгүй.
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setOnlyPending((v) => !v)}
+                  className="gap-1.5 shrink-0"
+                >
+                  <Clock3 className="w-4 h-4" />
+                  {onlyPending ? 'Бүгдийг харах' : 'Зөвхөн эдгээрийг харах'}
+                </Button>
+              </div>
+            )}
+
+            {/* 客から見つからない店舗の警告 */}
+            {!loading && hiddenShops.length > 0 && (
+              <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-card">
+                <div className="flex items-start gap-2 text-amber-800">
+                  <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
+                  <span className="text-sm">
+                    <strong>{hiddenShops.length} газар</strong> ангилал эсвэл дүүрэггүй байна.
+                    Эдгээр нь нүүр хуудасны хайлтад <strong>харагдахгүй</strong>.
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setOnlyHidden((v) => !v)}
+                  className="gap-1.5 shrink-0"
+                >
+                  <EyeOff className="w-4 h-4" />
+                  {onlyHidden ? 'Бүгдийг харах' : 'Зөвхөн эдгээрийг харах'}
+                </Button>
+              </div>
+            )}
+
+            {/* 検索と絞り込み */}
+            {!loading && shops.length > 0 && (
+              <div className="bg-white rounded-card border border-line p-3 mb-4 space-y-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-placeholder" />
+                  <input
+                    type="text"
+                    placeholder="Нэр, хаяг, утсаар хайх..."
+                    value={shopQuery}
+                    onChange={(e) => setShopQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2.5 border border-line rounded-control text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand-band"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2 items-center">
+                  <select
+                    value={shopCategory}
+                    onChange={(e) => setShopCategory(e.target.value)}
+                    aria-label="Ангилал"
+                    className="h-9 px-3 border border-line rounded-control text-sm text-ink bg-white focus:border-brand focus:outline-none"
+                  >
+                    <option value="">Бүх ангилал</option>
+                    {SUGGESTED_CATEGORIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={shopDistrict}
+                    onChange={(e) => setShopDistrict(e.target.value)}
+                    aria-label="Дүүрэг"
+                    className="h-9 px-3 border border-line rounded-control text-sm text-ink bg-white focus:border-brand focus:outline-none"
+                  >
+                    <option value="">Бүх дүүрэг</option>
+                    {UB_DISTRICTS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                  <span className="text-sm text-subtle tabular-nums ml-auto">
+                    {filteredShops.length} / {shops.length} газар
+                  </span>
+                  {(shopQuery || shopCategory || shopDistrict || onlyHidden) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShopQuery('');
+                        setShopCategory('');
+                        setShopDistrict('');
+                        setOnlyHidden(false);
+                      }}
+                      className="text-sm font-bold text-brand-dark hover:opacity-70"
+                    >
+                      Цэвэрлэх
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Shops List */}
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-48 bg-slate-200 rounded-2xl animate-pulse" />
+                  <div key={i} className="h-48 bg-line rounded-card animate-pulse" />
                 ))}
               </div>
             ) : shops.length === 0 ? (
               <Card variant="elevated" className="text-center py-12">
-                <Store className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                <h3 className="font-semibold text-slate-700">Үйлчилгээний газар бүртгэгдээгүй</h3>
-                <p className="text-slate-500 text-sm">Шинэ үйлчилгээний газар нэмэх товч дарна уу</p>
+                <Store className="w-12 h-12 text-placeholder mx-auto mb-4" />
+                <h3 className="font-semibold text-ink">Үйлчилгээний газар бүртгэгдээгүй</h3>
+                <p className="text-subtle text-sm">Шинэ үйлчилгээний газар нэмэх товч дарна уу</p>
+              </Card>
+            ) : filteredShops.length === 0 ? (
+              <Card variant="elevated" className="text-center py-12">
+                <Search className="w-12 h-12 text-placeholder mx-auto mb-4" />
+                <h3 className="font-semibold text-ink">Үр дүн олдсонгүй</h3>
+                <p className="text-subtle text-sm">Хайлт эсвэл шүүлтүүрээ өөрчилнө үү</p>
               </Card>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {shops.map((shop, index) => (
+                {filteredShops.map((shop, index) => (
                   <Card
                     key={shop.id}
                     variant="elevated"
                     className={`animate-fade-in stagger-${(index % 5) + 1} opacity-0`}
                   >
                     <div className="flex items-start justify-between mb-3">
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-md overflow-hidden">
+                      <div className="w-12 h-12 rounded-card flex items-center justify-center shadow-md overflow-hidden">
                         {shop.icon ? (
                           <img src={shop.icon} alt={shop.name} className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full bg-linear-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
+                          <div className="w-full h-full bg-brand flex items-center justify-center">
                             <span className="text-lg font-bold text-white">{shop.name.charAt(0)}</span>
                           </div>
                         )}
@@ -596,48 +830,111 @@ export default function AdminPage() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => editShop(shop)}
-                          className="p-2 text-slate-400 hover:text-sky-600 transition-colors"
+                          className="p-2 text-placeholder hover:text-brand-dark transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteShop(shop.id)}
-                          className="p-2 text-slate-400 hover:text-red-600 transition-colors"
+                          className="p-2 text-placeholder hover:text-red-600 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
-                    <h3 className="font-bold text-slate-800 mb-2">{shop.name}</h3>
+                    <h3 className="font-bold text-ink-strong mb-2">{shop.name}</h3>
+                    {shop.status === 'pending' && (
+                      <div className="mb-2">
+                        <div className="flex items-center gap-1.5 mb-2 text-xs font-bold text-brand-dark bg-brand-band border border-brand rounded-control px-2 py-1">
+                          <Clock3 className="w-3.5 h-3.5 shrink-0" />
+                          Баталгаажуулахыг хүлээж байна
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            className="flex-1 gap-1.5"
+                            isLoading={decidingId === shop.id}
+                            onClick={() => handleDecide(shop, 'approved')}
+                          >
+                            <ShieldCheck className="w-3.5 h-3.5" />
+                            Баталгаажуулах
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-1.5"
+                            disabled={decidingId === shop.id}
+                            onClick={() => handleDecide(shop, 'rejected')}
+                          >
+                            <Ban className="w-3.5 h-3.5" />
+                            Татгалзах
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    {shop.status === 'rejected' && (
+                      <div className="mb-2">
+                        <div className="flex items-start gap-1.5 mb-2 text-xs font-bold text-red-700 bg-red-50 border border-red-200 rounded-control px-2 py-1">
+                          <Ban className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                          <span>
+                            Татгалзсан
+                            {shop.rejection_reason && (
+                              <span className="block font-normal mt-0.5">{shop.rejection_reason}</span>
+                            )}
+                          </span>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full gap-1.5"
+                          isLoading={decidingId === shop.id}
+                          onClick={() => handleDecide(shop, 'approved')}
+                        >
+                          <ShieldCheck className="w-3.5 h-3.5" />
+                          Дахин баталгаажуулах
+                        </Button>
+                      </div>
+                    )}
+                    {(!shop.category || !shop.district) && (
+                      <div className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-control px-2 py-1">
+                        <EyeOff className="w-3.5 h-3.5 shrink-0" />
+                        {!shop.category && !shop.district
+                          ? 'Ангилал, дүүрэг алга'
+                          : !shop.category
+                            ? 'Ангилал алга'
+                            : 'Дүүрэг алга'}
+                      </div>
+                    )}
                     {(shop.category || shop.district) && (
                       <div className="flex flex-wrap gap-1.5 mb-2">
                         {shop.category && (
-                          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700">
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-brand-band text-brand-dark">
                             <Tag className="w-3 h-3" />
                             {shop.category}
                           </span>
                         )}
                         {shop.district && (
-                          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-surface text-subtle">
                             {shop.district}
                           </span>
                         )}
                       </div>
                     )}
-                    <div className="space-y-1 text-sm text-slate-600">
+                    <div className="space-y-1 text-sm text-subtle">
                       {shop.address && (
                         <div className="flex items-center gap-2">
-                          <MapPin className="w-3 h-3 text-sky-500" />
+                          <MapPin className="w-3 h-3 text-brand" />
                           <span>{shop.address}</span>
                         </div>
                       )}
                       <div className="flex items-center gap-2">
-                        <Clock className="w-3 h-3 text-sky-500" />
+                        <Clock className="w-3 h-3 text-brand" />
                         <span>
                           {shop.opening_time?.slice(0, 5)} - {shop.closing_time?.slice(0, 5)}
                         </span>
                       </div>
-                      <div className="text-xs text-slate-500">
+                      <div className="text-xs text-subtle">
                         Нэг цагт: {shop.max_capacity} хүн, {shop.slot_duration} минут
                       </div>
                     </div>
@@ -655,19 +952,19 @@ export default function AdminPage() {
             {showUserForm && (
               <Card variant="elevated" className="mb-6 animate-fade-in">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-bold text-slate-800">Шинэ админ хэрэглэгч нэмэх</h2>
+                  <h2 className="text-lg font-bold text-ink-strong">Шинэ админ хэрэглэгч нэмэх</h2>
                   <button
                     onClick={() => {
                       setShowUserForm(false);
                       resetUserForm();
                     }}
-                    className="text-slate-400 hover:text-slate-600"
+                    className="text-placeholder hover:text-subtle"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-                <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 mb-4">
-                  <p className="text-sky-800 text-sm">
+                <div className="bg-brand-band border border-line rounded-card p-4 mb-4">
+                  <p className="text-brand-dark text-sm">
                     💡 新規ユーザーを作成すると、自動的にパスワードが生成されます。
                   </p>
                 </div>
@@ -695,22 +992,22 @@ export default function AdminPage() {
                       onChange={(e) => setUserForm({ ...userForm, phone: e.target.value })}
                     />
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">Эрх *</label>
+                      <label className="block text-sm font-medium text-ink mb-1.5">Эрх *</label>
                       <select
-                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none"
+                        className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:outline-none"
                         value={userForm.role}
                         onChange={(e) => setUserForm({ ...userForm, role: e.target.value })}
                         required
                       >
                         <option value="shop_admin">Үйлчилгээний газрын админ</option>
-                        <option value="super_admin">Систем админ</option>
+                        <option value="super_admin">Системийн админ</option>
                       </select>
                     </div>
                     {userForm.role === 'shop_admin' && (
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1.5">Үйлчилгээний газар</label>
+                        <label className="block text-sm font-medium text-ink mb-1.5">Үйлчилгээний газар</label>
                         <select
-                          className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none"
+                          className="w-full px-4 py-3 border-2 border-line rounded-card focus:border-brand focus:outline-none"
                           value={userForm.shop_id}
                           onChange={(e) => setUserForm({ ...userForm, shop_id: e.target.value })}
                         >
@@ -755,30 +1052,60 @@ export default function AdminPage() {
               </Button>
             )}
 
+            {/* 検索と権限の絞り込み */}
+            {users.length > 0 && (
+              <div className="bg-white rounded-card border border-line p-3 mb-4 flex flex-col sm:flex-row gap-2 sm:items-center">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-placeholder" />
+                  <input
+                    type="text"
+                    placeholder="Нэр, и-мэйл, утсаар хайх..."
+                    value={userQuery}
+                    onChange={(e) => setUserQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2.5 border border-line rounded-control text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand-band"
+                  />
+                </div>
+                <select
+                  value={userRole}
+                  onChange={(e) => setUserRole(e.target.value)}
+                  aria-label="Эрх"
+                  className="h-10 px-3 border border-line rounded-control text-sm text-ink bg-white focus:border-brand focus:outline-none"
+                >
+                  <option value="">Бүх эрх</option>
+                  <option value="super_admin">Системийн админ</option>
+                  <option value="shop_admin">Үйлчилгээний газрын админ</option>
+                  <option value="customer">Хэрэглэгч</option>
+                </select>
+                <span className="text-sm text-subtle tabular-nums whitespace-nowrap">
+                  {filteredUsers.length} / {users.length}
+                </span>
+              </div>
+            )}
+
             {/* Users List */}
             {users.length === 0 ? (
               <Card variant="elevated" className="text-center py-12">
-                <Users className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                <h3 className="font-semibold text-slate-700">Хэрэглэгч байхгүй</h3>
+                <Users className="w-12 h-12 text-placeholder mx-auto mb-4" />
+                <h3 className="font-semibold text-ink">Хэрэглэгч байхгүй</h3>
               </Card>
             ) : (
               <Card variant="elevated">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-slate-200">
-                        <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Нэр</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">И-мэйл</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Эрх</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Үйлчилгээний газар</th>
-                        <th className="text-right py-3 px-4 text-sm font-medium text-slate-600">Үйлдэл</th>
+                      <tr className="border-b border-line">
+                        <th className="text-left py-3 px-4 text-sm font-medium text-subtle">Нэр</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-subtle">И-мэйл</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-subtle">Эрх</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-subtle">Үйлчилгээний газар</th>
+                        <th className="text-right py-3 px-4 text-sm font-medium text-subtle">Үйлдэл</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {users.map((user) => (
-                        <tr key={user.id} className="border-b border-slate-100 last:border-0">
-                          <td className="py-3 px-4 font-medium text-slate-800">{user.name}</td>
-                          <td className="py-3 px-4 text-slate-600">{user.email}</td>
+                      {filteredUsers.map((user) => (
+                        <tr key={user.id} className="border-b border-line last:border-0">
+                          <td className="py-3 px-4 font-medium text-ink-strong">{user.name}</td>
+                          <td className="py-3 px-4 text-subtle">{user.email}</td>
                           <td className="py-3 px-4">
                             <span
                               className={`text-xs px-2 py-1 rounded-full font-medium ${
@@ -786,17 +1113,17 @@ export default function AdminPage() {
                                   ? 'bg-purple-100 text-purple-800'
                                   : user.role === 'shop_admin'
                                   ? 'bg-blue-100 text-blue-800'
-                                  : 'bg-slate-100 text-slate-800'
+                                  : 'bg-surface text-ink-strong'
                               }`}
                             >
                               {user.role === 'super_admin'
-                                ? 'Систем админ'
+                                ? 'Системийн админ'
                                 : user.role === 'shop_admin'
                                 ? 'Үйлчилгээний газрын админ'
                                 : 'Хэрэглэгч'}
                             </span>
                           </td>
-                          <td className="py-3 px-4 text-slate-600">
+                          <td className="py-3 px-4 text-subtle">
                             {(user as { shop_name?: string }).shop_name || '-'}
                           </td>
                           <td className="py-3 px-4 text-right">
@@ -806,7 +1133,7 @@ export default function AdminPage() {
                                 size="sm"
                                 onClick={() => handleResetPassword(user.id, user.name, user.email || '')}
                                 isLoading={resetLoading === user.id}
-                                className="gap-1 text-sky-600 hover:text-sky-700 hover:bg-sky-50"
+                                className="gap-1 text-brand-dark hover:text-brand-dark hover:bg-brand-band"
                               >
                                 <Key className="w-4 h-4" />
                                 <span className="hidden sm:inline">Нууц үг шинэчлэх</span>
@@ -823,6 +1150,8 @@ export default function AdminPage() {
           </>
         )}
       </div>
+
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }

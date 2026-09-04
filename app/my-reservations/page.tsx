@@ -109,9 +109,9 @@ export default function MyReservationsPage() {
       <div className="min-h-screen py-12 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-slate-200 rounded w-1/3" />
-            <div className="h-32 bg-slate-200 rounded-2xl" />
-            <div className="h-32 bg-slate-200 rounded-2xl" />
+            <div className="h-8 bg-line rounded w-1/3" />
+            <div className="h-32 bg-line rounded-card" />
+            <div className="h-32 bg-line rounded-card" />
           </div>
         </div>
       </div>
@@ -119,16 +119,16 @@ export default function MyReservationsPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 bg-linear-to-b from-slate-50 to-white">
+    <div className="min-h-screen py-12 px-4 bg-white">
       <div className="max-w-5xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2 animate-fade-in">
+          <h1 className="text-4xl font-bold text-ink-strong mb-2 animate-fade-in">
             Миний захиалгууд
           </h1>
-          <p className="text-slate-600 text-lg">
+          <p className="text-subtle text-lg">
             Таны бүх захиалгын мэдээлэл
             {!loading && upcomingCount > 0 && (
-              <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-700">
+              <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-band text-brand-dark">
                 {upcomingCount} ирэх захиалга
               </span>
             )}
@@ -142,10 +142,10 @@ export default function MyReservationsPage() {
                 key={tab}
                 type="button"
                 onClick={() => setFilter(tab)}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                className={`px-4 py-2 rounded-card text-sm font-semibold transition-all ${
                   filter === tab
-                    ? 'bg-sky-500 text-white shadow-md'
-                    : 'bg-white text-slate-600 border border-slate-200 hover:border-sky-300'
+                    ? 'bg-brand text-white shadow-md'
+                    : 'bg-white text-subtle border border-line hover:border-line-strong'
                 }`}
               >
                 {tab === 'upcoming' ? 'Ирэх' : tab === 'past' ? 'Өнгөрсөн' : 'Бүгд'}
@@ -156,13 +156,13 @@ export default function MyReservationsPage() {
 
         {reservations.length === 0 ? (
           <Card variant="elevated" className="text-center py-16 animate-fade-in">
-            <div className="w-24 h-24 bg-linear-to-br from-sky-100 to-cyan-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-              <Calendar className="w-12 h-12 text-sky-500" />
+            <div className="w-24 h-24 bg-brand-band rounded-full mx-auto mb-6 flex items-center justify-center">
+              <Calendar className="w-12 h-12 text-brand" />
             </div>
-            <h2 className="text-2xl font-semibold text-slate-800 mb-3">
+            <h2 className="text-2xl font-semibold text-ink-strong mb-3">
               Захиалга байхгүй байна
             </h2>
-            <p className="text-slate-600 mb-8 text-lg">
+            <p className="text-subtle mb-8 text-lg">
               Та одоогоор захиалга хийгээгүй байна
             </p>
             <Link href="/">
@@ -173,12 +173,12 @@ export default function MyReservationsPage() {
           </Card>
         ) : filteredReservations.length === 0 ? (
           <Card variant="elevated" className="text-center py-12">
-            <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <h2 className="text-lg font-semibold text-slate-700 mb-2">
+            <Calendar className="w-12 h-12 text-line-strong mx-auto mb-4" />
+            <h2 className="text-lg font-semibold text-ink mb-2">
               {filter === 'upcoming' ? 'Ирэх захиалга байхгүй' : 'Захиалга олдсонгүй'}
             </h2>
-            <p className="text-slate-500 mb-6">
-              {filter === 'upcoming' ? 'Шинэ захиалга хийж үзнэ үү' : 'Өөр шүүлтүүр сонгоно уу'}
+            <p className="text-subtle mb-6">
+              {filter === 'upcoming' ? 'Шинэ захиалга нэмнэ үү' : 'Өөр шүүлтүүр сонгоно уу'}
             </p>
             {filter !== 'all' && (
               <Button variant="outline" onClick={() => setFilter('all')}>
@@ -196,21 +196,21 @@ export default function MyReservationsPage() {
                   key={reservation.id}
                   variant="elevated"
                   className={`animate-fade-in stagger-${(index % 5) + 1} opacity-0 transition-all hover:shadow-2xl ${
-                    isLocked ? 'bg-slate-50/80 border-2 border-slate-200' : 'border-2 border-transparent hover:border-sky-100'
+                    isLocked ? 'bg-surface/80 border-2 border-line' : 'border-2 border-transparent hover:border-brand-band'
                   }`}
                 >
                   {/* Header Section */}
-                  <div className="flex items-start justify-between gap-4 mb-6 pb-6 border-b-2 border-slate-100">
+                  <div className="flex items-start justify-between gap-4 mb-6 pb-6 border-b-2 border-line">
                     <div className="flex items-start gap-4 flex-1">
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shrink-0 ${
+                      <div className={`w-14 h-14 rounded-card flex items-center justify-center shadow-lg shrink-0 ${
                         isLocked 
-                          ? 'bg-slate-300' 
-                          : 'bg-linear-to-br from-sky-500 to-cyan-500'
+                          ? 'bg-line-strong' 
+                          : 'bg-brand'
                       }`}>
                         <Store className="w-7 h-7 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-xl font-bold text-slate-900 mb-2">
+                        <h3 className="text-xl font-bold text-ink-strong mb-2">
                           {reservation.shop_name}
                         </h3>
                         <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full font-semibold text-sm ${getStatusColor(reservation.status)}`}>
@@ -243,7 +243,7 @@ export default function MyReservationsPage() {
                           Сэтгэгдэл үлдээх
                         </Button>
                       ) : reservation.status === 'completed' ? (
-                        <div className="flex items-center gap-2 text-slate-400 text-sm px-3 py-2 bg-slate-100 rounded-xl">
+                        <div className="flex items-center gap-2 text-placeholder text-sm px-3 py-2 bg-surface rounded-card">
                           <Lock className="w-4 h-4" />
                           <span className="hidden sm:inline font-medium">Түгжигдсэн</span>
                         </div>
@@ -253,7 +253,7 @@ export default function MyReservationsPage() {
 
                   {/* Locked indicator */}
                   {isLocked && (
-                    <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 px-4 py-2 rounded-xl mb-4 border border-amber-200">
+                    <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 px-4 py-2 rounded-card mb-4 border border-amber-200">
                       <Lock className="w-4 h-4" />
                       <span>Энэ захиалгыг өөрчлөх боломжгүй</span>
                     </div>
@@ -262,29 +262,29 @@ export default function MyReservationsPage() {
                   {/* Main Information Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     {/* Date & Time Section */}
-                    <div className="bg-linear-to-br from-sky-50 to-cyan-50 rounded-xl p-5 border border-sky-100">
-                      <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">
+                    <div className="bg-brand-band rounded-card p-5 border border-line">
+                      <h4 className="text-xs font-semibold text-subtle uppercase tracking-wider mb-4">
                         Огноо ба Цаг
                       </h4>
                       <div className="space-y-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                            <Calendar className="w-5 h-5 text-sky-600" />
+                          <div className="w-10 h-10 bg-white rounded-card flex items-center justify-center shadow-sm">
+                            <Calendar className="w-5 h-5 text-brand-dark" />
                           </div>
                           <div>
-                            <div className="text-xs text-slate-500 mb-0.5">Огноо</div>
-                            <div className="text-lg font-bold text-slate-900">
+                            <div className="text-xs text-subtle mb-0.5">Огноо</div>
+                            <div className="text-lg font-bold text-ink-strong">
                               {formatDate(reservation.reservation_date)}
                             </div>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                            <Clock className="w-5 h-5 text-sky-600" />
+                          <div className="w-10 h-10 bg-white rounded-card flex items-center justify-center shadow-sm">
+                            <Clock className="w-5 h-5 text-brand-dark" />
                           </div>
                           <div>
-                            <div className="text-xs text-slate-500 mb-0.5">Цаг</div>
-                            <div className="text-lg font-bold text-slate-900">
+                            <div className="text-xs text-subtle mb-0.5">Цаг</div>
+                            <div className="text-lg font-bold text-ink-strong">
                               {reservation.reservation_time.slice(0, 5)}
                             </div>
                           </div>
@@ -294,19 +294,19 @@ export default function MyReservationsPage() {
 
                     {/* Contact Information Section */}
                     {(reservation.customer_phone || reservation.customer_email) && (
-                      <div className="bg-linear-to-br from-slate-50 to-slate-100 rounded-xl p-5 border border-slate-200">
-                        <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">
+                      <div className="bg-surface rounded-card p-5 border border-line">
+                        <h4 className="text-xs font-semibold text-subtle uppercase tracking-wider mb-4">
                           Холбоо Барих Мэдээлэл
                         </h4>
                         <div className="space-y-3">
                           {reservation.customer_phone && (
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                                <Phone className="w-5 h-5 text-slate-600" />
+                              <div className="w-10 h-10 bg-white rounded-card flex items-center justify-center shadow-sm">
+                                <Phone className="w-5 h-5 text-subtle" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="text-xs text-slate-500 mb-0.5">Утас</div>
-                                <div className="text-base font-semibold text-slate-900 truncate">
+                                <div className="text-xs text-subtle mb-0.5">Утас</div>
+                                <div className="text-base font-semibold text-ink-strong truncate">
                                   {reservation.customer_phone}
                                 </div>
                               </div>
@@ -314,12 +314,12 @@ export default function MyReservationsPage() {
                           )}
                           {reservation.customer_email && (
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                                <Mail className="w-5 h-5 text-slate-600" />
+                              <div className="w-10 h-10 bg-white rounded-card flex items-center justify-center shadow-sm">
+                                <Mail className="w-5 h-5 text-subtle" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="text-xs text-slate-500 mb-0.5">Имэйл</div>
-                                <div className="text-base font-semibold text-slate-900 truncate">
+                                <div className="text-xs text-subtle mb-0.5">Имэйл</div>
+                                <div className="text-base font-semibold text-ink-strong truncate">
                                   {reservation.customer_email}
                                 </div>
                               </div>
@@ -332,11 +332,11 @@ export default function MyReservationsPage() {
 
                   {/* Notes Section */}
                   {reservation.notes && (
-                    <div className="bg-slate-50 rounded-xl p-4 border-l-4 border-sky-400">
-                      <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                    <div className="bg-surface rounded-card p-4 border-l-4 border-brand">
+                      <div className="text-xs font-semibold text-subtle uppercase tracking-wider mb-2">
                         Тэмдэглэл
                       </div>
-                      <p className="text-sm text-slate-700 leading-relaxed">
+                      <p className="text-sm text-ink leading-relaxed">
                         {reservation.notes}
                       </p>
                     </div>

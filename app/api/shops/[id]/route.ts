@@ -15,7 +15,9 @@ export async function GET(
         COALESCE(rv.rating_count, 0) AS rating_count
       FROM shops s
       LEFT JOIN (
-        SELECT shop_id, ROUND(AVG(rating)::numeric, 1) AS rating_avg, COUNT(*) AS rating_count
+        SELECT shop_id,
+               ROUND(AVG(rating)::numeric, 1)::float8 AS rating_avg,
+               COUNT(*)::int AS rating_count
         FROM reviews
         GROUP BY shop_id
       ) rv ON rv.shop_id = s.id
@@ -29,7 +31,25 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(shops[0]);
+    /*
+     * 審査待ち・却下の店舗は、URL を直に叩かれても顧客には返さない。
+     * 見てよいのは super_admin と、その店舗自身の管理者だけ。
+     */
+    const shop = shops[0];
+    if (shop.status !== 'approved' || !shop.is_active) {
+      const session = await auth();
+      const role = (session?.user as { role?: string })?.role;
+      const ownShopId = (session?.user as { shopId?: number })?.shopId;
+      const allowed = role === 'super_admin' || ownShopId === Number(id);
+      if (!allowed) {
+        return NextResponse.json(
+          { error: 'Үйлчилгээний газар олдсонгүй' },
+          { status: 404 }
+        );
+      }
+    }
+
+    return NextResponse.json(shop);
   } catch (error) {
     console.error('Error fetching shop:', error);
     return NextResponse.json(
@@ -73,7 +93,15 @@ export async function PUT(
       slot_duration,
       max_capacity,
       is_active,
+      points_per_visit,
     } = body;
+
+    /*
+     * is_active と status は審査の結果であって、店舗自身が動かしてよい値ではない。
+     * 以前は is_active !== false という判定だったため、店舗管理者が設定を保存する
+     * たびに（body に is_active が無くても）true に戻り、審査待ちのまま公開されていた。
+     */
+    const isSuperAdmin = userRole === 'super_admin';
 
     const result = await sql`
       UPDATE shops
@@ -89,7 +117,8 @@ export async function PUT(
           closing_time = ${closing_time || '18:00'},
           slot_duration = ${slot_duration || 30},
           max_capacity = ${max_capacity || 1},
-          is_active = ${is_active !== false}
+          points_per_visit = ${points_per_visit ?? 0},
+          is_active = CASE WHEN ${isSuperAdmin} THEN ${is_active !== false} ELSE is_active END
       WHERE id = ${id}
       RETURNING *
     `;

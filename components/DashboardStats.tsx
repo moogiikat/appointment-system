@@ -37,17 +37,17 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-card p-5 border border-line shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-3">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>
+        <div className={`w-10 h-10 rounded-card flex items-center justify-center ${color}`}>
           <Icon className="w-5 h-5 text-white" />
         </div>
       </div>
-      <div className="text-3xl font-bold text-slate-800">
+      <div className="text-3xl font-bold text-ink-strong">
         {value}
-        {suffix && <span className="text-lg font-semibold text-slate-500 ml-0.5">{suffix}</span>}
+        {suffix && <span className="text-lg font-semibold text-subtle ml-0.5">{suffix}</span>}
       </div>
-      <div className="text-sm text-slate-500 mt-1">{label}</div>
+      <div className="text-sm text-subtle mt-1">{label}</div>
     </div>
   );
 }
@@ -84,7 +84,7 @@ export default function DashboardStats({
     return (
       <div className="mb-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-28 bg-white rounded-2xl animate-pulse border border-slate-200" />
+          <div key={i} className="h-28 bg-white rounded-card animate-pulse border border-line" />
         ))}
       </div>
     );
@@ -103,14 +103,14 @@ export default function DashboardStats({
         <button
           type="button"
           onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center gap-2 mb-4 text-slate-700 hover:text-sky-600 transition-colors group"
+          className="flex items-center gap-2 mb-4 text-ink hover:text-brand-dark transition-colors group"
         >
-          <BarChart3 className="w-5 h-5 text-sky-500" />
+          <BarChart3 className="w-5 h-5 text-brand" />
           <h2 className="text-lg font-bold">Статистик самбар</h2>
           {collapsed ? (
-            <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-sky-500" />
+            <ChevronDown className="w-4 h-4 text-placeholder group-hover:text-brand" />
           ) : (
-            <ChevronUp className="w-4 h-4 text-slate-400 group-hover:text-sky-500" />
+            <ChevronUp className="w-4 h-4 text-placeholder group-hover:text-brand" />
           )}
         </button>
       )}
@@ -122,7 +122,7 @@ export default function DashboardStats({
               label="Өнөөдрийн захиалга"
               value={stats.today_count}
               icon={Calendar}
-              color="bg-linear-to-br from-sky-500 to-cyan-500"
+              color="bg-brand"
             />
             <StatCard
               label="7 хоногийн захиалга"
@@ -138,7 +138,7 @@ export default function DashboardStats({
               color="bg-linear-to-br from-red-400 to-rose-500"
             />
             <StatCard
-              label="Дууссан хувь (30 хоног)"
+              label="Гүйцэтгэлийн хувь (30 хоног)"
               value={stats.completion_rate}
               suffix="%"
               icon={CheckCircle2}
@@ -148,8 +148,8 @@ export default function DashboardStats({
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Card variant="elevated" className="p-5!">
-              <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-sky-500" />
+              <h3 className="text-sm font-bold text-ink mb-4 flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-brand" />
                 Сүүлийн 7 хоног
               </h3>
               <div className="flex items-end gap-2 h-32">
@@ -159,16 +159,16 @@ export default function DashboardStats({
 
                   return (
                     <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
-                      <span className="text-xs font-semibold text-slate-600">{day.count}</span>
+                      <span className="text-xs font-semibold text-subtle">{day.count}</span>
                       <div
                         className={`w-full rounded-t-lg transition-all duration-500 ${
                           isToday
-                            ? 'bg-linear-to-t from-sky-500 to-cyan-400'
-                            : 'bg-linear-to-t from-slate-300 to-slate-200'
+                            ? 'bg-brand'
+                            : 'bg-surface'
                         }`}
                         style={{ height: `${height}%`, minHeight: day.count > 0 ? '8px' : '4px' }}
                       />
-                      <span className="text-[10px] text-slate-400 font-medium">
+                      <span className="text-[10px] text-placeholder font-medium">
                         {format(parseISO(day.date), 'M/d')}
                       </span>
                     </div>
@@ -178,21 +178,21 @@ export default function DashboardStats({
             </Card>
 
             <Card variant="elevated" className="p-5!">
-              <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-sky-500" />
+              <h3 className="text-sm font-bold text-ink mb-4 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-brand" />
                 Түгээмэл цаг (30 хоног)
               </h3>
               {stats.popular_times.length === 0 ? (
-                <p className="text-sm text-slate-400 text-center py-8">Мэдээлэл байхгүй</p>
+                <p className="text-sm text-placeholder text-center py-8">Мэдээлэл байхгүй</p>
               ) : (
                 <div className="space-y-3">
                   {stats.popular_times.map((slot, index) => (
                     <div key={slot.time} className="flex items-center gap-3">
-                      <span className="w-6 text-xs font-bold text-slate-400">#{index + 1}</span>
-                      <span className="w-12 text-sm font-bold text-slate-700">{slot.time}</span>
-                      <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
+                      <span className="w-6 text-xs font-bold text-placeholder">#{index + 1}</span>
+                      <span className="w-12 text-sm font-bold text-ink">{slot.time}</span>
+                      <div className="flex-1 h-6 bg-surface rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-linear-to-r from-sky-400 to-cyan-400 rounded-full flex items-center justify-end pr-2"
+                          className="h-full bg-brand rounded-full flex items-center justify-end pr-2"
                           style={{ width: `${(slot.count / maxPopular) * 100}%`, minWidth: '2rem' }}
                         >
                           <span className="text-xs font-bold text-white">{slot.count}</span>
@@ -206,8 +206,8 @@ export default function DashboardStats({
           </div>
 
           <Card variant="elevated" className="p-5!">
-            <h3 className="text-sm font-bold text-slate-700 mb-3">
-              Статусын хуваарь (30 хоног) — Нийт {monthTotal} захиалга
+            <h3 className="text-sm font-bold text-ink mb-3">
+              Төлөвийн хуваарь (30 хоног) — Нийт {monthTotal} захиалга
             </h3>
             <div className="flex flex-wrap gap-3">
               {[
@@ -218,7 +218,7 @@ export default function DashboardStats({
               ].map(({ key, label, color }) => (
                 <div
                   key={key}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold ${color}`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-card text-sm font-semibold ${color}`}
                 >
                   <span>{label}</span>
                   <span className="font-bold">

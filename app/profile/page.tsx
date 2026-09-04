@@ -107,9 +107,9 @@ export default function ProfilePage() {
   const getRoleText = (role: string) => {
     switch (role) {
       case 'super_admin':
-        return 'Систем админ';
+        return 'Системийн админ';
       case 'shop_admin':
-        return 'Үйлчилгээний газар админ';
+        return 'Үйлчилгээний газрын админ';
       default:
         return 'Хэрэглэгч';
     }
@@ -128,11 +128,11 @@ export default function ProfilePage() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-sky-50 py-12 px-4">
+      <div className="min-h-screen bg-white py-12 px-4">
         <div className="max-w-2xl mx-auto">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-slate-200 rounded w-1/3" />
-            <div className="h-64 bg-slate-200 rounded-2xl" />
+            <div className="h-8 bg-line rounded w-1/3" />
+            <div className="h-64 bg-line rounded-card" />
           </div>
         </div>
       </div>
@@ -140,12 +140,12 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-sky-50 py-8 px-4">
+    <div className="min-h-screen bg-white py-8 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Back button */}
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-colors mb-6 font-medium"
+          className="inline-flex items-center gap-2 text-subtle hover:text-brand-dark transition-colors mb-6 font-medium"
         >
           <ArrowLeft className="w-4 h-4" />
           Буцах
@@ -153,8 +153,8 @@ export default function ProfilePage() {
 
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Миний профайл</h1>
-          <p className="text-slate-500">Хувийн мэдээллээ удирдах</p>
+          <h1 className="text-3xl font-bold text-ink-strong mb-2">Миний профайл</h1>
+          <p className="text-subtle">Хувийн мэдээллээ удирдах</p>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -162,7 +162,7 @@ export default function ProfilePage() {
           <Card variant="elevated" className="mb-6">
             <div className="flex flex-col items-center">
               <div className="relative mb-4">
-                <div className="w-32 h-32 rounded-full overflow-hidden bg-linear-to-br from-sky-400 to-cyan-400 flex items-center justify-center shadow-xl">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-brand flex items-center justify-center shadow-xl">
                   {profile?.avatar ? (
                     <img
                       src={profile.avatar}
@@ -176,7 +176,7 @@ export default function ProfilePage() {
                   )}
                 </div>
               </div>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-subtle">
                 Профайл зураг нь Facebook/Google-ээс автоматаар авагдана
               </p>
             </div>
@@ -184,8 +184,8 @@ export default function ProfilePage() {
 
           {/* Profile Info */}
           <Card variant="elevated" className="mb-6">
-            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <User className="w-5 h-5 text-sky-500" />
+            <h2 className="text-lg font-bold text-ink-strong mb-4 flex items-center gap-2">
+              <User className="w-5 h-5 text-brand" />
               Хувийн мэдээлэл
             </h2>
 
@@ -200,13 +200,13 @@ export default function ProfilePage() {
               />
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                <label className="block text-sm font-medium text-ink mb-1.5">
                   И-мэйл
                 </label>
-                <div className="flex items-center gap-3 px-4 py-3 bg-slate-100 rounded-xl text-slate-600">
-                  <Mail className="w-5 h-5 text-slate-400" />
+                <div className="flex items-center gap-3 px-4 py-3 bg-surface rounded-card text-subtle">
+                  <Mail className="w-5 h-5 text-placeholder" />
                   <span>{profile?.email || '-'}</span>
-                  <span className="ml-auto text-xs text-slate-400">Өөрчлөх боломжгүй</span>
+                  <span className="ml-auto text-xs text-placeholder">Өөрчлөх боломжгүй</span>
                 </div>
               </div>
 
@@ -223,21 +223,21 @@ export default function ProfilePage() {
 
           {/* Account Info */}
           <Card variant="elevated" className="mb-6">
-            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-sky-500" />
+            <h2 className="text-lg font-bold text-ink-strong mb-4 flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-brand" />
               Бүртгэлийн мэдээлэл
             </h2>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <div className="text-sm text-slate-500 mb-1">Хэрэглэгчийн төрөл</div>
+                <div className="text-sm text-subtle mb-1">Хэрэглэгчийн төрөл</div>
                 <span className={`inline-flex px-3 py-1 rounded-full text-sm font-semibold ${getRoleColor(profile?.role || 'customer')}`}>
                   {getRoleText(profile?.role || 'customer')}
                 </span>
               </div>
               <div>
-                <div className="text-sm text-slate-500 mb-1">Бүртгүүлсэн огноо</div>
-                <div className="font-medium text-slate-700">
+                <div className="text-sm text-subtle mb-1">Бүртгүүлсэн огноо</div>
+                <div className="font-medium text-ink">
                   {profile?.created_at
                     ? new Date(profile.created_at).toLocaleDateString('mn-MN')
                     : '-'}
@@ -248,13 +248,13 @@ export default function ProfilePage() {
 
           {/* Error/Success Messages */}
           {error && (
-            <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm">
+            <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-600 rounded-card text-sm">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-600 rounded-xl text-sm flex items-center gap-2">
+            <div className="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-600 rounded-card text-sm flex items-center gap-2">
               <Check className="w-4 h-4" />
               Профайл амжилттай шинэчлэгдлээ!
             </div>

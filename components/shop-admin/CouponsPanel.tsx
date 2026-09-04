@@ -112,12 +112,13 @@ export default function CouponsPanel({ shopId, onError, onSuccess }: CouponsPane
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Энэ купоныг устгах уу?')) return;
+    const target = coupons.find((c) => c.id === id);
+    if (!confirm(`"${target?.title ?? ''}" купоныг устгах уу?`)) return;
     try {
       const res = await fetch(`/api/shops/${shopId}/coupons/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setCoupons((prev) => prev.filter((c) => c.id !== id));
-        onSuccess('Купон устгагдлаа');
+        onSuccess(`"${target?.title ?? ''}" устгагдлаа`);
       } else {
         onError('Устгахад алдаа гарлаа');
       }
@@ -152,8 +153,8 @@ export default function CouponsPanel({ shopId, onError, onSuccess }: CouponsPane
   return (
     <div className="max-w-2xl mx-auto space-y-5 pb-6">
       <Card variant="elevated" className="p-5!">
-        <h2 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-          <ScanLine className="w-4 h-4 text-sky-500" />
+        <h2 className="text-sm font-bold text-ink mb-4 flex items-center gap-2">
+          <ScanLine className="w-4 h-4 text-brand" />
           Купон ашиглах (кодоор)
         </h2>
         <div className="flex gap-2">
@@ -162,7 +163,7 @@ export default function CouponsPanel({ shopId, onError, onSuccess }: CouponsPane
             placeholder="Купоны кодыг оруулна уу"
             value={redeemCode}
             onChange={(e) => setRedeemCode(e.target.value)}
-            className="flex-1 px-4 py-2.5 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none text-sm font-mono uppercase"
+            className="flex-1 px-4 py-2.5 border-2 border-line rounded-card focus:border-brand focus:outline-none text-sm font-mono uppercase"
           />
           <Button type="button" variant="primary" onClick={handleRedeem} isLoading={redeeming}>
             Ашиглах
@@ -172,7 +173,7 @@ export default function CouponsPanel({ shopId, onError, onSuccess }: CouponsPane
 
       <Card variant="elevated" className="p-5!">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-slate-700 flex items-center gap-2">
+          <h2 className="text-sm font-bold text-ink flex items-center gap-2">
             <Ticket className="w-4 h-4 text-amber-500" />
             Купонууд
           </h2>
@@ -185,7 +186,7 @@ export default function CouponsPanel({ shopId, onError, onSuccess }: CouponsPane
         </div>
 
         {showForm && (
-          <form onSubmit={handleSubmit} className="space-y-3 mb-5 p-4 bg-slate-50 rounded-xl">
+          <form onSubmit={handleSubmit} className="space-y-3 mb-5 p-4 bg-surface rounded-card">
             <Input
               id="couponTitle"
               label="Гарчиг"
@@ -195,9 +196,9 @@ export default function CouponsPanel({ shopId, onError, onSuccess }: CouponsPane
               required
             />
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Тайлбар</label>
+              <label className="block text-sm font-medium text-ink mb-1.5">Тайлбар</label>
               <textarea
-                className="w-full px-4 py-2.5 border-2 border-slate-200 rounded-xl focus:border-sky-500 focus:outline-none resize-none text-sm"
+                className="w-full px-4 py-2.5 border-2 border-line rounded-card focus:border-brand focus:outline-none resize-none text-sm"
                 rows={2}
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -236,23 +237,23 @@ export default function CouponsPanel({ shopId, onError, onSuccess }: CouponsPane
         {loading ? (
           <div className="space-y-2">
             {[1, 2].map((i) => (
-              <div key={i} className="h-16 bg-slate-100 rounded-xl animate-pulse" />
+              <div key={i} className="h-16 bg-surface rounded-card animate-pulse" />
             ))}
           </div>
         ) : coupons.length === 0 ? (
-          <p className="text-sm text-slate-500 text-center py-6">Одоогоор купон нэмээгүй байна</p>
+          <p className="text-sm text-subtle text-center py-6">Одоогоор купон нэмээгүй байна</p>
         ) : (
           <div className="space-y-2">
             {coupons.map((coupon) => (
-              <div key={coupon.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+              <div key={coupon.id} className="flex items-center justify-between p-3 bg-surface rounded-card">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium text-slate-800 truncate">{coupon.title}</p>
+                    <p className="font-medium text-ink-strong truncate">{coupon.title}</p>
                     {!coupon.is_active && (
-                      <span className="text-xs px-1.5 py-0.5 rounded-full bg-slate-200 text-slate-500">Идэвхгүй</span>
+                      <span className="text-xs px-1.5 py-0.5 rounded-full bg-line text-subtle">Идэвхгүй</span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-subtle">
                     {coupon.points_cost > 0 ? `${coupon.points_cost} оноо` : 'Үнэгүй'}
                     {' · '}
                     {coupon.claimed_count} авсан
@@ -263,21 +264,21 @@ export default function CouponsPanel({ shopId, onError, onSuccess }: CouponsPane
                   <button
                     type="button"
                     onClick={() => handleToggleActive(coupon)}
-                    className="px-2 py-1 text-xs font-semibold text-slate-500 hover:text-sky-600 transition-colors"
+                    className="px-2 py-1 text-xs font-semibold text-subtle hover:text-brand-dark transition-colors"
                   >
                     {coupon.is_active ? 'Идэвхгүй болгох' : 'Идэвхжүүлэх'}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleEdit(coupon)}
-                    className="p-2 text-slate-400 hover:text-sky-600 transition-colors"
+                    className="p-2 text-placeholder hover:text-brand-dark transition-colors"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDelete(coupon.id)}
-                    className="p-2 text-slate-400 hover:text-red-600 transition-colors"
+                    className="p-2 text-placeholder hover:text-red-600 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
