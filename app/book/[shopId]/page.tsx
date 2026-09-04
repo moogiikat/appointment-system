@@ -27,6 +27,7 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -113,6 +114,7 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
   useEffect(() => {
     async function loadCustomerInfo() {
       if (session?.user?.name) setCustomerName(session.user.name);
+      if (session?.user?.email) setCustomerEmail(session.user.email);
 
       try {
         const res = await fetch('/api/profile');
@@ -165,6 +167,7 @@ export default function BookingPage({ params }: { params: Promise<{ shopId: stri
           user_id: (session?.user as { id?: number })?.id,
           customer_name: customerName,
           customer_phone: customerPhone,
+          customer_email: customerEmail,
           reservation_date: format(selectedDate, 'yyyy-MM-dd'),
           reservation_time: selectedTime,
           notes,

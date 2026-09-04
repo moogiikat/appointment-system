@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import sql from '@/lib/db';
 import { auth } from '@/auth';
 import { isPastDate, isPastTimeSlot, isValidMongoliaPhone } from '@/lib/utils';
+import {
+  sendEmail,
+  reservationPendingEmail,
+  reservationConfirmedEmail,
+  newReservationShopAlertEmail,
+} from '@/lib/email';
 
 // Get reservations
 export async function GET(request: NextRequest) {
@@ -71,6 +77,7 @@ export async function POST(request: NextRequest) {
       user_id,
       customer_name,
       customer_phone,
+      customer_email,
       reservation_date,
       reservation_time,
       notes,
@@ -151,12 +158,46 @@ export async function POST(request: NextRequest) {
 
     // Create reservation
     const result = await sql`
-      INSERT INTO reservations (shop_id, user_id, customer_name, customer_phone, reservation_date, reservation_time, notes, status)
-      VALUES (${shop_id}, ${user_id || null}, ${customer_name}, ${customer_phone}, ${reservation_date}, ${reservation_time}, ${notes || null}, ${finalStatus})
+      INSERT INTO reservations (shop_id, user_id, customer_name, customer_phone, customer_email, reservation_date, reservation_time, notes, status)
+      VALUES (${shop_id}, ${user_id || null}, ${customer_name}, ${customer_phone}, ${customer_email || null}, ${reservation_date}, ${reservation_time}, ${notes || null}, ${finalStatus})
       RETURNING *
     `;
 
-    return NextResponse.json(result[0], { status: 201 });
+    const reservation = result[0];
+    const emailInfo = {
+      shopName: shop.name,
+      date: reservation_date,
+      time: reservation_time,
+      customerName: customer_name,
+    };
+
+    if (customer_email) {
+      const html =
+        finalStatus === 'pending'
+          ? reservationPendingEmail(emailInfo)
+          : reservationConfirmedEmail(emailInfo);
+      await sendEmail({
+        to: customer_email,
+        subject: finalStatus === 'pending' ? 'Захиалгын хүсэлт хүлээн авлаа' : 'Захиалга баталгаажлаа',
+        html,
+      });
+    }
+
+    // Notify shop admins of a new pending reservation (skip if a shop/super admin created it themselves)
+    if (finalStatus === 'pending' && !isAdmin) {
+      const shopAdmins = await sql`
+        SELECT email FROM users WHERE shop_id = ${shop_id} AND role = 'shop_admin' AND email IS NOT NULL
+      `;
+      for (const admin of shopAdmins) {
+        await sendEmail({
+          to: admin.email,
+          subject: 'Шинэ захиалгын хүсэлт',
+          html: newReservationShopAlertEmail(emailInfo),
+        });
+      }
+    }
+
+    return NextResponse.json(reservation, { status: 201 });
   } catch (error) {
     console.error('Error creating reservation:', error);
     return NextResponse.json(

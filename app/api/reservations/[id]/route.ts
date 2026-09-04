@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sql from '@/lib/db';
 import { auth } from '@/auth';
+import {
+  sendEmail,
+  reservationConfirmedEmail,
+  reservationCancelledEmail,
+  reservationCompletedEmail,
+} from '@/lib/email';
 
 // Get single reservation
 export async function GET(
@@ -85,17 +91,50 @@ export async function PUT(
     }
 
     const reservation = result[0];
+    const shops = await sql`SELECT name, points_per_visit FROM shops WHERE id = ${reservation.shop_id}`;
+    const shopInfo = shops[0];
 
     // Award loyalty points on completion (idempotent, no real payment involved)
+    let pointsEarned = 0;
     if (status === 'completed' && reservation.user_id) {
-      const shops = await sql`SELECT points_per_visit FROM shops WHERE id = ${reservation.shop_id}`;
-      const pointsPerVisit = shops[0]?.points_per_visit || 0;
+      const pointsPerVisit = shopInfo?.points_per_visit || 0;
       if (pointsPerVisit > 0) {
-        await sql`
+        const inserted = await sql`
           INSERT INTO point_transactions (user_id, shop_id, reservation_id, amount, reason, description)
           VALUES (${reservation.user_id}, ${reservation.shop_id}, ${reservation.id}, ${pointsPerVisit}, 'visit', 'Захиалга дуусгасны оноо')
           ON CONFLICT (reservation_id, reason) DO NOTHING
+          RETURNING amount
         `;
+        pointsEarned = inserted[0]?.amount || 0;
+      }
+    }
+
+    // Notify the customer by email on status changes
+    if (reservation.customer_email && shopInfo) {
+      const emailInfo = {
+        shopName: shopInfo.name,
+        date: reservation.reservation_date,
+        time: reservation.reservation_time,
+        customerName: reservation.customer_name,
+      };
+      if (status === 'confirmed') {
+        await sendEmail({
+          to: reservation.customer_email,
+          subject: 'Захиалга баталгаажлаа',
+          html: reservationConfirmedEmail(emailInfo),
+        });
+      } else if (status === 'cancelled') {
+        await sendEmail({
+          to: reservation.customer_email,
+          subject: 'Захиалга цуцлагдлаа',
+          html: reservationCancelledEmail(emailInfo),
+        });
+      } else if (status === 'completed') {
+        await sendEmail({
+          to: reservation.customer_email,
+          subject: 'Үйлчилгээ дууслаа',
+          html: reservationCompletedEmail({ ...emailInfo, pointsEarned }),
+        });
       }
     }
 
