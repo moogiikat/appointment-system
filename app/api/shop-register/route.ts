@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import sql from '@/lib/db';
-import { UB_DISTRICTS, SUGGESTED_CATEGORIES } from '@/lib/constants';
+import { LOCATIONS, SUGGESTED_CATEGORIES } from '@/lib/constants';
 import { isValidMongoliaPhone } from '@/lib/utils';
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     if (category && !(SUGGESTED_CATEGORIES as readonly string[]).includes(category)) {
       return NextResponse.json({ error: 'Ангилал буруу байна' }, { status: 400 });
     }
-    if (district && !(UB_DISTRICTS as readonly string[]).includes(district)) {
+    if (district && !(LOCATIONS as readonly string[]).includes(district)) {
       return NextResponse.json({ error: 'Дүүрэг буруу байна' }, { status: 400 });
     }
 
