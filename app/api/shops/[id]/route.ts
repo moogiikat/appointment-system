@@ -97,28 +97,37 @@ export async function PUT(
     } = body;
 
     /*
-     * is_active と status は審査の結果であって、店舗自身が動かしてよい値ではない。
-     * 以前は is_active !== false という判定だったため、店舗管理者が設定を保存する
-     * たびに（body に is_active が無くても）true に戻り、審査待ちのまま公開されていた。
+     * 送られてこなかった項目は「変更しない」。
+     *
+     * 以前はここで icon || null のように既定値へ落としていたため、その項目を
+     * 持たない画面から保存すると値が消えていた。実際、店舗設定画面は icon を
+     * 送らないので、保存するたびにロゴが NULL になっていた。
+     * points_per_visit が保存されなかったのも is_active が勝手に true へ
+     * 戻っていたのも、すべて同じ原因。
+     *
+     * 「キーが無い＝据え置き」「空文字＝明示的に消す」で区別する。
      */
+    const has = (key: string) => Object.prototype.hasOwnProperty.call(body, key);
+
+    // is_active と status は審査の結果であり、店舗自身が動かしてよい値ではない
     const isSuperAdmin = userRole === 'super_admin';
 
     const result = await sql`
       UPDATE shops
-      SET name = ${name},
-          description = ${description || ''},
-          address = ${address || ''},
-          phone = ${phone || ''},
-          icon = ${icon || null},
-          category = ${category || null},
-          district = ${district || null},
-          photos = ${Array.isArray(photos) ? photos : []},
-          opening_time = ${opening_time || '09:00'},
-          closing_time = ${closing_time || '18:00'},
-          slot_duration = ${slot_duration || 30},
-          max_capacity = ${max_capacity || 1},
-          points_per_visit = ${points_per_visit ?? 0},
-          is_active = CASE WHEN ${isSuperAdmin} THEN ${is_active !== false} ELSE is_active END
+      SET name         = CASE WHEN ${has('name')}        THEN ${name}                                      ELSE name END,
+          description  = CASE WHEN ${has('description')} THEN ${description ?? ''}                         ELSE description END,
+          address      = CASE WHEN ${has('address')}     THEN ${address ?? ''}                             ELSE address END,
+          phone        = CASE WHEN ${has('phone')}       THEN ${phone ?? ''}                               ELSE phone END,
+          icon         = CASE WHEN ${has('icon')}        THEN ${icon || null}                              ELSE icon END,
+          category     = CASE WHEN ${has('category')}    THEN ${category || null}                          ELSE category END,
+          district     = CASE WHEN ${has('district')}    THEN ${district || null}                           ELSE district END,
+          photos       = CASE WHEN ${has('photos')}      THEN ${Array.isArray(photos) ? photos : []}       ELSE photos END,
+          opening_time = CASE WHEN ${has('opening_time')} THEN ${opening_time || '09:00'}                  ELSE opening_time END,
+          closing_time = CASE WHEN ${has('closing_time')} THEN ${closing_time || '18:00'}                  ELSE closing_time END,
+          slot_duration = CASE WHEN ${has('slot_duration')} THEN ${slot_duration || 30}                    ELSE slot_duration END,
+          max_capacity = CASE WHEN ${has('max_capacity')} THEN ${max_capacity || 1}                        ELSE max_capacity END,
+          points_per_visit = CASE WHEN ${has('points_per_visit')} THEN ${points_per_visit ?? 0}            ELSE points_per_visit END,
+          is_active    = CASE WHEN ${isSuperAdmin && has('is_active')} THEN ${is_active !== false}         ELSE is_active END
       WHERE id = ${id}
       RETURNING *
     `;
