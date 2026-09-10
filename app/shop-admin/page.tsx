@@ -13,6 +13,7 @@ import { ToastContainer, useToast } from '@/components/Toast';
 import WeekDateStrip from '@/components/shop-admin/WeekDateStrip';
 import ReservationCard from '@/components/shop-admin/ReservationCard';
 import ShopSettingsPanel from '@/components/shop-admin/ShopSettingsPanel';
+import QrPanel from '@/components/shop-admin/QrPanel';
 import PhoneReservationPanel from '@/components/shop-admin/PhoneReservationPanel';
 import ServicesPanel from '@/components/shop-admin/ServicesPanel';
 import ReviewsPanel from '@/components/shop-admin/ReviewsPanel';
@@ -33,9 +34,9 @@ import {
   Clock,
   Tag,
   MessageCircle,
-  Ticket, Clock3, Ban } from 'lucide-react';
+  Ticket, Clock3, Ban, QrCode } from 'lucide-react';
 
-type Tab = 'schedule' | 'phone' | 'stats' | 'services' | 'reviews' | 'coupons' | 'settings';
+type Tab = 'schedule' | 'phone' | 'stats' | 'services' | 'reviews' | 'coupons' | 'qr' | 'settings';
 type StatusFilter = 'all' | Reservation['status'];
 
 export default function ShopAdminPage() {
@@ -222,6 +223,7 @@ export default function ShopAdminPage() {
                   { key: 'services' as Tab, label: 'Үйлчилгээ', icon: Tag },
                   { key: 'reviews' as Tab, label: 'Сэтгэгдэл', icon: MessageCircle },
                   { key: 'coupons' as Tab, label: 'Купон', icon: Ticket },
+                  { key: 'qr' as Tab, label: 'QR код', icon: QrCode },
                   { key: 'settings' as Tab, label: 'Тохиргоо', icon: Settings },
                 ]).map(({ key, label, icon: Icon }) => (
                   <button
@@ -279,6 +281,14 @@ export default function ShopAdminPage() {
               refreshReservations();
               setStatsRefreshKey((k) => k + 1);
             }}
+          />
+        )}
+
+        {activeTab === 'qr' && shop && (
+          <QrPanel
+            shop={shop}
+            onSuccess={(msg) => showToast(msg, 'success')}
+            onError={(msg) => showToast(msg, 'error')}
           />
         )}
 

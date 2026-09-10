@@ -134,3 +134,26 @@ body {
   .animate-fade-in,
   .animate-slide-in { animation: none; opacity: 1; }
 }
+
+/*
+ * 印刷時は QR のカードだけを残す。
+ * 店頭に貼る紙にヘッダーやタブが混ざらないようにするため。
+ * visibility を使うのは、display:none だと祖先を辿って消してしまうから。
+ */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #qr-print,
+  #qr-print * {
+    visibility: visible;
+  }
+  #qr-print {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    padding-top: 24mm;
+  }
+}
