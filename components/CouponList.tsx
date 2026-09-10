@@ -1,11 +1,13 @@
 'use client';
 
+
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { ShopCoupon } from '@/lib/types';
 import Button from '@/components/ui/Button';
 import { Ticket, Check } from 'lucide-react';
+import { notifyPointsChanged } from '@/lib/events';
 
 interface CouponListProps {
   shopId: number;
@@ -56,6 +58,8 @@ export default function CouponList({ shopId }: CouponListProps) {
       const res = await fetch(`/api/coupons/${couponId}/claim`, { method: 'POST' });
       if (res.ok) {
         setClaimedIds((prev) => [...prev, couponId]);
+        // 引き換えで残高が減るので、ヘッダーのバッジに取り直させる
+        notifyPointsChanged();
       } else {
         const data = await res.json();
         setError(data.error || 'Алдаа гарлаа');

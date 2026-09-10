@@ -7,9 +7,11 @@ import { Heart } from 'lucide-react';
 interface FavoriteButtonProps {
   shopId: number;
   className?: string;
+  /** 切り替わったことを親に伝える。お気に入り一覧が自分を消せるようにするため */
+  onToggled?: (isFavorite: boolean) => void;
 }
 
-export default function FavoriteButton({ shopId, className = '' }: FavoriteButtonProps) {
+export default function FavoriteButton({ shopId, className = '', onToggled }: FavoriteButtonProps) {
   const { status } = useSession();
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -36,15 +38,17 @@ export default function FavoriteButton({ shopId, className = '' }: FavoriteButto
     const next = !isFavorite;
     setIsFavorite(next);
     try {
-      if (next) {
-        await fetch('/api/favorites', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ shop_id: shopId }),
-        });
-      } else {
-        await fetch(`/api/favorites?shop_id=${shopId}`, { method: 'DELETE' });
-      }
+      // fetch は 4xx/5xx でも例外にならないので、明示的に確認する。
+      // 見逃すと失敗しても onToggled が走り、一覧からカードが消えてしまう。
+      const res = next
+        ? await fetch('/api/favorites', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ shop_id: shopId }),
+          })
+        : await fetch(`/api/favorites?shop_id=${shopId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('favorite request failed');
+      onToggled?.(next);
     } catch {
       setIsFavorite(!next);
     } finally {

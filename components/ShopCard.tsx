@@ -9,6 +9,7 @@ import { categoryStyle } from '@/lib/constants';
 
 interface ShopCardProps {
   shop: Shop;
+  onFavoriteToggled?: (shopId: number, isFavorite: boolean) => void;
 }
 
 /*
@@ -16,7 +17,7 @@ interface ShopCardProps {
  * 写真 182px（SP 120px）→ ジャンル名 12px #999 → 店名 14px #424242。
  * CTA ボタンは置かない。カード全体がリンクで、hover は opacity 0.7。
  */
-export default function ShopCard({ shop }: ShopCardProps) {
+export default function ShopCard({ shop, onFavoriteToggled }: ShopCardProps) {
   /*
    * 写真とロゴでは扱いが違う。写真は枠いっぱいに敷いて切り抜いてよいが、
    * ロゴを object-cover すると上下が切れて図形も社名も欠ける。
@@ -57,6 +58,7 @@ export default function ShopCard({ shop }: ShopCardProps) {
         <FavoriteButton
           shopId={shop.id}
           className="absolute top-2 right-2 w-8 h-8 bg-white/90 shadow-control"
+          onToggled={(isFavorite) => onFavoriteToggled?.(shop.id, isFavorite)}
         />
       </div>
 

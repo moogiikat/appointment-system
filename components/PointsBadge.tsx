@@ -3,15 +3,32 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Coins } from 'lucide-react';
+import { POINTS_CHANGED } from '@/lib/events';
 
 export default function PointsBadge() {
   const [balance, setBalance] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch('/api/points')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => setBalance(data ? data.balance : null))
-      .catch(() => setBalance(null));
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const res = await fetch('/api/points');
+        const data = res.ok ? await res.json() : null;
+        if (!cancelled) setBalance(data ? data.balance : null);
+      } catch {
+        if (!cancelled) setBalance(null);
+      }
+    }
+
+    load();
+    // クーポン引き換えなどでポイントが動いたら取り直す
+    window.addEventListener(POINTS_CHANGED, load);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener(POINTS_CHANGED, load);
+    };
   }, []);
 
   return (
