@@ -71,7 +71,14 @@ export default function FavoritesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {shops.map((shop) => (
-              <ShopCard key={shop.id} shop={shop} />
+              <ShopCard
+                key={shop.id}
+                shop={shop}
+                onFavoriteToggled={(shopId, isFavorite) => {
+                  // 解除されたらこの一覧に残す理由がないので即座に外す
+                  if (!isFavorite) setShops((prev) => prev.filter((s) => s.id !== shopId));
+                }}
+              />
             ))}
           </div>
         )}
