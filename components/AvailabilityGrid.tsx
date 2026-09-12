@@ -118,27 +118,29 @@ export default function AvailabilityGrid({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between gap-2 mb-3">
         <button
           type="button"
           onClick={() => setWeekOffset((w) => Math.max(0, w - 1))}
           disabled={weekOffset === 0}
-          className="inline-flex items-center gap-1 h-8 px-3 rounded-control border border-line-strong text-[13px] text-ink bg-white disabled:text-placeholder disabled:bg-surface hover:opacity-70"
+          className="inline-flex items-center gap-1 h-8 px-2 sm:px-3 rounded-control border border-line-strong text-[13px] text-ink bg-white disabled:text-placeholder disabled:bg-surface hover:opacity-70 shrink-0 whitespace-nowrap"
         >
-          <ChevronLeft className="w-4 h-4" />
-          Өмнөх 7 хоног
+          <ChevronLeft className="w-4 h-4 shrink-0" />
+          <span className="hidden sm:inline">Өмнөх 7 хоног</span>
+          <span className="sm:hidden">Өмнөх</span>
         </button>
-        <span className="text-[13px] font-bold text-ink-strong tabular-nums">
+        <span className="text-[13px] font-bold text-ink-strong tabular-nums shrink-0">
           {format(dates[0], 'M/d')} – {format(dates[DAYS - 1], 'M/d')}
         </span>
         <button
           type="button"
           onClick={() => setWeekOffset((w) => Math.min(MAX_WEEKS_AHEAD - 1, w + 1))}
           disabled={weekOffset >= MAX_WEEKS_AHEAD - 1}
-          className="inline-flex items-center gap-1 h-8 px-3 rounded-control border border-line-strong text-[13px] text-ink bg-white disabled:text-placeholder disabled:bg-surface hover:opacity-70"
+          className="inline-flex items-center gap-1 h-8 px-2 sm:px-3 rounded-control border border-line-strong text-[13px] text-ink bg-white disabled:text-placeholder disabled:bg-surface hover:opacity-70 shrink-0 whitespace-nowrap"
         >
-          Дараах 7 хоног
-          <ChevronRight className="w-4 h-4" />
+          <span className="hidden sm:inline">Дараах 7 хоног</span>
+          <span className="sm:hidden">Дараах</span>
+          <ChevronRight className="w-4 h-4 shrink-0" />
         </button>
       </div>
 
